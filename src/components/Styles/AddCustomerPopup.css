@@ -1,0 +1,115 @@
+.ac_popup_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.ac_popup_container {
+  background-color: white;
+  border: 1px solid #ccc;
+  max-width: 90%;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.ac_popup_header {
+  display: flex;
+  justify-content: space-between; /* Keep space between title and button */
+  align-items: center;
+  position: relative; /* Allow absolute positioning of close button */
+}
+
+.ac_popup_title {
+  margin: 0;
+  flex-grow: 1; /* Allow title to take up available space */
+}
+
+.ac_close_button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: red;
+  position: absolute; /* Position it relative to the header */
+  left: 140px; /* Position to the right */
+  bottom:0px;
+  padding-top: 20px;
+}
+
+.ac_close_button:hover {
+  color: darkred;
+}
+
+.ac_divider {
+  border: 0;
+  border-top: 2px solid #091a44;
+  margin: 20px 0;
+}
+
+.ac_field {
+  display: flex; /* Align label and input side by side */
+  align-items: center; /* Center vertically */
+  margin-bottom: 15px; /* Space between fields */
+}
+
+.ac_field label {
+  margin-right: 10px; /* Space between label and input */
+  font-size: 15px;
+  width: 120px; /* Fixed width for labels */
+}
+
+.ac_field input {
+  flex: 1;
+  height: 40px; /* Consistent height */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.ac_field input:focus {
+  border-color: #666;
+}
+
+.ac_button_container {
+  display: flex;
+  justify-content: center; /* Center the button */
+  margin-top: 20px;
+}
+
+.ac_save_button {
+  background-color: #5570F1;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  border-radius: 20px;
+  margin-right: 40px;
+}
+
+.ac_save_button:hover {
+  opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ac_popup_container {
+    width: 95%;
+  }
+}

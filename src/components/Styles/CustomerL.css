@@ -1,0 +1,172 @@
+/* Container for the entire customer loyalty component */
+.cl_container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: white;
+    margin-top: 200px;
+    width: 1400px;
+    margin-right: 100px;
+    margin-left: 200px;
+}
+
+/* Main area for the customer list */
+.cl_main {
+    display: flex;
+}
+
+/* Header styling */
+.cl_headerContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header actions styling */
+.cl_headerActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+/* Search container to align the icon and input */
+.cl_searchContainer {
+    position: relative;
+}
+
+/* Search icon styling */
+.cl_searchIcon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+/* Search bar input styling */
+.cl_searchBar {
+    padding: 10px 10px 10px 40px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 400px;
+    margin-right: 20px;
+}
+
+/* Button styling for adding customers */
+.cl_add {
+    display: flex;
+    align-items: center;
+    background-color: #5570F1;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    margin-bottom: 20px;
+    width: 210px;
+}
+
+/* Hover effect for button */
+.cl_add:hover {
+    background-color: #4560d1;
+}
+
+/* Table wrapper to allow scrolling */
+.cl_table_wrapper {
+    overflow-x: auto;
+}
+
+/* Table styling */
+.cl_table {
+    width: 1600px;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.cl_table th,
+.cl_table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+/* Table header styling */
+.cl_table th {
+    background-color: white;
+    color: #B5B7C0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 21px;
+    letter-spacing: -0.01em;
+}
+
+/* Table cell styling */
+.cl_table td {
+    background-color: white;
+    color: #292D32;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 21px;
+    letter-spacing: -0.01em;
+}
+
+/* Divider styling */
+.cl_divider {
+    margin: 20px 0;
+    border: none;
+    height: 1px;
+    background-color: #ddd;
+}
+
+/* Responsive adjustments for tablet view (1024px and below) */
+@media (max-width: 1300px) {
+    .cl_container {
+        width: 100%;
+        margin-left: 300px;
+        margin-right: 10px;
+        max-width:1200px;
+    }
+    
+    .cl_searchBar {
+        width: 80%; /* Reduce search bar width */
+    }
+
+    .cl_add {
+        width: 180px; /* Slightly reduce button width */
+        font-size: 13px;
+    }
+
+    .cl_table {
+        width: 1200px; /* Reduce table width for smaller screens */
+    }
+}
+
+/* Responsive adjustments for mobile view (768px and below) */
+@media (max-width: 768px) {
+    .cl_container {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+    .cl_searchBar {
+        width: 100%; /* Full width on mobile */
+    }
+
+    .cl_add {
+        width: 100%; /* Full width on mobile */
+        margin-bottom: 15px;
+    }
+
+    .cl_table {
+        width: 100%; /* Full width for mobile */
+        font-size: 12px; /* Smaller font for mobile */
+    }
+
+    .cl_table th,
+    .cl_table td {
+        padding: 8px;
+    }
+}

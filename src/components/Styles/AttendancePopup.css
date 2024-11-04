@@ -1,0 +1,68 @@
+/* AttendancePopup.css */
+
+.popup-overlay1 {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .popup-container1 {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .popup-title1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  
+  .status-icon {
+    font-size: 1rem;
+    display: block;
+    text-align: center;
+  }
+  
+  .present {
+    color: green;
+  }
+  
+  .absent {
+    color: red;
+  }
+  
+  .button-group1 {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    gap: 2rem;
+  }
+  
+  .close-button {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .close-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .confirmation-message{
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+  }

@@ -1,0 +1,192 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.admin_inventory_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-top: 60px;
+    margin-bottom:500px;
+    margin-left:280px;
+}
+
+.inventory_details_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    width: 100%;
+    max-width: 1500px; /* Increased max width */
+}
+
+.inventory_details_header h1 {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.add_inventory_button {
+    background-color: transparent;
+    color: #091a44;
+    border: 2px solid #091a44;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 200px;
+    margin-right: 20px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.add_inventory_button:hover {
+    background-color: #5570F1;
+    color: white;
+}
+
+.horizontal_line_container {
+    display: flex;
+    justify-content: center;
+}
+
+.horizontal_line {
+    border: none;
+    height: 1px;
+    width: 1400px;
+    background-color: #091a44;
+    margin: 10px 0;
+    margin-right: 150px;
+    margin-left: 150px;
+}
+
+.admin_inventory_table_container {
+    width: 1500px; /* Increased width for table container */
+    margin-top: 20px;
+}
+
+.admin_inventory_table {
+    width: 100%; /* Table will take the full width of its container */
+    border-collapse: collapse;
+}
+
+.admin_inventory_table th,
+.admin_inventory_table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: center; /* Changed to left alignment */
+    border: 1px solid #ddd;
+}
+
+.admin_inventory_table th {
+    background-color: #ffffff; /* Updated color */
+    color: #B5B7C0; /* Font color for headings */
+    font-family: 'Poppins', sans-serif; /* Updated font family */
+    font-size: 14px; /* Updated font size */
+    font-weight: 500; /* Updated font weight */
+    line-height: 21px; /* Updated line height */
+    letter-spacing: -0.01em; /* Updated letter spacing */
+}
+
+.admin_inventory_table td {
+    background:#ffffff ; /* Updated background color for data cells */
+    color:#292D32 ; /* Font color for data */
+    font-family: 'Poppins', sans-serif; /* Updated font family */
+    font-size: 14px; /* Updated font size */
+    font-weight: 500; /* Updated font weight */
+    line-height: 21px; /* Updated line height */
+    letter-spacing: -0.01em; /* Updated letter spacing */
+}
+
+
+/* Responsive adjustments for tablet view (1024px and below) */
+
+/* Responsive styles for tablet and small desktop view */
+@media (max-width: 1300px) {
+    .admin_inventory_container {
+        width: 95%; /* Set to 95% for better fit on medium screens */
+        margin: 0 auto; /* Center the container */
+        padding: 20px; /* Add padding for spacing */
+        margin-left: 180px;
+        margin-bottom: 300px;
+    }
+
+    .inventory_details_header {
+        flex-direction: column; /* Stack header elements vertically */
+        align-items: flex-start; /* Align items to the start */
+        margin-bottom: 15px; /* Add space below the header */
+    }
+
+    .add_inventory_button {
+        width: 100px; /* Full width for the button */
+        font-size: 14px; /* Adjust font size for consistency */
+        padding: 12px; /* Add padding for larger click area */
+        background-color:white; /* Main button color */
+        color: black; /* Text color for contrast */
+        border: none; /* Remove default border */
+        border-radius: 5px; /* Rounded corners */
+        cursor: pointer; /* Pointer cursor on hover */
+        transition: background-color 0.3s; /* Smooth transition */
+        margin-left:1100px;
+        border: 2px solid #091a44;
+    }
+
+    .add_inventory_button:hover {
+        background-color: #4560d1; /* Darker color on hover */
+    }
+
+    .horizontal_line {
+        width: 100%; /* Full width */
+        margin: 20px 0; /* Top and bottom spacing */
+        border: 0; /* Reset default border */
+        height: 2px; /* Set height for the line */
+        color: #292D32;
+    }
+
+    .admin_inventory_table_container {
+        width: 100%; /* Full width for the table container */
+        margin-top: 20px; /* Add space above the table */
+    }
+
+    .admin_inventory_table {
+        width: 1200px; /* Full width for the table */
+        border-collapse: collapse; /* Collapse borders for a cleaner look */
+    }
+
+    .admin_inventory_table th,
+    .admin_inventory_table td {
+        padding: 10px; /* Adjust padding for smaller screens */
+        text-align: center; /* Center-align text */
+        border: 1px solid #ddd; /* Border for cells */
+    }
+
+    .admin_inventory_table th {
+        background-color:white; /* Light background for headers */
+        color: #B5B7C0; /* Font color for headings */
+        font-size: 14px; /* Font size for headers */
+    }
+
+    .admin_inventory_table td {
+        background: #ffffff; /* Background color for data cells */
+        color: #292D32; /* Font color for data */
+        font-size: 14px; /* Font size for data */
+    }
+
+    /* Adjustments for better readability on smaller screens */
+    .admin_inventory_table th,
+    .admin_inventory_table td {
+        padding: 8px; /* Reduce padding for better fit */
+        font-size: 12px; /* Reduce font size for better fit */
+    }
+}
+
+
+
+
+
+/* Additional styles for smaller screens */
+

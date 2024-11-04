@@ -1,0 +1,90 @@
+.staff-setting-container {
+  padding: 40px;
+  border-radius: 10px;
+  width:1200px;
+  margin: 70px auto; /* Increased top margin to create space from header */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  background-color: transparent; /* Set background to transparent */
+  margin-top: 980px;
+  margin-left: 250px;
+}
+
+.heading-settings {
+  text-align: center;
+  color: #333;
+  font-size: 28px;
+  margin-bottom: 30px;
+  font-weight: 900;
+}
+
+h3 {
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.table-section {
+  margin-bottom: 40px;
+  margin-top: 20px; /* Added margin to move tables lower */
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.styled-table th, .styled-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.styled-table th {
+  background-color: #f2f2f2;
+  font-size: 16px;
+  color: #333;
+}
+
+.styled-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.styled-table tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+
+.input-field {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #333;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(149, 199, 230, 0.5);
+}
+
+.button-container {
+  text-align: center;
+}
+
+.save-button {
+  padding: 12px 30px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #87a9cc;
+}

@@ -1,0 +1,363 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.content-box h2, .content-footer h2 {
+  margin-left: 1380px;
+  padding-top: 20px;
+}
+
+/* Main Dashboard Layout */
+.horizontal-container {
+  height: 100vh;
+  display: flex;
+}
+
+.vertical-navigation {
+  flex: 0 0 70px;
+  background-color: white;
+}
+
+/* Gradient Heading */
+.gradient-heading {
+  background-image: linear-gradient(to right, royalblue, #091A44);
+  background-size: 300% 100%;
+  background-position: -100%;
+  animation: move-gradient 3s ease-in infinite;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+@keyframes move-gradient {
+  from {
+    background-position: 100%;
+  }
+  to {
+    background-position: -100%;
+  }
+}
+
+/* Content Header */
+.content-header {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.content-header input[type="text"] {
+  padding: 20px;
+  border: none;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  outline: none;
+  width: 500px;
+}
+
+.content-header input[type="text"]:hover {
+  background-color: #e0e0e0;
+}
+
+.content-header input[type="text"]:focus {
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Content Body */
+.content-body {
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Align content to the left */
+}
+
+/* Tables */
+.US-con table,
+.BT-con table {
+  padding: 12px; /* General table padding */
+  text-align: center;
+  overflow: hidden; /* Prevent content overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflowed content */
+  white-space: nowrap; /* Prevent text wrapping */
+  width: 100%; /* Make tables responsive */
+  margin: 0 auto; /* Center tables */
+  padding-bottom: 30px; /* Bottom padding for the table */
+}
+
+.US-con th,
+.US-con td,
+.BT-con th,
+.BT-con td {
+  padding: 12px; /* General padding for table cells */
+  text-align: center;
+}
+
+.US-con th,
+.BT-con th {
+  background: white;
+  color: #B5B7C0;
+}
+
+.US-con td,
+.BT-con td {
+  background: white;
+  color: #292D32;
+}
+
+.content-box tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.content-box tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* Footer */
+.content-footer {
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Search Bar */
+.billing_search-bar,
+.US_search-bar {
+  display: flex;
+  align-items: center;
+  margin-left: 20px; /* Move search bars to the left */
+  width: 250px;
+  margin-bottom: 20px;
+}
+
+.search-Billing,
+.appoint_sea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Popup Styles */
+.background-blur {
+  filter: blur(5px);
+  pointer-events: none; /* Prevent interaction with blurred content */
+}
+
+.popup-content {
+  margin-right: 60px;
+  border-radius: 10px;
+  width: 500px;
+}
+
+.popup-content h3, p {
+  text-align: center;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.popup-buttons button {
+  padding: 10px 20px;
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.popup-buttons button:last-child {
+  background-color: #dc3545;
+}
+
+.popup-buttons button:hover {
+  opacity: 0.8;
+}
+
+/* Billing Table Specific Styles */
+.billing_table_container {
+  width: 100%;
+  max-width: 1600px; /* Further increased maximum width for tables */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 40px 0; /* Increased margin above and below each table */
+  border: 1px solid #e0e0e0;
+  padding: 20px; /* Added padding inside the table section */
+  margin-left: 280px; /* Adjusted left margin */
+}
+
+.para {
+  background: #d4dde5;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.para p {
+  margin-right: 15px;
+  padding-top: 10px;
+}
+
+/* Media Queries */
+@media (max-width: 1300px) {
+  /* Tablet View */
+  .content-body {
+    flex-direction: column; /* Stack content boxes vertically */
+  }
+
+  /* Reduce width of billing table container and tables */
+  .billing_table_container,
+  .US-con table,
+  .BT-con table {
+    width:1200px; /* Reduce table width for tablet view */
+    margin: 0 auto; /* Center tables */
+    padding: 5px; /* Reduce padding inside the table section */
+    margin-left:100px;
+    padding-right: 140px;
+  }
+
+  /* Adjust input field styles */
+  .content-header input[type="text"] {
+    width: 100%; /* Full width search bar */
+    padding: 15px; /* Reduce padding */
+    border-radius: 15px; /* Slightly reduce border radius */
+  }
+
+  /* Reduce padding for the content box and footer */
+  .content-box,
+  .content-footer {
+    padding: 5px; /* Reduce padding for tablet screens */
+  }
+
+  /* Adjust popup content width */
+  .popup-content {
+    width: 90%; /* Make popup content responsive */
+  }
+
+  /* Reduce size of table header and cell padding */
+  .US-con th,
+  .US-con td,
+  .BT-con th,
+  .BT-con td {
+    padding-left: 2px;  /* Reduce left padding for smaller screens */
+    padding-right: 2px; /* Reduce right padding for smaller screens */
+    padding-top: 5px;   /* Optional: Adjust top padding */
+    padding-bottom: 5px; /* Optional: Adjust bottom padding */
+    font-size: 12px;    /* Optional: Reduce font size for smaller screens */
+  }
+
+  /* Adjust styles for the gradient heading */
+  .gradient-heading {
+    font-size: 24px; /* Adjust font size for smaller screens */
+  }
+
+  /* Adjust the margin for the content footer heading */
+  .content-box h2,
+  .content-footer h2 {
+    margin-left: auto; /* Center heading for better alignment */
+    margin-right: auto;
+  }
+
+  /* Adjusting the styles for the popup buttons */
+  .popup-buttons button {
+    padding: 8px 16px; /* Reduce button padding */
+    font-size: 14px; /* Reduce button font size */
+  }
+
+  /* For search bar */
+  .billing_search-bar,
+  .US_search-bar {
+    width: 80%; /* Adjust search bar width */
+    max-width: 200px;
+    margin-left: 100px; /* Center align search bars */
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Mobile View */
+  .content-body {
+    flex-direction: column; /* Stack content boxes vertically */
+  }
+
+  .billing_table_container,
+  .US-con table,
+  .BT-con table {
+    width: 100%; /* Full width for mobile */
+    overflow-x: auto;
+  }
+
+  .content-header input[type="text"] {
+    width: 100%; /* Full width search bar */
+  }
+
+  .content-box,
+  .content-footer {
+    padding: 10px; /* Adjust padding for smaller screens */
+  }
+}
+@media (min-width: 1600px) {
+  .content-box h2, .content-footer h2 {
+    margin-left: 1500px;
+    font-size: 24px;
+  }
+
+  .billing_table_container {
+    max-width: 1800px; /* Expand the table container for larger screens */
+    padding: 30px;
+  }
+
+  .content-header input[type="text"] {
+    width: 600px; /* Increase width of search bar */
+  }
+
+  .popup-content {
+    width: 600px; /* Expand popup width */
+  }
+}
+
+@media (min-width: 1800px) {
+  .content-box h2, .content-footer h2 {
+    margin-left: 1600px;
+    font-size: 26px;
+  }
+
+  .billing_table_container {
+    max-width: 2000px; /* Further expand the table container for ultra-large screens */
+    padding: 40px;
+  }
+
+  .content-header input[type="text"] {
+    width: 700px; /* Increase width of search bar */
+  }
+
+  .popup-content {
+    width: 700px; /* Increase popup width */
+  }
+
+  .US-con th, .BT-con th, .US-con td, .BT-con td {
+    padding: 20px; /* Increase padding for readability on larger screens */
+    font-size: 18px;
+  }
+
+  .popup-buttons button {
+    padding: 15px 30px; /* Increase button size */
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,111 @@
+.ad_p_popup_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+.divider {
+  border: 0;
+  border-top: 2px solid #091a44; /* Divider style */
+  margin-top: 30px;
+}
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.ad_p_popup_container {
+  background-color: white;
+  border: 1px solid #ccc;
+  max-width: 90%;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.ad_p_pph3 {
+  margin: 0;
+  flex-grow: 1;
+  margin-top: 13px;
+}
+
+.close_button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: red;
+  position: absolute;
+  left: 240px;
+  top: 1px; /* Adjust this value to move the button above the line */
+}
+
+.close_button:hover {
+  color: darkred;
+}
+
+.ad_p_divider {
+  border: 0;
+  border-top: 2px solid #091a44;
+  margin: 20px 0;
+}
+
+.adp1, .adp2, .adp3, .adp4 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  margin-top: 10px;
+}
+
+.adp1 label, .adp2 label, .adp3 label, .adp4 label {
+  margin-right: 10px;
+  font-size: 15px;
+  width: 120px;
+}
+
+.adp1 input, .adp2 input, .adp3 input, .adp4 input, .adp4 select {
+  flex: 1;
+  height: 40px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.adp1 input:focus, .adp2 input:focus, .adp3 input:focus, .adp4 input:focus {
+  border-color: #666;
+}
+
+.ad_p_button_container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.ad_p_save_button {
+  background-color: #5570F1;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-right: 60px;
+}
+
+.ad_p_save_button:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .ad_p_popup_container {
+    width: 95%;
+  }
+}

@@ -1,0 +1,113 @@
+.popup_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.popup_container {
+  background-color: white;
+  border: 1px solid #ccc;
+  max-width: 90%;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: relative; /* Allows for absolute positioning of the close button */
+}
+
+.popup_header {
+  display: flex;
+  justify-content: space-between; /* Space between title and button */
+  align-items: center;
+  margin-top: 12px;
+}
+
+.pph3 {
+  margin: 0;
+  flex-grow: 1; /* Allow title to take up available space */
+  text-align: left; /* Align the title to the left */
+}
+
+.close_button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px; /* Increased size for better visibility */
+  color: red;
+  position: absolute; /* Position the button absolutely */
+  left: 140px; /* Distance from the right */
+}
+
+.close_button:hover {
+  color: darkred;
+}
+
+.divider {
+  border: 0;
+  border-top: 2px solid #091a44; /* Divider style */
+  margin-top: 30px;
+}
+
+.field {
+  display: flex; /* Align label and input side by side */
+  align-items: center; /* Center vertically */
+  margin-top: 20px; /* Space between fields */
+}
+
+.field label {
+  margin-right: 10px; /* Space between label and input */
+  font-size: 15px;
+  width: 120px; /* Fixed width for labels */
+}
+
+.field input {
+  flex: 1;
+  height: 40px; /* Consistent height */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: #666; /* Highlight border on focus */
+}
+
+.button_container {
+  display: flex;
+  justify-content: center; /* Center the button */
+  margin-top: 20px;
+}
+
+.save_button {
+  background-color: #5570F1;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px; /* Keeping the rounded button style */
+  cursor: pointer;
+  margin-right: 60px;
+}
+
+.save_button:hover {
+  opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .popup_container {
+    width: 95%;
+  }
+}

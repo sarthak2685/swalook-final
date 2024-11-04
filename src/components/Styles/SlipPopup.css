@@ -1,0 +1,42 @@
+/* SalarySlipPopup.css */
+.salary-slip-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .salary-slip-popup-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px;
+  }
+  
+  .salary-slip-popup-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+  
+  .salary-slip-download-button,
+  .salary-slip-close-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .salary-slip-download-button:hover,
+  .salary-slip-close-button:hover {
+    background-color: #218838;
+  }
+  

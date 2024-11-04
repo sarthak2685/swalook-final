@@ -1,0 +1,59 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.settings_container {
+  background-color:white;
+  margin-top: 400px;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+  margin-right:20px;
+  margin-left:310px;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.content_container {
+  display: flex;
+  justify-content: center; /* Center the boxes */
+  align-items: center; /* Align items vertically in the center */
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.settings_box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  height: 45vh;
+  border: 1px solid #ccc;
+  border-radius: 15px; /* Added border radius */
+  margin: 10px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  transition: transform 0.2s; /* Optional: for hover effect */
+}
+
+.settings_box img {
+  width: 50%;
+  margin-bottom: 10px;
+}
+
+.settings_box h2 {
+  margin-bottom: 10px;
+  color: #091A44;
+}
+
+/* Optional hover effect */
+.settings_box:hover {
+  transform: translateY(-5px); /* Slight lift on hover */
+}

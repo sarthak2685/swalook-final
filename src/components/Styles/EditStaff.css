@@ -1,0 +1,145 @@
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #ffffff;
+  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease; /* Adding fade-in animation */
+}
+
+/* Scrollable Form Container */
+.scrollable-form {
+  overflow-y: auto;
+  max-height: calc(80vh - 100px);
+  padding-right: 10px;
+  margin-bottom: 20px;
+}
+
+/* Heading */
+.modal-content h2 {
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+  color: #333;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Form Group */
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Full width for uniform input sizing */
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  width: 380px; /* Make input take full width of its container */
+  transition: border-color 0.3s ease;
+  margin-left: 30px;
+}
+
+.form-group input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding: 10px 0;
+}
+
+/* Button Styles */
+.button-group button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.3s, transform 0.1s;
+  font-weight: 600;
+  margin: 0 5px;
+}
+
+.button-group button:first-child {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.button-group button:first-child:hover {
+  background-color: #218838;
+}
+
+.button-group button:last-child {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.button-group button:last-child:hover {
+  background-color: #c82333;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 15px;
+    max-width: 90%;
+  }
+
+  .button-group button {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .form-group input {
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,115 @@
+/* SalarySlipPopup.css */
+
+.popup-overlay2 {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .popup-container2 {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .popup-title2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  
+  .salary-table2 {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .salary-table2 th,
+  .salary-table2 td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  
+  .salary-table2 th {
+    background-color: #f0f0f0;
+  }
+  
+  .salary-table2 tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .download-button2 {
+    background-color: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .download-button3 {
+    background-color: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .download-button2:hover {
+    background-color: #218838;
+  }
+  
+
+  .close-button2 {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: block;
+    margin: 8px auto;
+    text-align: center;
+    height:55px;
+    width:300px;
+  }
+  .generate-button2{
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: block;
+    margin: 8px auto;
+    text-align: center;
+    height:55px;
+    width:300px;
+  }
+  
+  .generate-button2:hover {
+    background-color: #0056b3;
+  }
+  
+  .close-button2:hover {
+    background-color: #0056b3;
+  }
+  
+  .button-group2 {
+    display: flex;
+    justify-content: center;
+  }
+  

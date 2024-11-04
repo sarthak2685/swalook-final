@@ -1,0 +1,439 @@
+/* StaffManagement.css */
+
+.staff-mgmt-container {
+  padding: 20px;
+  width: 100%;
+  margin-left: 140px;
+  margin-bottom: 350px;
+  margin-top: 30px;
+}
+
+.table-responsive {
+  max-height: 450px; /* Increased max-height */
+  overflow-y: auto;
+}
+
+.header-container {
+  display: flex; /* Use flexbox to arrange items side by side */
+  justify-content: space-between; /* Space between items */
+  align-items: center; /* Center items vertically */
+  margin-left: 120px; /* Adjust margin for proper alignment */
+}
+
+.staff-mgmt-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0; /* Remove margin to prevent extra spacing */
+}
+
+.staff-mgmt-add-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 200px;
+}
+
+.add-staff {
+  display: flex;
+  justify-content: flex-end; /* Align to the right */
+  align-items: center; /* Center items vertically */
+}
+
+.staff-mgmt-add-button:hover {
+  background-color: #0056b3;
+}
+
+.staff-mgmt-table {
+  width: 1600px; /* Adjusted maximum width */
+  border-collapse: separate; /* Use separate borders for spacing */
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-left: 120px; /* Decreased margin-left to move table left */
+  margin-right: auto; /* Center the table */
+  border: 1px solid #e0e0e0; /* Light border for the table */
+  margin-top: 20px;
+}
+
+.staff-mgmt-table th,
+.staff-mgmt-table td {
+  font-family: 'Poppins', sans-serif; /* Set font family */
+  font-size: 14px; /* Set font size */
+  font-weight: 500; /* Set font weight */
+  line-height: 21px; /* Set line height */
+  letter-spacing: -0.01em; /* Set letter spacing */
+  text-align: left; /* Set text alignment */
+  border-bottom: 1px solid #e0e0e0; /* Light horizontal border for cells */
+  padding: 12px 10px; /* Increased padding for more spacing */
+  height: 40px; /* Set a fixed height for uniformity */
+  margin: 5px 0; /* Add margin to create space between rows */
+}
+
+.staff-mgmt-table th {
+  background-color: #ffffff; /* Set heading color */
+  color: #B5B7C0; /* Set text color for readability */
+}
+
+.staff-mgmt-table td {
+  color: #292D32; /* Set body text color */
+  text-align: center; /* Center text for buttons */
+}
+
+.icon-container {
+  display: flex;
+  flex-direction: column; /* Stack icons vertically */
+  align-items: center; /* Center icons horizontally */
+}
+
+.staff-mgmt-attendance-button,
+.staff-mgmt-salary-button {
+  background-color: #007bff; /* Button color */
+  color: white;
+  padding: 5px 10px; /* Adjusted padding for compactness */
+  font-size: 12px; /* Font size */
+  border: none;
+  border-radius: 15px; /* Reduced border radius */
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100px;
+  display: inline-block; /* Ensure they can be centered */
+  margin: 0 5px; /* Add some margin for spacing */
+}
+
+.staff-mgmt-edit-button,
+.staff-mgmt-delete-button {
+  background-color: #007bff; /* Button color */
+  color: white;
+  padding: 3px 5px; /* Adjusted padding for compactness */
+  font-size: 12px; /* Font size */
+  border: none;
+  border-radius: 15px; /* Reduced border radius */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.staff-mgmt-attendance-button:hover,
+.staff-mgmt-salary-button:hover,
+.staff-mgmt-edit-button:hover,
+.staff-mgmt-delete-button:hover {
+  background-color: #0056b3;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center; /* Center buttons */
+  margin-top: 10px; /* Spacing above the buttons */
+}
+
+.modal-content6 {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: auto;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+.modal-content6 h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333333;
+}
+
+.delete_icon,
+.delete_item {
+  border-radius: 6px;
+  color: white;
+  border: none;
+  font-size: 0.9rem; /* Slightly smaller font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete_icon {
+  background-color: #007bff;
+}
+
+.delete_icon:hover {
+  background-color: #0056b3;
+}
+
+.delete_item {
+  background-color: #dc3545;
+}
+
+.delete_item:hover {
+  background-color: #c82333;
+}
+
+.modal-overlay6 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 500px) {
+  .modal-content6 {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .delete_icon,
+  .delete_item {
+    font-size: 0.9rem;
+  }
+}
+
+.gb_ver_nav2 {
+  height: 69vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.gb_h7 {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 21vh;
+  padding-right: 1rem;
+}
+/* Confirmation Popup */
+.confirmation-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000; /* Make sure it's above other elements */
+  text-align: center;
+  width: 90%;
+  max-width: 400px; /* Set a maximum width */
+}
+
+/* Popup Text */
+.confirmation-popup p {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* Button Group */
+.button-group {
+  display: flex; /* Use flexbox for side-by-side buttons */
+  justify-content: space-between; /* Space between buttons */
+  margin-top: 10px; /* Space above the button group */
+}
+
+/* Button Styles */
+.confirmation-popup button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.1s;
+  flex: 1; /* Allow buttons to grow equally */
+  margin: 0 5px; /* Space between buttons */
+}
+
+.confirmation-popup button:first-child {
+  background-color: #e74c3c; /* Red for delete */
+  color: white;
+}
+
+.confirmation-popup button:first-child:hover {
+  background-color: #c0392b; /* Darker red on hover */
+}
+
+.confirmation-popup button:last-child {
+  background-color: #3498db; /* Blue for cancel */
+  color: white;
+}
+
+.confirmation-popup button:last-child:hover {
+  background-color: #2980b9; /* Darker blue on hover */
+}
+
+/* Overlay (if needed) */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Dark background */
+  z-index: 999; /* Below popup */
+}
+/* StaffManagement.css */
+
+/* Base styles remain unchanged */
+
+/* Responsive styles for tablet view */
+@media (max-width: 1300px) {
+
+  .staff-mgmt-table {
+    width: 90%; /* Set a smaller width for tablet view */
+    max-width: 800px; /* Optional: set a maximum width to limit expansion */
+    margin-left: 80px; /* Center the table */
+    margin-right: auto; /* Center the table */
+    box-shadow: none; /* Remove shadow for simplicity */
+  }
+  .staff-mgmt-title {
+    font-size: 1.2rem; /* Reduce title size */
+    margin-bottom: 10px; /* Add some space below title */
+  }
+
+  .staff-mgmt-add-button {
+    width: 100%; /* Make the button full width */
+    padding: 8px; /* Adjust padding */
+    font-size: 1rem; /* Adjust font size */
+  }
+
+  .staff-mgmt-table {
+    width: 100%; /* Set width to 100% for smaller screens */
+    margin-left: 150px; /* Remove left margin */
+    margin-right: 0; /* Remove right margin */
+    box-shadow: none; /* Remove shadow for simplicity */
+  }
+
+  .staff-mgmt-table th,
+  .staff-mgmt-table td {
+    font-size: 12px; /* Reduce font size */
+    padding: 8px; /* Adjust padding */
+  }
+
+  .icon-container {
+    flex-direction: row; /* Align icons horizontally */
+    justify-content: center; /* Center icons */
+  }
+
+  .staff-mgmt-attendance-button,
+  .staff-mgmt-salary-button,
+  .staff-mgmt-edit-button,
+  .staff-mgmt-delete-button {
+    width: 80px; /* Set a smaller width for buttons */
+    padding: 5px; /* Adjust padding */
+    font-size: 10px; /* Reduce font size */
+  }
+
+  .modal-content6 {
+    width: 90%; /* Use a percentage width */
+    padding: 20px; /* Adjust padding */
+  }
+
+  .confirmation-popup {
+    width: 90%; /* Use a percentage width */
+    padding: 15px; /* Adjust padding */
+  }
+
+  .confirmation-popup p {
+    font-size: 0.9rem; /* Reduce font size */
+  }
+
+  .button-group {
+    flex-direction: column; /* Stack buttons vertically */
+  }
+
+  .confirmation-popup button {
+    font-size: 0.9rem; /* Reduce font size for buttons */
+    padding: 8px 10px; /* Adjust padding */
+  }
+}
+
+/* Keep existing styles below */
+
+/* Extra Large Screen Styling for StaffManagement.css */
+@media (min-width: 1440px) {
+
+  /* Container adjustments for extra large screens */
+  .staff-mgmt-container {
+    padding: 30px;
+    width: 80%;
+    margin-left: 200px;
+    margin-right: auto;
+    margin-bottom: 400px;
+    margin-top: 50px;
+  }
+
+  /* Header adjustments */
+  .header-container {
+    margin-left: 160px;
+  }
+
+  .staff-mgmt-title {
+    font-size: 2rem; /* Larger title size */
+    font-weight: 700;
+  }
+
+  .staff-mgmt-add-button {
+    font-size: 1.1rem; /* Slightly larger font */
+    padding: 12px 24px; /* Larger padding */
+    width: 220px; /* Increase width */
+  }
+
+  /* Table adjustments */
+  .staff-mgmt-table {
+    width: 90%;
+    max-width: 1800px; /* Wider max-width */
+    margin-left: auto; /* Center the table */
+    margin-right: auto;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Increase shadow for depth */
+  }
+
+  .staff-mgmt-table th,
+  .staff-mgmt-table td {
+    font-size: 16px; /* Increase font size */
+    padding: 15px 12px; /* Increase padding for readability */
+    height: 50px; /* Adjust row height */
+  }
+
+  /* Button adjustments */
+  .staff-mgmt-attendance-button,
+  .staff-mgmt-salary-button,
+  .staff-mgmt-edit-button,
+  .staff-mgmt-delete-button {
+    width: 120px; /* Increase button width */
+    font-size: 14px; /* Larger font */
+    padding: 8px 12px;
+  }
+
+  /* Modal adjustments */
+  .modal-content6 {
+    padding: 40px; /* Increase padding for spacing */
+    max-width: 500px;
+    font-size: 1.1rem; /* Increase font size */
+  }
+
+  /* Confirmation popup adjustments */
+  .confirmation-popup {
+    padding: 30px;
+    max-width: 500px;
+    font-size: 1.2rem; /* Larger font size for readability */
+  }
+
+  /* Button group adjustments */
+  .button-group {
+    margin-top: 20px;
+  }
+
+  .confirmation-popup button {
+    font-size: 1.1rem;
+    padding: 12px 18px;
+  }
+}

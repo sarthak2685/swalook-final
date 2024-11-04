@@ -1,0 +1,184 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #FFFFFF; /* Set background to white */
+}
+
+/* Navbar Styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px; /* Horizontal padding */
+  background-color: #FFFFFF; /* Background color */
+  color: black; /* Text color */
+  width: calc(100% - 296px); /* Adjusted width to match the sidebar */
+  height: 84px; /* Fixed height */
+  position: fixed; /* Keep fixed */
+  top: 0; /* Align to the top */
+  left: 296px; /* Align next to the sidebar */
+  z-index: 1000; /* Ensure it appears above other content */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-heading {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  text-align: left;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between elements */
+}
+
+.notification-icon {
+  font-size: 36px; /* Size of the icon */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.select-input {
+  width: 154px; /* Width of the input */
+  height: 32px; /* Height of the input */
+  padding: 5px 12px; /* Padding */
+  border-radius: 10px; /* Increased border radius */
+  background-color: #FEF5EA; /* Background color */
+  border: 1px solid #ccc; /* Optional border */
+  opacity: 1; /* Fully visible */
+  margin-right: 15px; /* Space between select input and notification icon */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.user-photo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.profile-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.account-icon {
+  font-size: 36px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 100%;
+  background-color: #333; /* Dropdown background */
+  border-radius: 8px; /* Adjust border radius for a softer look */
+  display: flex; /* Use flex to align items */
+  flex-direction: column; /* Align items in a column */
+  min-width: 200px;
+  padding: 5px 0; /* Padding for the dropdown */
+  z-index: 1001; /* Ensure dropdown is above other elements */
+}
+
+.dropdown-item {
+  padding: 10px 15px; /* Add horizontal padding for more clickable area */
+  color: #fff; /* Text color */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.2s; /* Smooth transition for hover effect */
+  text-align: center; /* Center align text */
+}
+
+.dropdown-item:hover {
+  background-color: #444; /* Change background color on hover */
+}
+
+.down-arrow {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #000; /* Adjust the color */
+  margin-left: 5px;
+}
+
+.invisible-line {
+  border: none; /* No visible border */
+  height: 2px; /* Height of the line */
+  background-color: transparent; /* Make it invisible */
+  margin-top: 5px; /* Space between heading and line */
+}
+
+.home-icon {
+  font-size: 36px; /* Size of the icon */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-right: 15px; /* Space between icon and dashboard heading */
+  margin-top: 40px;
+}
+
+.logo {
+  width: 101px;
+  height: 90px;
+  position: absolute;
+  top: 6px;
+  left: 89px;
+  opacity: 1; /* Set to 1 for visibility */
+}
+
+.dropdown-item {
+  text-decoration: none; /* Remove underline from links */
+}
+
+/* Ensure this applies specifically to the dropdown items */
+.dropdown-item:hover {
+  text-decoration: none; /* Optional: add underline on hover for better UX */
+}
+
+/* Responsive styles for screens less than 1300px */
+@media (max-width: 1300px) {
+  .navbar {
+    width: calc(100% - 300px); /* Adjust width */
+    left: 200px; /* Adjust position */
+    padding: 0 15px; /* Reduce horizontal padding */
+    margin-left: 100px;
+  }
+
+  .select-input {
+    width: 120px; /* Decrease width of select input */
+  }
+
+  .logo {
+    width: 80px; /* Adjust logo size */
+    height: auto; /* Maintain aspect ratio */
+  }
+
+  .navbar-right {
+    gap: 10px; /* Reduce gap between navbar-right items */
+  }
+
+  .notification-icon, .account-icon {
+    font-size: 32px; /* Decrease icon size */
+  }
+
+  .dashboard-heading {
+    font-size: 18px; /* Decrease font size for heading */
+  }
+  
+  .home-icon {
+    font-size: 32px; /* Decrease home icon size */
+  }
+}

@@ -1,0 +1,166 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+html, body {
+    height: 100%;
+}
+
+.ba_horizontal {
+    display: flex;
+    height: calc(100vh - 100px); /* Assuming header height is 70px */
+    font-family: 'Montserrat', sans-serif;
+    width:1000px;
+    margin-left:150px;
+}
+
+.ba_h1 {
+    flex: 0 0 70px; /* Sidebar width */
+    background-color: white;
+}
+
+.ba_h2 {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color:white;
+    align-items: center;
+    padding: 20px; /* Added padding for better spacing */
+}
+
+.ba_heading {
+    margin: 20px 0; /* Adjusted margin */
+    text-align: center;
+    color: #091A44;
+}
+
+.ba_cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    padding: 20px;
+}
+
+.ba_card {
+    background-color: #5570F1;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(80, 61, 149, 0.1);
+    padding: 20px;
+    text-align: center;
+    width: 150px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.ba_card.selected {
+    border-color: #5C6BC0; /* Color to match the theme */
+    box-shadow: 0 0 10px #5C6BC0; /* Glow effect */
+}
+
+.ba_card_img {
+    width: 100%;
+    height: auto;
+}
+
+.ba_card_text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: white;
+    font-weight: bold;
+}
+
+.ba_card:hover {
+    transform: scale(1.05);
+}
+
+.ba_horizontal_line {
+    width: 90%;
+    border: 1px solid #091A44;
+    margin: 20px 0;
+}
+
+.ba_select_analysis {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ba_select_heading {
+    font-size: 24px;
+    color: #091A44;
+    margin: 0 10px;
+    flex: 1;
+}
+
+.ba_select_month {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0 10px;
+}
+
+.ba_content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 80%; 
+    margin: 10px 0; /* Adjusted margins */
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    text-align: center;
+}
+
+.ba_p {
+    font-size: 20px;
+    color: #091A44;
+    margin: 10px;
+    font-weight: lighter;
+}
+
+@media (max-width: 768px) {
+    .ba_cards {
+        justify-content: space-around;
+    }
+
+    .ba_content {
+        width: 90%; /* Adjust width for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .ba_card {
+        width: 100%;
+    }
+
+    .ba_horizontal_line {
+        width: 100%;
+    }
+
+    .ba_select_analysis {
+        padding: 10px;
+    }
+
+    .ba_content {
+        width: 100%;
+        height: auto; /* Remove fixed height */
+    }
+}

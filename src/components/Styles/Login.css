@@ -1,0 +1,227 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+
+}
+
+.staff_login_container {
+  height: 100vh; /* Full viewport height */
+}
+
+.staff_logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px; /* Adjust the margin as needed */
+}
+
+.staff_S_logo {
+  width: 150px;
+  height: auto;
+  margin-left: 12vw;
+}
+
+
+.staff_login_main {
+display: flex;
+height: 100%;
+width: 100vw;
+}
+
+.staff_login_main > div {
+flex: 1;
+}
+
+.AL_input-group {
+margin-bottom: 15px;
+}
+
+label {
+display: block;
+margin-bottom: 5px;
+font-size: large;
+}
+
+input[type="text"],
+input[type="password"] {
+width: 100%;
+padding: 10px;
+padding-right: 10vw;
+font-size: medium;
+border: 1px solid #ccc;
+border-radius: 3px;
+}
+
+.l_al{
+display: flex;
+justify-content: center;
+
+}
+
+button {
+background-color: #5570F1;
+color: white;
+padding: 10px 20px;
+border: none;
+font-size: large;
+width: 100%;
+border-radius: 5px;
+cursor: pointer;
+font-family: 'Montserrat', sans-serif;
+}
+
+.forgot-password {
+margin-top: 10px;
+font-size: 14px;
+margin-bottom: 10px;
+color: #888;
+text-align: center;
+}
+
+.forgot-password a {
+color: #007bff;
+text-decoration: none;
+cursor: pointer;
+}
+
+.forgot-password a:hover {
+text-decoration: underline;
+}
+body {
+font-family: 'Montserrat', sans-serif;
+}
+
+.staff_login_head {
+margin-bottom: 10px;
+text-align: center;
+font-size: 35px;
+color:#5570F1;
+}
+
+.staff_form {
+margin-left: 15vw;
+}
+
+.staff_left {
+margin-top: 18vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+position: relative;
+}
+
+.staff_right {
+/* margin-top: 10px;   */
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+position: relative;
+}
+
+.staff_loginbg {
+background: url(../../assets/login_bg.png);
+background-size: cover;
+width: 100%;
+height: 100%;
+}
+
+.admin_welcome {
+font-weight: bolder;
+font-size: 60px;
+color: white;
+}
+
+.welcome_text {
+margin-left: 50px;
+margin-top: 100px;
+}
+
+/* Responsive CSS */
+@media only screen and (max-width: 1024px) {
+.staff_login_main {
+  flex-direction: column;
+}
+
+.staff_left,
+.staff_right {
+  width: 100%;
+}
+
+.staff_right {
+  margin-top: 20px;
+}
+
+.staff_form {
+  margin: 0 auto;
+  width: 60%;
+}
+
+.staff_logo {
+  margin-left: 0; /* Reset margin-left */
+  margin-top: 0; /* Reset margin-top */
+  justify-content: center; /* Center the logo */
+}
+
+.staff_S_logo {
+  margin-left: 0; /* Reset margin-left */
+  width: 150px;
+  height: auto;
+}
+}
+
+@media only screen and (max-width: 768px) {
+.staff_login_main {
+    flex-direction: column;
+}
+
+.staff_left,
+.staff_right {
+    width: 100%;
+}
+
+.staff_right {
+   margin-top: 20px;
+}
+
+.staff_form {
+    margin: 0 auto; 
+    width: 60%; 
+}
+
+.staff_logo {
+  margin-left: 0; /* Reset margin-left */
+  margin-top: 0; /* Reset margin-top */
+  justify-content: center; /* Center the logo */
+}
+
+.staff_S_logo {
+  margin-left: 0; /* Reset margin-left */
+  width: 150px;
+  height: auto;
+}
+}
+
+@media only screen and (max-width: 480px) {
+.staff_S_logo {
+  width: 100px;
+  height: auto;
+  margin-left: 0;
+  margin-top: -80px;
+}
+
+.staff_right {
+  display: none;
+}
+
+.staff_form {
+  width: 90%;
+}
+.staff_login_main {
+  margin-top: 10vh;
+}
+}

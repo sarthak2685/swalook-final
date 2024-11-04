@@ -1,0 +1,118 @@
+.add-staff-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.5); /* Set a dark overlay for the background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.required-asterisk {
+  color: black; /* Dark color for the asterisk */
+  font-weight: bold;
+  margin-left: 5px; /* Space between label text and asterisk */
+  display: inline; /* Ensure it stays on the same line */
+}
+
+.label-with-asterisk {
+  display: flex;
+  align-items: center; /* Align the text and asterisk vertically */
+  margin-bottom: 5px; /* Space between label and input */
+  text-align: center;
+}
+
+.add-staff-modal-container {
+  background: #fff; /* White background for the modal */
+  border-radius: 8px;
+  max-width: 450px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack children vertically */
+  justify-content: space-between; /* Ensure space between header and button group */
+}
+
+.add-staff-modal-title {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.add-staff-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-grow: 1; /* Allow the form to grow and take available space */
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #444;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: #333;
+}
+
+.full-width-input {
+  width: 100%; /* Ensure the input fields cover full width */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 5px;
+  font-size: 14px;
+  box-sizing: border-box; /* Include padding and border in width */
+}
+
+.full-width-input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.add-staff-button-group {
+  display: flex;
+  justify-content: flex-start; /* Align buttons to the left */
+  margin-top: 20px;
+  margin-left: -80px; /* Move the button group slightly left */
+}
+
+.add-staff-submit-button,
+.add-staff-cancel-button {
+  padding: 10px 20px; /* Adjust padding for better appearance */
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 48%; /* Make buttons take half of the width minus margin */
+}
+
+.add-staff-submit-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.add-staff-cancel-button {
+  background-color: #dc3545; /* Change cancel button color for distinction */
+  color: white;
+}
+
+.add-staff-submit-button:hover {
+  background-color: #0056b3;
+}
+
+.add-staff-cancel-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}

@@ -1,0 +1,93 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.DS_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    backdrop-filter: blur(5px); /* Apply blur effect */
+    z-index: 999; /* Ensure it's above other elements */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.DS_container {
+    background-color: white;
+    border: 1px solid #ccc;
+    width: fit-content;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.DS_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.DSh3 {
+    margin: 0;
+    flex-grow: 2;
+  }
+  
+  .close_button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: red;
+    margin-left: auto;
+  }
+  
+  .close_button:hover {
+    color: darkred;
+  }
+
+  .DS_dropdown-container {
+    margin-top: 20px;
+    position: relative;
+    width: 300px; /* Adjust the width as needed */
+  }
+  
+  .DS_select {
+    width: 500px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    appearance: none; /* Remove default arrow */
+    background-color: #fff; /* Dropdown background color */
+    cursor: pointer;
+    font-size: 16px; /* Adjust font size as needed */
+  }
+
+  .delete_button {
+    margin-top: 10px;
+    background-color: #5570F1;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    margin-right: 60px;
+  }
+  
+  .delete_button:hover {
+    opacity: 0.9;
+  }
+  
+
+  

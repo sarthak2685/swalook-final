@@ -1,0 +1,114 @@
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Overlay */
+.confirm-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6); /* Slightly darker background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it appears on top of everything */
+}
+
+/* Dialog box */
+.confirm-dialog-box {
+  background-color: #fff;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Stronger shadow for emphasis */
+  position: relative;
+  animation: fadeIn 0.3s ease-out; /* Smooth fade-in animation */
+}
+
+.confirm-dialog-box h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.confirm-dialog-box p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+/* Button container */
+.confirm-dialog-buttons {
+  display: flex;
+  justify-content: space-between; /* Space buttons apart */
+  margin-top: 15px;
+}
+
+/* Button styles */
+.confirm-button, .cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  flex: 1; /* Allow buttons to grow */
+  margin: 0 5px; /* Add margin for spacing */
+}
+
+.confirm-button {
+  background-color:#28a745; /* Red for delete action */
+  color: white;
+}
+
+.confirm-button:hover {
+  background-color: #28a745; /* Darker shade on hover */
+}
+
+.cancel-button {
+  background-color:#e63b28 ; /* Blue for cancel action */
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #e63b28; /* Darker shade on hover */
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: scale(0.9);
+  }
+  to {
+      opacity: 1;
+      transform: scale(1);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+  .confirm-dialog-box {
+      padding: 15px 20px;
+  }
+
+  .confirm-dialog-buttons {
+      flex-direction: column; /* Stack buttons on small screens */
+      gap: 10px;
+  }
+
+  .confirm-button, .cancel-button {
+      width: 100%; /* Full width buttons */
+      margin: 0; /* Remove margin on small screens */
+  }
+}

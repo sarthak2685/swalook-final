@@ -1,0 +1,318 @@
+/* OwnerDashboard.css */
+
+.owner-dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .owner-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .owner-main {
+    background-color: #f1f1f1;
+    height: 100vh;
+    padding: 20px; /* Add padding to the main content */
+  }
+  
+  .owner-gradient-heading {
+    background-image: linear-gradient(to right, #091A44, #03396c);
+    background-size: 300% 100%;
+    background-position: -100%;
+    animation: owner-move-gradient 3s ease-in infinite;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    margin: 0;
+    flex: 1;
+  }
+  
+  @keyframes owner-move-gradient {
+    from {
+        background-position: 100%;
+    }
+    to {
+        background-position: -100%;
+    }
+  }
+  
+  .owner-dropdown-menu {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    outline: none;
+    flex: 1;
+    width: 100%;
+    
+    max-width: 300px; /* Increased width for larger screens */
+    appearance: none; /* Remove default dropdown arrow */
+    -webkit-appearance: none; /* Remove default dropdown arrow for Safari */
+    -moz-appearance: none; /* Remove default dropdown arrow for Firefox */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><polygon points="0,0 140,0 70,70" fill="gray"/></svg>'); /* Custom dropdown arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+  }
+  
+  @media (max-width: 1024px) {
+    .owner-content-header {
+        flex-direction: column;
+        align-items: center; /* Center items in tablet view */
+    }
+  
+    .owner-gradient-heading {
+        margin-bottom: 10px;
+        text-align: center;
+        width: 100%;
+    }
+  
+    .owner-dropdown-menu {
+        max-width: 250px; /* Decreased width for tablets */
+        width: 100%;
+        margin-top: 10px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .owner-content-header {
+        padding: 15px;
+        align-items: center; /* Center items in tablet view */
+    }
+  
+    .owner-dropdown-menu {
+        padding: 8px;
+        max-width: 250px; /* Decreased width for tablets */
+        width: 100%;
+        margin-top: 10px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .owner-content-header {
+        align-items: center; /* Center items in mobile view */
+    }
+  
+    .owner-dropdown-menu {
+        padding: 5px;
+        max-width: 200px; /* Decreased width for mobile devices */
+        width: 100%;
+        margin-top: 10px;
+    }
+  }
+  
+  .owner-table-heading,
+  .billing-table-heading {
+    color: #091A44; /* Color from your theme */
+    margin-top: 20px; /* Adjust as needed */
+    text-align: center;
+  }
+  
+  .owner-data-table,
+  .billing-data-table {
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    height: 300px; /* Set the height as needed */
+    width: 90%; /* Adjust width as needed */
+    max-height: 500px; /* Set max-height for overflow */
+    overflow-y: auto; /* Enable vertical scrolling if needed */
+    overflow-x: auto; /* Enable horizontal scrolling if needed */
+    margin: 20px auto; /* Center the div horizontally */
+    border-radius: 10px; /* Optional: Add border radius for rounded corners */
+    padding: 20px; /* Add padding to the tables */
+  }
+  
+  .owner-table,
+  .billing-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+  }
+  
+  .owner-table th,
+  .billing-table th,
+  .owner-table td,
+  .billing-table td {
+    text-align: center;
+    padding: 10px;
+    border-left: 1px solid #ddd; /* Add vertical lines between columns */
+  }
+  
+  .owner-table th:first-child,
+  .billing-table th:first-child,
+  .owner-table td:first-child,
+  .billing-table td:first-child {
+    border-left: none; /* Remove border from the first column */
+  }
+  
+  .owner-table th,
+  .billing-table th {
+    font-weight: bold;
+    border-bottom: 2px solid #ddd; /* Add border at the bottom of the th elements */
+  }
+  
+  .owner-table tbody tr:nth-child(even),
+  .billing-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .owner-table tbody tr:hover,
+  .billing-table tbody tr:hover {
+    background-color: #f0f0f0;
+  }
+
+  /* Add this to center text inside the dropdown */
+.status-dropdown {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+ 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  outline: none;
+  flex: 1;
+  width: 100%;
+  max-width: 300px; /* Adjust width as needed */
+  appearance: none; /* Remove default dropdown arrow */
+  -webkit-appearance: none; /* Remove default dropdown arrow for Safari */
+  -moz-appearance: none; /* Remove default dropdown arrow for Firefox */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><polygon points="0,0 140,0 70,70" fill="gray"/></svg>'); /* Custom dropdown arrow */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
+  text-align: center; /* Center text horizontally */
+}
+
+/* Ensure the text in span is also centered */
+.center-text {
+  text-align: center;
+}
+
+  
+  @media (max-width: 768px) {
+    .owner-data-table,
+    .billing-data-table {
+      width: 100%;
+      overflow-x: auto;
+    }
+  }
+  
+  .center-text {
+    text-align: center;
+  }
+  
+  .f {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Enable wrapping of flex items */
+    gap: 10px; /* Add space between flex items */
+  }
+  
+  /* Tablet view */
+  @media (max-width: 1024px) {
+    .f {
+      flex-direction: column; /* Stack items in tablet view */
+      justify-content: center; /* Center items in tablet view */
+    }
+  
+  }
+  
+  /* Mobile view */
+  @media (max-width: 480px) {
+    .f {
+      flex-direction: column; /* Stack items in mobile view */
+      justify-content: center; /* Center items in mobile view */
+    }
+  }
+  
+  .owner-date-picker {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    outline: none;
+    width: 100%;
+    flex: 1;
+    max-width: 300px;
+    margin-left: 10px; /* Space between dropdown and date picker */
+  }
+  
+  @media (max-width: 1024px) {
+    .owner-date-picker {
+      max-width: 250px; /* Adjust width for tablets */
+      width: 100%;
+      margin-top: 10px;
+      margin-left: 0; /* Remove left margin for stacked layout */
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .owner-date-picker {
+      padding: 8px;
+      max-width: 250px; /* Adjust width for tablets */
+      width: 100%;
+      margin-top: 10px;
+      margin-left: 0; /* Remove left margin for stacked layout */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .owner-date-picker {
+      padding: 5px;
+      max-width: 200px; /* Adjust width for mobile devices */
+      width: 100%;
+      margin-top: 10px;
+      margin-left: 0; /* Remove left margin for stacked layout */
+    }
+  }
+  
+  
+  .owner-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px; /* space between items */
+  }
+  
+  .owner-dropdown-menu,
+  .owner-date-picker,
+  .search-button {
+    flex: 1; /* make items flexible */
+    min-width: 150px; /* ensure a minimum width */
+  }
+  
+  .search-button {
+    padding: 8px 12px;
+    background-color: #091A44;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap; /* prevent text wrapping */
+  }
+  
+  .search-button:hover {
+    background-color: #09215e;
+  }
+  
+  @media (max-width: 768px) {
+    .owner-controls {
+      flex-direction: column; /* stack items vertically on small screens */
+      align-items: stretch; /* stretch items to full width */
+    }
+  }
+  
+  

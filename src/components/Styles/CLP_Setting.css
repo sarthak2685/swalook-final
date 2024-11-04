@@ -1,0 +1,246 @@
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.clp_setting_container {
+  background-color: white;
+  margin-top: 250px;
+  margin-left: 160px;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+.clp_main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.clp_settings_content {
+  width: 100%;
+  max-width: 1200px;
+  text-align: center;
+}
+
+.clp_settings_heading {
+  margin-top: 10px;
+  color: #091A44;
+  margin-bottom: 10px;
+}
+
+.clp_divider {
+  border: 0;
+  height: 1px;
+  background: #091A44;
+  margin: 20px 0;
+}
+
+.clp_settings_body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.clp_image_container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.clp_image_container img {
+  max-width: 100%;
+  height: auto;
+}
+
+.clps_table_container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+  padding: 20px;
+  width: 500px;
+}
+
+.clps_table_container table {
+  width: 900px;
+  border-collapse: collapse;
+  border: 1px solid #B5B7C0;
+}
+
+.clps_table_container th, .clps_table_container td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #B5B7C0;
+}
+
+.clps_table_container th {
+  background-color: white;
+  color: #B5B7C0;
+}
+
+.clps_table_container .edit-button,
+.clps_table_container .delete-button {
+  margin-left: 10px;
+}
+
+.clp_threshold_container {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.clp_threshold_input {
+  padding: 5px;
+  width: 100px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Tablet and small desktop view adjustments */
+@media (max-width: 1300px) {
+  .clp_setting_container {
+      margin-left: 240px;
+      width: 95vw; /* Adjust width for smaller screens */
+  }
+
+  .clp_settings_content {
+      max-width: 100%;
+      padding: 10px; /* Adjust padding */
+  }
+
+  .clp_settings_body {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px; /* Reduce gap for tighter layout */
+  }
+
+  .clp_image_container, .clps_table_container {
+      width: 100%; /* Full width on smaller screens */
+      padding: 15px; /* Adjust padding for smaller screens */
+  }
+
+  .clps_table_container table {
+      width: 100%;
+      font-size: 14px; /* Adjust font size for smaller screens */
+  }
+}
+
+/* Mobile view adjustments */
+@media (max-width: 768px) {
+  .clp_settings_body {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+  }
+
+  .clp_image_container, .clps_table_container {
+      width: 100%;
+      padding: 10px;
+  }
+
+  .clps_table_container table {
+      font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .clp_settings_heading {
+      font-size: 20px;
+  }
+
+  .clps_table_container table {
+      font-size: 12px;
+  }
+
+  .clp_image_container img {
+      max-width: 90%;
+  }
+}
+
+/* Extra Large Screen Styles */
+@media screen and (min-width: 1440px) {
+
+  /* Container Adjustments */
+  .clp_setting_container {
+    margin-top: 300px;
+    margin-left: 200px;
+    width: 90vw; /* Decrease width slightly for more breathing space */
+    padding: 20px;
+  }
+
+  /* Main Layout */
+  .clp_main {
+    gap: 50px;
+  }
+
+  .clp_settings_content {
+    max-width: 1400px; /* Wider content area */
+    padding: 20px;
+    font-size: 1.1rem; /* Larger font size */
+  }
+
+  .clp_settings_heading {
+    font-size: 2rem; /* Increase heading font size */
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Divider */
+  .clp_divider {
+    margin: 30px 0; /* Increase vertical spacing */
+  }
+
+  /* Settings Body Layout */
+  .clp_settings_body {
+    gap: 30px; /* Increase gap for more space between elements */
+  }
+
+  .clp_image_container,
+  .clps_table_container {
+    padding: 30px; /* Additional padding */
+  }
+
+  /* Table Styles */
+  .clps_table_container {
+    width: 600px;
+    gap: 50px; /* Increase gap between table elements */
+  }
+
+  .clps_table_container table {
+    width: 1000px; /* Wider table */
+    font-size: 1rem; /* Larger font size */
+  }
+
+  .clps_table_container th,
+  .clps_table_container td {
+    padding: 16px; /* Increase cell padding */
+  }
+
+  /* Threshold Container */
+  .clp_threshold_container {
+    gap: 20px;
+  }
+
+  .clp_threshold_input {
+    width: 120px; /* Wider input */
+    padding: 10px;
+  }
+}

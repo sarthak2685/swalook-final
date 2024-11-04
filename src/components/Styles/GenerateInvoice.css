@@ -1,0 +1,358 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.gbform-group, .gbform-groups {
+  display: flex;
+  align-items: center; /* Center align vertically */
+  width: 500px; /* Keep width as needed */
+  margin-left: 60px; /* Adjust as necessary */
+}
+
+.gbform-group label, .gbform-groups label,gb_select-field {
+  margin-right: 10px; /* Space between label and input */
+  color: #091A44; /* Label color */
+  width: 150px; /* Adjusted width for label */
+}
+
+.gb_input-field, .gb_input-fields {
+  padding: 8px;
+  border: 1px solid #CFD3D4; /* General border */
+  border-radius: 8px;
+  height: 58px;
+  flex: 1; /* Makes input fields take remaining space */
+}
+
+.gb_select-field {
+  display: flex;
+  flex-direction: column;
+  width: 350px;
+  margin-left: 220px;
+  height:80px;
+}
+
+.gb_horizontal {
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+input, select {
+  font-family: 'Montserrat', sans-serif;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* General Styling */
+.GI {
+  color: #091A44;
+}
+
+.gb_h1, .gb_h2 {
+  background-color: white;
+}
+
+.gb_h1 {
+  flex: 0 0 70px;
+}
+
+.gb_h2 {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  height: 100vh;
+  transition: background-color 0.3s ease;
+}
+
+/* Layout */
+.gb_left, .gb_right {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.gb_appoint{
+  color: #091A44;
+}
+
+.gb_left {
+  margin-top: 60px;
+  width: 700px;
+  padding: 20px;
+  margin-right: 10px;
+  height: 1450px;
+  margin-left: 180px;
+  border-radius: 30px;
+}
+
+.gb_right {
+  margin-top: 80px;
+  width: 700px;
+  margin-left: 100px;
+  height: 1450px;
+  border-radius: 30px;
+}
+
+.gb_btn_contain {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.gb_button {
+  width: 50%; 
+  padding: 10px 16px; 
+  background-color: #5570F1; 
+  color: #fff;
+  border: none;
+  border-radius: 8px; 
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.gb_button:hover {
+  background-color: #0b2158;
+}
+
+/* Table Styles */
+.gb_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gb_table th, .gb_table td {
+  padding: 10px; 
+  text-align: center;
+  border: 1px solid #dddddd;
+}
+
+.gb_table th {
+  font-family: 'Poppins', sans-serif; 
+  font-weight: 500;
+  color: #B5B7C0; 
+  background-color: transparent;
+}
+
+.gb_table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.gb_table tbody tr:hover {
+  background-color: #e2e2e2;
+}
+
+/* Media Queries */
+@media only screen and (max-width: 768px) {
+  .gb_right {
+    display: none; 
+  }
+
+  .gb_left {
+    width: 100%; 
+  }
+
+  .gb_button {
+    width: 60%; 
+  }
+}
+.membership-container {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.membership-label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.membership-select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+  width:350px;
+  margin-left: 220px;
+}
+
+.membership-select:focus {
+  border-color: #007bff; /* Change to your primary color */
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.membership-select option {
+  padding: 10px;
+}
+
+.services-table {
+  margin: 20px auto;
+  width: 90%;
+  max-width: 800px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.services-table-content {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+.services-table-content th, .services-table-content td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.services-table-content th {
+  background-color: #f4f4f4;
+  color: #B5B7C0;
+  font-weight: bold;
+}
+
+.services-table-content tr:hover {
+  background-color: #f1f1f1;
+}
+
+.service-table-field {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.3s;
+}
+
+.service-table-field:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+
+.service_dp{
+padding-right: 30px;
+}
+
+.status-dropdown:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+
+@media (max-width: 600px) {
+  .services-table {
+    width: 100%;
+  }
+}
+/* Remove extra padding in GST cell container */
+.service_dp {
+  padding-right: 0;
+}
+
+/* Full width dropdown styling */
+.status-dropdowns {
+  width: 100px;  /* Set specific width */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding-right: 60px;
+  height: 40px;
+}
+
+
+.status-dropdown:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+/* Existing CSS remains unchanged */
+
+@media only screen and (max-width: 1000px) {
+  body {
+    flex-direction: column; /* Stack items vertically */
+    height: auto; /* Allow height to adjust */
+  }
+
+  .gbform-group, .gbform-groups {
+    width: 90%; /* Reduce width of input field sections */
+    margin-left: auto; /* Center align the container */
+    margin-right: auto; /* Center align the container */
+  }
+
+  .gbform-group label, .gbform-groups label {
+    width: auto; /* Allow labels to size based on content */
+    margin-right: 5px; /* Reduce space between label and input */
+  }
+
+  .gb_input-field, .gb_input-fields {
+    height: 48px; /* Adjust input field height */
+  }
+
+  .gb_select-field {
+    width: 100%; /* Use full width for select fields */
+    margin-left: 0; /* Reset left margin */
+    height: 60px; /* Adjust height */
+  }
+
+  .gb_left {
+    width: 90%; /* Reduce width for left container */
+    margin-left: auto; /* Center align the container */
+    margin-right: auto; /* Center align the container */
+    height: auto; /* Adjust height */
+  }
+
+  .gb_right {
+    display: none; /* Hide right container on smaller screens */
+  }
+
+  .gb_btn_contain {
+    flex-direction: column; /* Stack buttons vertically */
+  }
+
+  .gb_button {
+    width: 100%; /* Full width for button */
+    margin: 10px 0; /* Add vertical spacing */
+  }
+
+  .membership-select {
+    width: 100%; /* Use full width for select */
+    margin-left: 0; /* Reset left margin */
+  }
+
+  .services-table {
+    width: 90%; /* Reduce width for services table */
+    margin-left: auto; /* Center align the table */
+    margin-right: auto; /* Center align the table */
+  }
+
+  .services-table-content {
+    font-size: 12px; /* Reduce font size for table */
+  }
+
+  .services-table-content th, .services-table-content td {
+    padding: 8px; /* Reduce padding */
+  }
+
+  .status-dropdowns {
+    width: 100%; /* Full width for dropdown */
+  }
+}

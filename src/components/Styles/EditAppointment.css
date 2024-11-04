@@ -1,0 +1,156 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.edit_popup_overlay {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  position: fixed; /* Position fixed to cover the whole screen */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  width: 100vw; /* Full width */
+  height: 100vh; /* Full height */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 1000; /* Ensure it appears above other content */
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+.edit_popup_container {
+  position: relative; /* Set this to position child elements absolutely */
+  background: white; /* Background for the popup */
+  border-radius: 8px; /* Rounded corners */
+  padding: 20px; /* Space inside the popup */
+  width: 500px; /* Set a fixed width */
+  max-width: 90%; /* Responsive max width */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+}
+
+.edit_close_button {
+  position: absolute; /* Position the button absolutely */
+  top: 1px; /* Distance from the top */
+  right: -60px; /* Distance from the right */
+  background: transparent; /* Transparent background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  color: red; /* Set the icon color to red */
+  font-size: 24px; /* Adjust size as needed */
+  padding-bottom: 10px;
+
+}
+
+.edit_close_button:hover {
+  opacity: 0.7; /* Slight opacity change on hover */
+}
+
+/* Uniform styles for all input fields */
+.edit-appoint_input-field,
+.edit-schedule_date-input,
+.edit-schedule_time-dropdown,
+.edit-appoint_select-field {
+  width: 100%; /* Full width */
+  padding: 10px; /* Consistent padding */
+  border: 1px solid #ccc; /* Consistent border */
+  border-radius: 5px; /* Rounded corners */
+  margin-top: 5px; /* Space above */
+  font-size: 16px; /* Consistent font size */
+  color: #333; /* Consistent text color */
+  background-color: #f9f9f9; /* Light background color */
+  transition: border-color 0.3s ease; /* Smooth border color change */
+}
+
+/* Focus styles */
+.edit-appoint_input-field:focus,
+.edit-schedule_date-input:focus,
+.edit-schedule_time-dropdown:focus,
+.edit-appoint_select-field:focus {
+  outline: none; /* Remove default outline */
+  border-color: #66afe9; /* Change border color on focus */
+  box-shadow: 0 0 5px #66afe9; /* Add shadow on focus */
+}
+
+.edit-appointform-group {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.edit-appointform-group label {
+  margin-left: 10px;
+  margin-top: 12px;
+  margin-right: 10px;
+  text-align: center;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.edit-appoint_select-field-cont {
+  width: 70%;
+}
+
+/* Styles for the dropdown arrow */
+.edit-appoint_select-field::after {
+  content: '\25BC'; /* Unicode character for downward arrow */
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none; /* Ensure the arrow doesn't interfere with clicking */
+}
+
+.edit-schedule_form-group {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+/* Styles for the time selection section */
+.edit-schedule_time-selection {
+  margin-top: 10px;   
+  display: flex;
+  align-items: center;
+}
+
+.edit-schedule_time-label {
+  margin-left: 10px;
+  display: block;
+  margin-bottom: 5px;
+  margin-right: 10px;
+}
+
+.edit-appoint-button-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.edit-appoint_submit-button {
+  margin-top: 20px;
+  width: 40%;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #66afe9;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  margin-right: 60px;
+}
+
+.edit-appoint_submit-button:hover {
+  background-color: #0b2158;
+}
+
+.edit_popup_header h3 {
+  color: #091A44;
+}

@@ -1,0 +1,34 @@
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+  }
+  
+  .error-content {
+    text-align: center;
+  }
+  
+  .error-heading {
+    font-size: 48px;
+    color: #e74c3c;
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    font-size: 24px;
+    color: #333;
+  }
+  
+  @media only screen and (max-width: 768px) {
+    .error-heading {
+      font-size: 36px;
+    }
+  
+    .error-message {
+      font-size: 18px;
+    }
+  }
+  

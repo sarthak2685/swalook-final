@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./header_crm_logo.webp" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="The ultimate cloud-based salon and CRM software for streamlining operations, enhancing customer relations, and boosting your salon's success."
+    />
+    <link rel="apple-touch-icon" href="./header_crm_logo.webp" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>Swalook</title>
+    <style>
+      /* Optional: Add a CSS rule to handle zoom for all elements */
+      body {
+        zoom: 0.75; /* Setting the default zoom level */
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    
+    <script>
+      // Disable zoom in case the user tries to pinch or zoom the webpage
+      document.addEventListener('wheel', function(event) {
+        if (event.ctrlKey) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+          event.preventDefault(); // Prevent pinch zoom on touch devices
+        }
+      }, { passive: false });
+
+      // Additional script to prevent zoom with keyboard shortcuts (Ctrl + +)
+    </script>
+  </body>
+</html>

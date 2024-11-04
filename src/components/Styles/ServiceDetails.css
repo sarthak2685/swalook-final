@@ -1,0 +1,160 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.service_details_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  margin-left: 250px;
+  margin-bottom: 50px;
+  margin-top: 220px;
+}
+
+.service_details_header h1 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.add_service_button,
+.delete_service_button {
+  background-color: transparent;
+  color: black;
+  border: 2px solid;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 150px; /* Reduced width */
+  margin-right: 10px; /* Adjusted margin */
+  font-family: 'Montserrat', sans-serif;
+}
+
+.add_service_button:hover,
+.delete_service_button:hover {
+  background-color: #5570F1;
+  color: white;
+}
+
+.add_service_button:focus {
+  outline: none;
+}
+
+.horizontal_line_container {
+  display: flex;
+  justify-content: center;
+}
+
+.horizontal_line {
+  border: none;
+  height: 1px;
+  width: 90vw;
+  background-color: #091a44;
+  margin: 10px 0;
+  margin-bottom: 100px;
+}
+
+.admin_service_table_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  width: 80%; /* Reduced width for better alignment */
+  font-family: 'Montserrat', sans-serif;
+}
+
+.admin_service_table {
+  width: 1400px; /* Full width of the container */
+  border-collapse: collapse;
+  margin-bottom: 600px;
+  margin-left: 250px;
+}
+
+.admin_service_table th,
+.admin_service_table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  color: #292D32;
+}
+
+.admin_service_table th {
+  background-color: white;
+  border-bottom: 2px solid #091a44;
+  color: #B5B7C0;
+}
+
+/* Responsive CSS */
+
+/* For Tablets (1024px) and Below */
+@media only screen and (max-width: 1024px) {
+  .service_details_header {
+    flex-direction: column;
+    padding: 10px;
+    text-align: center;
+    margin-left: 0; /* Remove left margin */
+    margin-top: 50px; /* Adjust top margin */
+  }
+
+  .add_service_button,
+  .delete_service_button {
+    width: 100%; /* Full width on smaller screens */
+    margin: 10px 0;
+  }
+
+  .horizontal_line {
+    width: 90%;
+  }
+
+  .admin_service_table_container {
+    width: 95%;
+  }
+
+  .admin_service_table {
+    width: 100%; /* Make table responsive */
+    margin-left: 0; /* Remove left margin */
+  }
+
+  .admin_service_table th,
+  .admin_service_table td {
+    padding: 10px; /* Adjust padding for smaller screens */
+    font-size: 14px; /* Reduce font size */
+  }
+
+  .admin_service_table th {
+    font-size: 16px; /* Slightly larger font for headers */
+  }
+}
+
+/* For Phones */
+@media only screen and (max-width: 768px) {
+  .service_details_header {
+    flex-direction: column;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .add_service_button,
+  .delete_service_button {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  .horizontal_line {
+    width: 90%;
+  }
+
+  .admin_service_table_container {
+    width: 95%;
+  }
+
+  .admin_service_table {
+    width: 100%;
+  }
+}

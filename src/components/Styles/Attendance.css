@@ -1,0 +1,157 @@
+.attendance-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .attendance-popup-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    width: 400px;
+  }
+  
+  .attendance-popup-title {
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .attendance-popup-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    gap: 1rem;
+  }
+  
+  .attendance-close-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  
+  .attendance-close-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .attendance-present {
+    color: green;
+  }
+  
+  .attendance-absent {
+    color: red;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 480px) {
+    .attendance-popup-container {
+      width: 90%;
+    }
+  }
+  /* Calendar Styles */
+  .react-calendar {
+    background-color: #fff; /* White background for the calendar */
+    border: none; /* No border */
+    border-radius: 8px; /* Rounded corners */
+  }
+  
+  
+  
+  .react-calendar__navigation {
+    background-color: #007bff; /* Match the close button color */
+    color: white; /* White text for better contrast */
+    font-size: 14px; /* Smaller font size for month and year */
+    overflow: hidden; /* Hide overflow */
+  }
+  
+  .react-calendar__navigation span {
+    display: block; /* Block display to ensure full width */
+    margin: 0 0 0 -29px;/* Prevent wrapping */
+  }
+  
+  /* Navigation Button Styles */
+  .react-calendar__navigation button {
+    background-color: #007bff; /* Match the close button color */
+    color: white; /* White text */
+    font-size: 14px; /* Smaller font size for buttons */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer on hover */
+  }
+  
+  /* Keep buttons enabled */
+  .react-calendar__navigation button:disabled {
+    opacity: 1; 
+    background-color: #007bff; /* Match the close button color */
+  
+  }
+  /* .react-calendar__navigation button:hover {
+    background-color: none;
+    color: white; 
+  } */
+  
+  
+  
+  /* Days of the Week */
+  .react-calendar__month-view__weekdays {
+    background-color: #f0f0f0; /* Light gray for weekday headers */
+    color: #333; /* Darker text for visibility */
+  }
+  
+  /* Day Tiles */
+  .react-calendar__tile {
+    border-radius: 4px; /* Rounded corners */
+    padding: 10px; /* Increase padding for better touch area */
+    text-align: center; /* Centered text */
+    transition: background-color 0.2s; /* Smooth background transition */
+  }
+  
+  /* Marked Attendance */
+  .react-calendar__tile--active {
+    background-color: #28a745; /* Green for marked attendance */
+    color: white; /* White text for marked attendance */
+  }
+  
+  /* Present Days */
+  .react-calendar__tile.present {
+    background-color: #cce5ff; /* Light blue for present */
+    color: #004085; /* Dark blue text for contrast */
+  }
+  
+  /* Absent Days */
+  .react-calendar__tile.absent {
+    background-color: #fff3cd; /* Light yellow for absent */
+    color: #856404; /* Dark yellow text for contrast */
+  }
+  
+  /* Default Day Styles */
+  .react-calendar__tile {
+    color: #000; /* Default black color for dates */
+  }
+  
+  /* Hover Effect on Days */
+  .react-calendar__tile:hover {
+    background-color: #e7f3ff; /* Light blue on hover */
+    cursor: pointer; /* Pointer on hover */
+  }
+  
+  /* Current Day Highlight */
+  .react-calendar__tile--now {
+    border: 2px solid #007bff; /* Highlight current day with blue border */
+  }
+  .attendance-save-button{
+    background-color: #007bff;
+  }
+  .attendance-save-button:hover{
+    background-color: #0056b3;
+  }

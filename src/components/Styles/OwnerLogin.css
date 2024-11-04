@@ -1,0 +1,145 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+.owner_login_container {
+  height: 100vh; /* Full viewport height */
+  font-family: Montserrat, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Center the content */
+  width: 100%; /* Make the container full width */
+}
+
+.owner_login_main {
+  display: flex;
+  flex-direction: column; /* Change to column for centering */
+  align-items: center; /* Center the content */
+  width: 500px; /* Increased width of the form */
+  max-width: 90%; /* Limit max width on smaller screens */
+}
+
+.owner_logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.owner_S_logo {
+  width: 150px;
+  height: auto;
+}
+
+.OL_input-group {
+  margin-bottom: 15px;
+  width: 100%; /* Full width for input group */
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: large;
+  text-align: center; /* Center label text */
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%; /* Full width */
+  max-width: 375px; /* Optional max width */
+  height: 58px; /* Fixed height */
+  padding: 8px 16px; /* Padding */
+  border-radius: 8px; /* Uniform rounded corners */
+  border: 1px solid #ccc; /* Add border color */
+  background-color: #fff; /* Solid background for visibility */
+  margin-top: 10px;
+}
+
+.password-input-container {
+  position: relative;
+}
+
+.lock-icon {
+  position: absolute;
+  left: 10px; /* Adjust as needed */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Align icon */
+  color: #888; /* Icon color */
+}
+
+input[type="password"] {
+  padding-left: 40px; /* Leave space for the icon */
+}
+
+button {
+  margin-top: 20px;
+  width: 275px; /* Fixed width */
+  height: 40px; /* Fixed height */
+  padding: 17px 16px; /* Padding */
+  border-radius: 12px; /* Uniform rounded corners */
+  background-color: #5570F1; /* Button color */
+  color: white; /* Text color */
+  border: none; /* No border */
+  cursor: pointer;
+  opacity: 1; /* Set to visible */
+  margin-left: 60px;
+}
+
+.forgot-password {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+}
+
+.forgot-password a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.owner_login_head {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 35px;
+  color: #091A44;
+}
+
+.owner_form {
+  width: 80%;
+  margin: 0 auto; /* Center the form */
+}
+
+/* Responsive CSS */
+@media only screen and (max-width: 768px) {
+  .owner_form {
+    width: 90%; /* Adjust form width */
+  }
+
+  .owner_S_logo {
+    width: 100px; /* Adjust logo size for mobile */
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%; /* Full width for smaller screens */
+    padding-left: 16px; /* Adjust padding for smaller screens */
+  }
+
+  button {
+    width: 100%; /* Full width for smaller screens */
+  }
+}
+
+input::placeholder {
+  color: #ccc; /* Light placeholder color */
+  opacity: 1; /* Ensure it’s fully visible */
+}
