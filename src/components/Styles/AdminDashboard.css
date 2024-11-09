@@ -27,7 +27,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 30px; /* Adjusts space between icons */
+  gap: 40px; /* Adjusts space between icons */
 }
 .status-dropdowns {
   width: 400px;
@@ -224,96 +224,102 @@ body {
   margin-right: 15px;
   padding-top: 10px;
 }
+.actions-th{
 
-/* Media Queries */
+}
+/* Tablet View */
 @media (max-width: 1500px) {
-  /* Tablet View */
+  /* Stack content boxes vertically */
   .content-body {
-    flex-direction: column; /* Stack content boxes vertically */
+    flex-direction: column;
+    margin-top: 80px;
+    margin-left: 300px;
   }
-
-  /* Reduce width of billing table container and tables */
+  /* Apply consistent padding and move table data to the left */
   .billing_table_container,
   .US-con table,
   .BT-con table {
-    width:1250px; /* Reduce table width for tablet view */
-    margin: 0 auto; /* Center tables */
-    padding: 5px; /* Reduce padding inside the table section */
-    margin-left:200px;
-    padding-right: 140px;
+    width: 1250px;
+    margin: 0 auto;
+    padding: 10px; /* Consistent padding */
+    margin-left: 0; /* Align table data to the left */
+    padding-right: 30px;
+    margin-bottom: 60px;
+  }
+  .actions-th {
+    padding-left: 50px; /* Adjust to align the "Actions" heading with the icons */
+    text-align: center; /* Center-align heading text */
   }
 
   /* Adjust input field styles */
   .content-header input[type="text"] {
-    width: 100%; /* Full width search bar */
-    padding: 15px; /* Reduce padding */
-    border-radius: 15px; /* Slightly reduce border radius */
+    width: 100%;
+    padding: 15px;
+    border-radius: 15px;
   }
 
   .service_buttons {
     padding-left: 30px;
   }
-  .status-dropdowns{
-    width:100px;
+  .status-dropdowns {
+    width: 100px;
   }
   .action-cell {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 30px; /* Adjusts space between icons */
+    align-items: right;
+    justify-content: flex-center; /* Align icons to the left */
+    gap: 30px; /* Adjust space between icons */
   }
-  
 
-  /* Reduce padding for the content box and footer */
+  /* Consistent padding for content box and footer */
   .content-box,
   .content-footer {
-    padding: 5px; /* Reduce padding for tablet screens */
+    padding: 10px;
   }
 
   /* Adjust popup content width */
   .popup-content {
-    width: 90%; /* Make popup content responsive */
+    width: 90%;
   }
 
-  /* Reduce size of table header and cell padding */
+  /* Reduce padding for table header and cells */
   .US-con th,
   .US-con td,
   .BT-con th,
   .BT-con td {
-    padding-left: 2px;  /* Reduce left padding for smaller screens */
-    padding-right: 2px; /* Reduce right padding for smaller screens */
-    padding-top: 5px;   /* Optional: Adjust top padding */
-    padding-bottom: 5px; /* Optional: Adjust bottom padding */
-    font-size: 12px;    /* Optional: Reduce font size for smaller screens */
+    padding: 20px;
+    text-align: center; /* Align text to the left */
+    font-size: 12px;
   }
 
   /* Adjust styles for the gradient heading */
   .gradient-heading {
-    font-size: 24px; /* Adjust font size for smaller screens */
+    font-size: 24px;
   }
 
-  /* Adjust the margin for the content footer heading */
+  /* Adjust margin for content footer heading */
   .content-box h2,
   .content-footer h2 {
-    margin-left: 850px; /* Center heading for better alignment */
-    margin-right: auto;
+    margin-left: 80%;
+    transform: translateX(-50%); /* Center heading */
   }
 
-  /* Adjusting the styles for the popup buttons */
+  /* Adjust popup buttons */
   .popup-buttons button {
-    padding: 8px 16px; /* Reduce button padding */
-    font-size: 14px; /* Reduce button font size */
+    padding: 8px 16px;
+    font-size: 14px;
   }
 
-  /* For search bar */
+  /* Search bar adjustments */
   .billing_search-bar,
   .US_search-bar {
-    width: 80%; /* Adjust search bar width */
+    width: 80%;
     max-width: 200px;
-    margin-left: 100px; /* Center align search bars */
+    margin-left: 100px;
     margin-right: auto;
   }
 }
+
 /* Media Queries for Small Screens */
 @media (max-width: 1100px) {
   /* Stack layout for smaller screens */

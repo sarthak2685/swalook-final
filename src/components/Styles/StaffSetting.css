@@ -7,8 +7,7 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   font-family: 'Arial', sans-serif;
   background-color: transparent;
-  margin-top: 980px;
-  margin-left: 250px;
+  margin-left: 550px;
 }
 
 .heading-settings {
@@ -93,8 +92,8 @@ h3 {
 /* Responsive adjustments for screens up to 1400px */
 @media (max-width: 1400px) {
   .staff-setting-container {
-    width: 90%;
-    margin-left: 200px;
+    width: 60%;
+    margin-left: 500px;
     padding: 30px;
   }
 

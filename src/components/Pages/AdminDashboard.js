@@ -238,7 +238,7 @@ function AdminDashboard() {
                         <th>Date</th>
                         <th>Services</th>
                         <th>Mobile No</th>
-                        <th>Actions</th>
+                        <th className='actions-th'>Actions</th>
                       </tr>
                     </thead>
                     <tbody>

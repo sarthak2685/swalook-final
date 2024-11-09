@@ -111,7 +111,8 @@ body {
         margin: 0 auto; /* Center the container */
         padding: 20px;
         margin-left: 180px;
-        margin-bottom: 300px;
+        margin-bottom: 200px;
+        margin-top: 180px;
     }
 
     .inventory_details_header {
@@ -196,7 +197,8 @@ body {
         margin: 0 auto;
         padding: 10px;
         margin-left: 120px;
-        margin-bottom: 300px;
+        margin-bottom: 200px;
+        margin-top: 180px;
     }
 
     .inventory_details_header {
@@ -208,7 +210,7 @@ body {
 
     .inventory_details_header h1 {
         padding-top: 40px;
-        margin-left: 120px;
+        margin-left: 160px;
         font-size: 1.4rem;
     }
 
@@ -218,6 +220,7 @@ body {
         padding: 2px 6px;
         margin-left: auto; /* Align to the right */
         align-self: flex-start;
+        margin-right: 100px;
     }
 
     .horizontal_line {
