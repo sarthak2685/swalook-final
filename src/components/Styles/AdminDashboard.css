@@ -23,6 +23,16 @@ body {
   height: 100vh;
   display: flex;
 }
+.action-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px; /* Adjusts space between icons */
+}
+.status-dropdowns {
+  width: 400px;
+
+}
 
 .vertical-navigation {
   flex: 0 0 70px;
@@ -77,6 +87,7 @@ body {
   background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
+
 
 /* Content Body */
 .content-body {
@@ -215,7 +226,7 @@ body {
 }
 
 /* Media Queries */
-@media (max-width: 1300px) {
+@media (max-width: 1500px) {
   /* Tablet View */
   .content-body {
     flex-direction: column; /* Stack content boxes vertically */
@@ -225,10 +236,10 @@ body {
   .billing_table_container,
   .US-con table,
   .BT-con table {
-    width:1200px; /* Reduce table width for tablet view */
+    width:1250px; /* Reduce table width for tablet view */
     margin: 0 auto; /* Center tables */
     padding: 5px; /* Reduce padding inside the table section */
-    margin-left:100px;
+    margin-left:200px;
     padding-right: 140px;
   }
 
@@ -238,6 +249,20 @@ body {
     padding: 15px; /* Reduce padding */
     border-radius: 15px; /* Slightly reduce border radius */
   }
+
+  .service_buttons {
+    padding-left: 30px;
+  }
+  .status-dropdowns{
+    width:100px;
+  }
+  .action-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px; /* Adjusts space between icons */
+  }
+  
 
   /* Reduce padding for the content box and footer */
   .content-box,
@@ -270,7 +295,7 @@ body {
   /* Adjust the margin for the content footer heading */
   .content-box h2,
   .content-footer h2 {
-    margin-left: auto; /* Center heading for better alignment */
+    margin-left: 850px; /* Center heading for better alignment */
     margin-right: auto;
   }
 
@@ -289,75 +314,100 @@ body {
     margin-right: auto;
   }
 }
-
-@media (max-width: 768px) {
-  /* Mobile View */
-  .content-body {
-    flex-direction: column; /* Stack content boxes vertically */
+/* Media Queries for Small Screens */
+@media (max-width: 1100px) {
+  /* Stack layout for smaller screens */
+  .content-body,
+  .cl_container {
+    flex-direction: column;
+    padding: 8px;
+    width: 100%; /* Full width */
+    margin: 0; /* Remove extra margins */
+    margin-left:90px;
   }
 
+  /* Adjust widths and margins for tables */
   .billing_table_container,
   .US-con table,
   .BT-con table {
-    width: 100%; /* Full width for mobile */
-    overflow-x: auto;
+    width: 800px; /* Make tables responsive */
+    padding: 5px;
+    margin: 0 auto;
   }
 
+  /* Full-width input fields and reduce padding */
   .content-header input[type="text"] {
-    width: 100%; /* Full width search bar */
+    width: 100%;
+    padding: 10px;
+    font-size: 14px; /* Slightly reduce font size */
+    border-radius: 10px;
   }
 
+  /* Adjust font size and spacing for table headers and cells */
+  .US-con th,
+  .US-con td,
+  .BT-con th,
+  .BT-con td {
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  /* Make buttons responsive */
+  .cl_add,
+  .popup-buttons button {
+    width: 100%; /* Full width buttons */
+    font-size: 12px; /* Adjust font size */
+    padding: 6px;
+    margin: 5px 0;
+  }
+
+  /* Responsive popup content */
+  .popup-content {
+    width: 95%; /* Full width with small margin */
+  }
+
+  /* Reduce padding for content boxes and footers */
   .content-box,
   .content-footer {
-    padding: 10px; /* Adjust padding for smaller screens */
+    padding: 5px;
+  }
+
+  /* Center and adjust font size for headings */
+  .gradient-heading {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  /* Adjust heading alignment for content and footer */
+  .content-box h2,
+  .content-footer h2 {
+    margin: 0 auto;
+    text-align: center;
+    font-size: 18px;
+    margin-left:450px;
+  }
+
+  /* Adjust the search bar for small screens */
+  .billing_search-bar,
+  .US_search-bar {
+    width: 30%; /* Full width on smaller screens */
+    max-width: 100%; /* Remove fixed max-width */
+    margin: 10px auto;
+    margin-left:50px;
   }
 }
-@media (min-width: 1600px) {
-  .content-box h2, .content-footer h2 {
-    margin-left: 1500px;
-    font-size: 24px;
-  }
 
-  .billing_table_container {
-    max-width: 1800px; /* Expand the table container for larger screens */
-    padding: 30px;
-  }
-
-  .content-header input[type="text"] {
-    width: 600px; /* Increase width of search bar */
-  }
-
-  .popup-content {
-    width: 600px; /* Expand popup width */
-  }
-}
-
+/* For Ultra-Large Screens */
 @media (min-width: 1800px) {
   .content-box h2, .content-footer h2 {
-    margin-left: 1600px;
-    font-size: 26px;
+    font-size: 28px;
+    text-align: left;
   }
 
-  .billing_table_container {
-    max-width: 2000px; /* Further expand the table container for ultra-large screens */
-    padding: 40px;
-  }
-
-  .content-header input[type="text"] {
-    width: 700px; /* Increase width of search bar */
-  }
-
-  .popup-content {
-    width: 700px; /* Increase popup width */
-  }
-
-  .US-con th, .BT-con th, .US-con td, .BT-con td {
-    padding: 20px; /* Increase padding for readability on larger screens */
-    font-size: 18px;
-  }
-
-  .popup-buttons button {
-    padding: 15px 30px; /* Increase button size */
-    font-size: 16px;
+  .cl_table, .billing_table_container {
+    max-width: 2200px;
+    padding: 30px;
   }
 }
+
+  

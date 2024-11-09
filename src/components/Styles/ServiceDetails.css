@@ -99,7 +99,7 @@ body {
     padding: 10px;
     text-align: center;
     margin-left: 0; /* Remove left margin */
-    margin-top: 50px; /* Adjust top margin */
+    margin-top: 10px; /* Adjust top margin */
   }
 
   .add_service_button,
@@ -114,10 +114,11 @@ body {
 
   .admin_service_table_container {
     width: 95%;
+    margin-bottom:200px;
   }
 
   .admin_service_table {
-    width: 100%; /* Make table responsive */
+    width: 800px; /* Make table responsive */
     margin-left: 0; /* Remove left margin */
   }
 
@@ -134,6 +135,81 @@ body {
 
 /* For Phones */
 @media only screen and (max-width: 768px) {
+  .service_details_header {
+    flex-direction: column;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .add_service_button,
+  .delete_service_button {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  .horizontal_line {
+    width: 90%;
+  }
+
+  .admin_service_table_container {
+    width: 95%;
+  }
+
+  .admin_service_table {
+    width: 100%;
+  }
+}
+@media (max-width: 1300px) {
+  .service_details_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-left: 100px;
+    text-align: left;
+    flex-direction: row; /* Ensure row layout */
+  }
+
+  .service_details_header h1 {
+    font-size: 1.5rem;
+    flex-grow: 1; /* Heading on the left */
+    margin-left:80px;
+  }
+
+  .add_service_button,
+  .delete_service_button {
+    width: auto; /* Allow button width to adjust */
+    margin-left: 10px; /* Space between buttons */
+  }
+
+  .horizontal_line {
+    width: 90%;
+  }
+
+  .admin_service_table_container {
+    width: 95%;
+    margin-left: 150px;
+  }
+
+  .admin_service_table {
+    width: 1000px;
+    margin: 20px 0;
+    margin-bottom: 350px;
+  }
+
+  .admin_service_table th,
+  .admin_service_table td {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .admin_service_table th {
+    font-size: 16px;
+  }
+}
+
+/* Phones (768px and Below) */
+@media (max-width: 768px) {
   .service_details_header {
     flex-direction: column;
     padding: 10px;

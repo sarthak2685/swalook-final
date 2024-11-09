@@ -68,21 +68,21 @@ body {
 }
 
 .confirm-button {
-  background-color:#28a745; /* Red for delete action */
+  background-color: #28a745; /* Green for confirm action */
   color: white;
 }
 
 .confirm-button:hover {
-  background-color: #28a745; /* Darker shade on hover */
+  background-color: #218838; /* Darker green on hover */
 }
 
 .cancel-button {
-  background-color:#e63b28 ; /* Blue for cancel action */
+  background-color: #e63b28; /* Red for cancel action */
   color: white;
 }
 
 .cancel-button:hover {
-  background-color: #e63b28; /* Darker shade on hover */
+  background-color: #c9302c; /* Darker red on hover */
 }
 
 @keyframes fadeIn {
@@ -97,6 +97,23 @@ body {
 }
 
 /* Responsive Design */
+@media (max-width: 768px) {
+  .confirm-dialog-box {
+      max-width: 90%; /* Ensure the box uses more of the available space */
+      padding: 15px 20px;
+  }
+
+  .confirm-dialog-buttons {
+      flex-direction: column; /* Stack buttons on tablet screens */
+      gap: 10px;
+  }
+
+  .confirm-button, .cancel-button {
+      width: 100%; /* Full width buttons */
+      margin: 0; /* Remove margin on small screens */
+  }
+}
+
 @media (max-width: 500px) {
   .confirm-dialog-box {
       padding: 15px 20px;

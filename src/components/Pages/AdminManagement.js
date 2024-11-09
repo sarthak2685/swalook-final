@@ -183,7 +183,7 @@ const AdminManagement = () => {
       <Header />
       <div className="update">
         <VertNav />
-        <div className="staff-mgmt-container">
+        <div className="staff-mgmt-containers">
           <Toaster />
           <div className="header-container">
             <h1 className="staff-mgmt-title">Staff Management</h1>
@@ -197,7 +197,7 @@ const AdminManagement = () => {
             {loading ? (
               <p>Loading...</p>
             ) : (
-              <table className="staff-mgmt-table">
+              <table className="staff-mgmt-tables">
                 <thead>
                   <tr>
                     <th>SNo.</th>
@@ -210,8 +210,8 @@ const AdminManagement = () => {
                     <th>Business MTD</th>
                     <th>Mark Attendance</th>
                     <th style={{ paddingLeft: '30px' }}>Salary Slip</th>
-                    <th style={{ paddingLeft: '110px' }}>Edit</th>
-                    <th style={{ paddingLeft: '110px' }}>Delete</th>
+                    <th style={{ paddingLeft: '20px' }}>Edit</th>
+                    <th style={{ paddingLeft: '20px' }}>Delete</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -242,19 +242,20 @@ const AdminManagement = () => {
                         </button>
                       </td>
                       <td>
-                        <div className="icon-container">
+                        <div className="icon-containers">
                           <IconButton onClick={() => handleEditStaff(staff)} aria-label="edit" className="staff-mgmt-edit-button">
                             <Edit />
                           </IconButton>
                         </div>
                       </td>
                       <td>
-                        <div className="icon-container">
+                        <div className="icon-containers">
                           <IconButton
                             className="staff-mgmt-delete-button"
                             onClick={() => openDeleteConfirm(staff.id)}
                             color="error"
                             aria-label="delete"
+                            style={{ cursor: 'pointer', color: 'black' }} 
                           >
                             <Delete />
                           </IconButton>

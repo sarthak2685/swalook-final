@@ -21,7 +21,7 @@ function getCurrentDate() {
   return `${day}/${month}/${year}`;
 }
 
-function GenerateInvoice() {
+function GenerateInvoice({onViewDetailsClick}) {
   const navigate = useNavigate();
    const [serviceOptions, setServiceOptions] = useState([]);
    const [customer_name , setCustomer_Name] = useState('');
@@ -64,6 +64,8 @@ console.log(sname);
    const [staffData, setStaffData] = useState([]);
 
     const bid = localStorage.getItem('branch_id');
+
+    console.log("ye hai jo v hai",onViewDetailsClick);
 
     useEffect(() => {
       const fetchData = async () => {
@@ -241,48 +243,7 @@ console.log(sname);
     };
 
 
-    /*const branchoption = {
-      'Simply Divine Unisex Beauty Salon': [
-        { key: 'Rajni', value: 'Rajni' },
-        { key: 'Manju', value: 'Manju' },
-        { key: 'Pooja', value: 'Pooja' },
-        { key: 'Seela', value: 'Seela' },
-        { key: 'Minakshi', value: 'Minakshi' },
-        { key: 'Zainab', value: 'Zainab' },
-        { key: 'Manoj', value: 'Manoj' }
-      ],
-      'Simply Divine Salon' : [
-        { key: 'Zishan', value: 'Zishan' },
-        { key: 'Raman', value: 'Raman' },
-        { key: 'Renu', value: 'Renu' },
-        { key: 'Mohan', value: 'Mohan' },
-        { key: 'Sahib', value: 'Sahib' },
-        { key: 'Piyush', value: 'Piyush' },
-        { key: 'Bhim', value: 'Bhim' },
-        { key: 'Nidhi', value: 'Nidhi' },
-        { key:'Tanu ', value: 'Tanu' },
-      ],
-      'Test Salon':[
-        { key: 'sarthak', value: 'Sarthak' },
-        { key: 'devashish', value:'devashish' },
-      ],
-      'Ads Beauty Salon':[
-        { key: 'Tara Sonar', value: 'Tara Sonar' },
-        { key: 'Moni Das', value: 'Moni Das' },
-        { key: 'Ansh', value: 'Ansh' },
-        { key: 'Imran', value: 'Imran' },
-        { key: 'Bhoirobi Saikia', value: 'Bhoirobi Saikia' },
-        { key: 'Sonali Kumari', value: 'Sonali Kumari' },
-        { key: 'Niki Sonowal', value: 'Niki Sonowal' },
-        { key: 'Junaki Hazorika', value: 'Junaki Hazorika'},
-      ],
-      'AB Unisex Salon': [
-        { key: ' Gobinda Dey', value: 'Gobinda Dey' },
-        { key: 'JATIN BASFOR', value: 'JATIN BASFOR' },
-        { key: 'NEELAM TAMANG', value: 'NEELAM TAMANG' },
-        { key: 'SILPA LAMA ', value: 'SILPA LAMA ' },
-             ]
-    }*/
+     
              console.log('Selected salon:', sname);
              console.log(staffData)
 
@@ -318,25 +279,23 @@ console.log(sname);
 
     //console.log(servicesTableData, "servicesTableData");
     
-
-    const handleGenerateInvoice = () => {
-
-
-      // if(GBselectedServices.length === 0){
-      //   setDialogTitle('Error');
-      //   setDialogMessage('Please select services!');
-      //   setDialogOpen(true);
-
-      //   return;
-      // }
-
-      // if(service_by.length === 0){
-      //   setDialogTitle('Error');
-      //   setDialogMessage('Please select service by!');
-      //   setDialogOpen(true);
-      //   return;
-      // }
-
+    const handleGenerateInvoice = async () => {
+      // Validate services and service_by selections
+      if (GBselectedServices.length === 0) {
+        setDialogTitle('Error');
+        setDialogMessage('Please select services!');
+        setDialogOpen(true);
+        return;
+      }
+    
+      if (service_by.length === 0) {
+        setDialogTitle('Error');
+        setDialogMessage('Please select service by!');
+        setDialogOpen(true);
+        return;
+      }
+    
+      // Validate mobile number
       const mobileNoPattern = /^[0-9]{10}$/;
       if (!mobileNoPattern.test(mobile_no)) {
         setDialogTitle('Error');
@@ -344,19 +303,15 @@ console.log(sname);
         setDialogOpen(true);
         return;
       }
-
     
-
-      for(let i = 0; i < servicesTableData.length; i++){
-        if(servicesTableData[i].inputFieldValue === ''){
+      // Validate services table data
+      for (let i = 0; i < servicesTableData.length; i++) {
+        if (servicesTableData[i].inputFieldValue === '') {
           setDialogTitle('Error');
           setDialogMessage('Please enter quantity for selected services!');
           setDialogOpen(true);
           return;
         }
-      }
-
-      for (let i = 0; i < servicesTableData.length; i++) {
         if (servicesTableData[i].gst === '') {
           setDialogTitle('Error');
           setDialogMessage('Please select GST for all services!');
@@ -364,35 +319,107 @@ console.log(sname);
           return;
         }
       }
-
-      for(let i = 0; i < productData.length; i++){
-        if(productData[i].quantity === ''){
+    
+      // Validate product data
+      for (let i = 0; i < productData.length; i++) {
+        if (productData[i].quantity === '') {
           setDialogTitle('Error');
           setDialogMessage('Please enter quantity for selected products!');
           setDialogOpen(true);
           return;
         }
       }
-      navigate(`/${sname}/${branchName}/${InvoiceId}/invoice`,{
-        state: {
-          customer_name,
-          email,
-          mobile_no,
-          address,
-          GBselectedServices: servicesTableData,
-          service_by,
-          discount,
-          isGST,
-          gst_number,
-          comments,
-          InvoiceId,
-          productData,
-          deductedPoints,
-          selectMembership,
+    
+      // If user does not exist, call handleSubmit to add the user
+      let submitResult = null;
+      if (!userExists) {
+        try {
+          submitResult = handleSubmit(); // Add user only if user doesn't exist
+        } catch (error) {
+          console.error('Error during user submission:', error);
+          setDialogTitle('Error');
+          setDialogMessage('An error occurred while adding user details. Please try again.');
+          setDialogOpen(true);
+          return;
         }
-      }); 
-      
+      }
+    
+      // Proceed to navigate regardless of handleSubmit result (or if user exists)
+      try {
+        await Promise.all([
+          submitResult,  // Only call submitResult if user doesn't exist
+          navigate(`/${sname}/${branchName}/${InvoiceId}/invoice`, {
+            state: {
+              customer_name,
+              email,
+              mobile_no,
+              address,
+              GBselectedServices: servicesTableData,
+              service_by,
+              discount,
+              isGST,
+              gst_number,
+              comments,
+              InvoiceId,
+              productData,
+              deductedPoints,
+              selectMembership,
+            }
+          })
+        ]);
+      } catch (error) {
+        console.error('Error navigating:', error);
+        setDialogTitle('Error');
+        setDialogMessage('An error occurred while navigating. Please try again.');
+        setDialogOpen(true);
+      }
     };
+    
+    
+    
+    const handleSubmit = async () => {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const bid = localStorage.getItem('branch_id');
+    
+      try {
+        const response = await axios.post(
+          `${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${bid}`,
+          {
+            name: customer_name,
+            mobile_no: mobile_no,
+            email: email,
+            membership: selectMembership
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Token ${token}`
+            }
+          }
+        );
+    
+        const result = response.data;
+        console.log('API Response:', result);
+    
+        if (response.status >= 200 && response.status < 300 && result.success) {
+          setPopupMessage('Customer added successfully!');
+          setShowPopup(true);
+        } else {
+          setPopupMessage('Failed to add customer.');
+          setShowPopup(true);
+          return false;  // Indicate failure
+        }
+      } catch (error) {
+        setPopupMessage('An error occurred.');
+        setShowPopup(true);
+        console.error('Error:', error.response ? error.response.data : error.message);
+        return false;  // Indicate error
+      } finally {
+        setLoading(false);
+      }
+    };
+    
 
   const [get_persent_day_bill, setGet_persent_day_bill] = useState([]);
 
@@ -445,7 +472,7 @@ console.log(sname);
   
   const [userExists, setUserExists] = useState(null);
   const [membershipOptions, setMembershipOptions] = useState(false);
-  const [selectMembership, setSelectMembership] = useState('');
+  const [selectMembership, setSelectMembership] = useState('None');
 
   const handleDeleteClick = (id) => {
     setDeleteInvoiceId(id);
@@ -477,179 +504,59 @@ console.log(sname);
 
 
   const handlePhoneBlur = async () => {
-    if (mobile_no) {
-      //console.log('Checking membership status...', mobile_no);
-      
+    if (mobile_no && (mobile_no.length === 10 || mobile_no.length === 12)) {
       try {
-        const branchName = localStorage.getItem('branch_name');
-        const response = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/verify/?branch_name=${bid}&customer_mobile_no=${mobile_no}`,{
+        const branchName = localStorage.getItem('branch_id');
+  
+        const response = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${branchName}`, {
           headers: {
             'Authorization': `Token ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
-          }
+          },
         });
+        console.log("kya ua response", response);
+  
         if (response.data.status) {
-          // Successful response handling
-          setUserExists(true);
-          setMembershipStatus(true);
-          setMembershipType(response.data.membership_type);
-          setUserPoints(response.data.points);
-          console.log('User exists, membership details:', response.data);
-      
+          // User exists, populate membership details
+         
   
           // Fetch additional user details
-          const userDetailsResponse = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/get_details/?branch_name=${bid}&mobile_no=${mobile_no}`,{
+          const userDetailsResponse = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/get_details/?branch_name=${branchName}&mobile_no=${mobile_no}`, {
             headers: {
               'Authorization': `Token ${localStorage.getItem('token')}`,
               'Content-Type': 'application/json',
-            }
+            },
           });
   
           if (userDetailsResponse.data) {
-            setCustomer_Name(userDetailsResponse.data.data.name);
-            // console.log("customer name", userDetailsResponse.data.data.name );
-            setEmail(userDetailsResponse.data.data.email);
-            // setAddress(userDetailsResponse.data.address);
-            // console.log("user detaial:", userDetailsResponse.data);
+            const userData = userDetailsResponse.data.data;
+            setUserExists(true);
+            setMembershipStatus(true);
+            setCustomer_Name(userData.name);
+            setEmail(userData.email);
+            setMembershipType(userData.membership);
+            setUserPoints(userData.loyality_profile.current_customer_points);
           }
         } else {
-          // Handle case where user does not exist
+          // User does not exist, clear membership details and fetch membership options
           setUserExists(false);
-          console.log();
           setMembershipStatus(false);
-          setMembershipType('');
-          await fetchMembershipOptions(); // Ensure this is awaited if it returns a promise
-          console.log('User does not exist, fetching membership options...');
+          // setMembershipType('None');
+          await fetchMembershipOptions();
         }
-  
       } catch (error) {
         console.error('Error checking membership status:', error);
       }
     }
   };
+  
 
  
 
-
-  const handleSubmit = async ()=> {
-    setLoading(true);
-    const token = localStorage.getItem('token');
-    const bid = localStorage.getItem('branch_id');
-    console.log('Selected Membership:', selectMembership);
-    console.log('Posting data:', {
-      name: customer_name,
-      mobile_no: mobile_no,
-      email: email,
-      membership: selectMembership
-    });
-    
-    try {
-      const response = await axios.post(
-        `${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${bid}`,
-        {
-          name: customer_name,
-          mobile_no: mobile_no,
-          email: email,
-          membership: selectMembership
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
-          }
-        }
-      );
-      
-      const result = response.data;
-      console.log('API Response:', result);
-      
-      if (response.status >= 200 && response.status < 300 && result.success) {
-        setPopupMessage('Customer added successfully!');
-        setShowPopup(true);
-        console.log('Customer added successfully!');
-        // onClose();  
-        window.location.reload();
-      } else {
-        setPopupMessage('Failed to add customer.');
-        setShowPopup(true);
-        console.log('Failed to add customer:', result.message || 'No additional information');
-      }
-    } catch (error) {
-      setPopupMessage('An error occurred.');
-      setShowPopup(true);
-      console.error('Error:', error.response ? error.response.data : error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-
 const handleMembershipChange = async (selectMembership) => {
   console.log('swalook Membership:', selectMembership);
   setSelectMembership(selectMembership);
-  if (selectMembership) {
-    // console.log('swalook Membership:', selectMembership);
-    // await handleSubmit(); 
-    setLoading(true);
-    const token = localStorage.getItem('token');
-    const bid = localStorage.getItem('branch_id');
-    console.log('Selected Membership:', selectMembership);
-    console.log('Posting data:', {
-      name: customer_name,
-      mobile_no: mobile_no,
-      email: email,
-      membership: selectMembership
-    });
-    
-    try {
-      const response = await axios.post(
-        `${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${bid}`,
-        {
-          name: customer_name,
-          mobile_no: mobile_no,
-          email: email,
-          membership: selectMembership
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
-          }
-        }
-      );
-      
-      const result = response.data;
-      console.log('API Response:', result);
-      
-      if (response.status >= 200 && response.status < 300 && result.success) {
-        setPopupMessage('Customer added successfully!');
-        setShowPopup(true);
-        console.log('Customer added successfully!');
-        // onClose();  
-        window.location.reload();
-      } else {
-        setPopupMessage('Failed to add customer.');
-        setShowPopup(true);
-        console.log('Failed to add customer:', result.message || 'No additional information');
-      }
-    } catch (error) {
-      setPopupMessage('An error occurred.');
-      setShowPopup(true);
-      console.error('Error:', error.response ? error.response.data : error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
   
-
-const handleMembershipChange = async (selectMembership) => {
-  console.log('swalook Membership:', selectMembership);
-  setSelectMembership(selectMembership);
-  if (selectMembership) {
-    console.log('swalook Membership:', selectMembership);
-    await handleSubmit(); 
-  }
-  }
 };
 
 
@@ -683,160 +590,132 @@ const handleMembershipChange = async (selectMembership) => {
     }
   }, [mobile_no]);
   
-  // const handleMembershipChange = async(selectedValue) => {
-  //   setSelectMembership(selectedValue);
-  //   if (selectedValue) {
-  //     await handleSubmit();  
-  //   }
-  // };
+ 
 
 
+ 
+  
   return (
+    <>
+    <Header />
+      <div className='gb_h1'>
+        <div className='gb_ver_nav'>
+          <VertNav />
+        </div>
+      </div>
     <div className='gb_dash_main'>
       <Helmet>
         <title>Generate Invoice</title>
       </Helmet>
-        <Header />
-        <div className='gb_horizontal'>
-        <div className='gb_h1'>
-        <div className='gb_ver_nav'>
-          <VertNav />
-        </div>
-        </div>
-        
+      <div className='gb_horizontal'>
         <div className='gb_h2'>
-            <div className='gb_left'>
-                <h2 className='GI'>Generate Invoice</h2>
-                <hr className='gb_hr'/>
-                <div className='gi_con'>
-                <h3 className='cd'>Customer Details</h3>
-                <div className="gbform-groups">
-                <label htmlFor="name">Name:</label>
-                <input type="text" id="name" className="gb_input-field" placeholder='Enter Full Name' value={customer_name} required onChange={(e) => setCustomer_Name(e.target.value)}/>
-                </div>
-                <div className="gbform-group">
-                <label htmlFor="email">Email:</label>
-                <input type="email" id="email" className="gb_input-fields" placeholder='Enter Email Address'  value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div className="gbform-group">
-                <label htmlFor="phone">Phone:</label>
-                <input type="number" id="phone" className="gb_input-fields" placeholder='Enter Mobile Number' required onBlur={handlePhoneBlur} onChange={(e)=>setMobileNo(e.target.value)}/>
-                </div>
-                <div className="gbform-groups">
-                <label htmlFor="address">Address:</label>
-                <input type="text" id="address" className="gb_input-field" placeholder='Enter Address' value={address} rows={3} onChange={(e)=>setAddress(e.target.value)}></input>
-                </div>
-                {userExists && membershipType !== 'None'  ? (
-  <div className='services-table'>
-    <table className='services-table-content'>
-      <thead>
-        <tr>
-          <th>Membership Type</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{membershipType}</td>
-          <td>{userPoints}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-)  :(mobile_no.length === 10 || mobile_no.length === 12 ? (
-    <div className="membership-container">
-            <label className="membership-label" htmlFor="membership">Select Membership Plan</label>
-            <select
-              id="membership"
-              value={selectMembership}
-              onChange={(e) => handleMembershipChange(e.target.value)}
-              className="membership-select"
-            >
-              <option value="">Select a plan</option>
-              {membershipOptions.length > 0 ? (
-                membershipOptions.map((option) => (
-                  <option key={option.program_type} value={option.program_type}>
-                    {option.program_type}
-                  </option>
-                ))
-              ) : (
-                <option value="" disabled>No membership options available</option>
-              )}
-            </select>
-          </div>
-) : null )}
-
-
-  
-
-
-                {/* {!userExists && membershipOptions.length > 0 && (  
-      <div className="membership-container">
-        <label className="membership-label" htmlFor="membership">Select Membership Plan</label>
-        <select
-          id="membership"
-          value={selectMembership}
-          onChange={(e) => handleMembershipChange(e.target.value)}
-          className="membership-select"
-        >
-          <option value="">Select a plan</option>
-          {membershipOptions.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.name}
-            </option>
-          ))}
-        </select>
-      </div>
-    )} */}
+          {/* User Info Section */}
+          {/* <div className='user-info'>
+            <div className='user-stats'>
+              <div className='stat-item'>
+                <span>Business</span>
+                <h2>Rs. 15,000 <small>+0.00%</small></h2>
                 
-                {/* {membershipStatus && (
-                  <>
-                   <div className='services-table'>
-                   <table className='services-table-content'>
-                     <thead>
-                       <tr>
-                         <th>Membership Type</th>
-                         <th>Points</th>
-                       </tr>
-                     </thead>
-                     <tbody>
-                       <tr>
-                         <td>{membershipType}</td>
-                         <td>{userPoints}</td>
-                       </tr>
-                     </tbody>
-                   </table>
-                   </div>
-                 </>
-              )} */}
-
-<h3 className='sb'>Served By:</h3>
-                <div className='gb_select-field-cont'>
-                <Multiselect
-                options={staffData}
-                showSearch={true}
-                onSelect={handleServedSelect}
-                onRemove={handleServedSelect}
-                displayValue="label"                placeholder="Select Served By"
-                className="gb_select-field"
-                />
+              </div>
+              <div className='stat-item'>
+                <span>Number of Appointments</span>
+                <h2>15 <small>+0.00%</small></h2>
+                
+              </div>
+              <div className='stat-item'>
+                <span>Number of Invoices</span>
+                <h2>12  <small>+0.00%</small></h2>
+               
+              </div>
+              <div className='stat-item'>
+              <button className='edit-button'>View Details</button>
+              </div>
+            </div>
+          </div> */}
+          {userExists ? (
+                <div className='user-info'>
+                  <div className='user-stats'>
+                    <div className='stat-item'>
+                      <span>Business</span>
+                      <h2>Rs. 15,000 <small>+0.00%</small></h2>
+                    </div>
+                    <div className='stat-item'>
+                      <span>Number of Appointments</span>
+                      <h2>15 <small>+0.00%</small></h2>
+                    </div>
+                    <div className='stat-item'>
+                      <span>Number of Invoices</span>
+                      <h2>12  <small>+0.00%</small></h2>
+                    </div>
+                    <div className='stat-item'>
+                      <button
+                      variant="outlined"
+                      onClick={onViewDetailsClick}
+                       className='edit-button'>
+                        View Details
+                        </button>
+                    </div>
+                  </div>
                 </div>
-          
-                {/* {userExists && mobile_no.length === 10 && (
-      <div className="membership-container">
-        <label className="membership-label" htmlFor="membership">
-          Upgrade Membership Plan
+              ) : null}
+  
+          {/* Invoice Form Section */}
+          <div className='invoice-section'>
+            <h2 className='section-titles'>Invoice</h2>
+            <div className='form-container'>
+              {/* Customer Details */}
+              <div className='form-section'>
+                <h3 className='form-titles'>Customer Details</h3>
+                <div className='form-row'>
+                <div className='form-groups'>
+                    <input type="number" id="phone" placeholder='Phone Number' required onBlur={handlePhoneBlur} onChange={(e) => setMobileNo(e.target.value)} />
+                  </div>
+                  <div className='form-groups'>
+                    <input type="text" id="name" placeholder='Full Name' value={customer_name} readOnly={userExists} required onChange={(e) => setCustomer_Name(e.target.value)
+                      
+                    } />
+                  </div>
+                
+                  <div className='form-groups'>
+                    <input type="email" id="email" placeholder='Email Address' value={email} readOnly={userExists} required onChange={(e) => setEmail(e.target.value)} />
+                  </div>
+                </div>
+              </div>
+              
+              {userExists && membershipType !== 'None' ? (
+      <div className="gb_services-table">
+        <table className="gb_services-table-content" id="memebership_points">
+          <thead>
+            <tr>
+              <th>Membership Type</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{membershipType}</td>
+              <td>{userPoints}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    ) : mobile_no.length === 10 || mobile_no.length === 12 ? (
+      <div className="gb_membership-container">
+        <label className="gb_membership-label" htmlFor="membership">
+          Select Membership Plan
         </label>
         <select
           id="membership"
-          value={selectMembership}
+          value={selectMembership || 'None'}
           onChange={(e) => handleMembershipChange(e.target.value)}
-          className="membership-select"
+          className="gb_membership-select"
         >
-          <option value="">Select a plan</option>
+          <option value="None" disabled={selectMembership === 'None'}>
+            Select a plan
+          </option>
           {membershipOptions.length > 0 ? (
             membershipOptions.map((option) => (
-              <option key={option.id} value={option.id}>
+              <option key={option.program_type} value={option.program_type}>
                 {option.program_type}
               </option>
             ))
@@ -847,242 +726,291 @@ const handleMembershipChange = async (selectMembership) => {
           )}
         </select>
       </div>
-    )} */}
-                <h3 className='sts'>Select Services</h3>
-                <div className='gb_select-field-cont'>
-                <Multiselect
-                options={serviceOptions}
-                showSearch={true}
-                onSelect={handleServiceSelect}
-                onRemove={handleServiceSelect}
-                displayValue="value"
-                placeholder="Select Service "
-                className="gb_select-field"
-                showCheckbox={true}
-                selectedValues={value}
-                />
-                </div>
-
-                {value.length > 0 && (
-                  <div className='services-table'>
-                    <table className='services-table-content'>
-                      <thead>
-                        <tr>
-                          <th>Service Name</th>
-                          <th>Quantity</th>
-                          <th>GST</th>
-                          <th>Price</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {value.map((service, index) => (
-                          <tr key={index}>
-                            <td>{service.value}</td>
-                            <td><input type='number' className="service-table-field" placeholder='Enter Quantity' required onChange={handleInputChange}/></td>
-                            <td className='service_dp'>
-                              <select className='status-dropdowns' required onChange={(e) => handleGST(e, index)}>
-                                <option value="">Select GST</option>
-                                <option value='No GST'>No GST</option>
-                                <option value='Inclusive'>Inclusive</option>
-                                <option value='Exclusive'>Exclusive</option>
-                              </select>
-                            </td>
-                            <td>
-                              {service.gst === 'Inclusive' ? (
-                                <>{(service.price / 1.18).toFixed(2)}</>
-                              ) : service.gst === 'Exclusive' ? (
-                                <>{(service.price)}</>
-                              ) : (
-                                <>{service.price}</>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-
-                <h3 className='sts'>Select Product</h3>
-                <div className='gb_select-field-cont'>
-                <Multiselect
-                options={inventoryData}
-                showSearch={true}
-                displayValue="value"
-                onSelect={handleProductSelect}
-                onRemove={handleProductSelect}
-                placeholder="Select Product "
-                className="gb_select-field"
-                showCheckbox={true}
-                selectedValues={product_value}
-                />
-                </div>
-
-                {product_value.length > 0 && (
-                  <div className='services-table'>
-                    <table className='services-table-content'>
-                      <thead>
-                        <tr>
-                          <th>Product Name</th>
-                          <th>Quantity</th>
-                          <th>unit</th>
-                          <th>Available</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                      {product_value.map((product, index) => (
-                <tr key={index}>
-                  <td>{product.value}</td>
-                  <td>
-                    <input
-                      type='number'
-                      className="service-table-field"
-                      placeholder='Enter Quantity in ml/gm'
-                      required
-                      onChange={(e) => handleProductInputChange(index, e.target.value)}
-                      style={{ borderColor: product.quantity === 0 ? 'red' : 'black' }}
-
+    ) : null}
+  
+              {/* Service/Product Selection */}
+              <div className='form-section'>
+                <div className='form-row'>
+                  <div className='forms-groups'>
+                    <label>Select Services:</label>
+                    <Multiselect
+                      options={serviceOptions}
+                      showSearch={true}
+                      onSelect={handleServiceSelect}
+                      onRemove={handleServiceSelect}
+                      displayValue="value"
+                      placeholder="Select Service"
+                      showCheckbox={true}
+                      selectedValues={value}
                     />
-                  </td>
-                  <td>
-                    {product.unit}
-                  </td>
-                  <td>
-                    {product.quantity}
-                  </td>
-                </tr>
-              ))}
-                      </tbody>
-                    </table>
                   </div>
-                )}
-
-
-
-                {membershipStatus && (
-                  <div className="gbform-group">
-                    <label htmlFor="points">Points:</label>
-                    <input type="number" id="points" className="gb_input-field" placeholder='Enter Points' onChange={(e) => setDeductedPoints(e.target.value)} />
+                  <div className='forms-groups'>
+                    <label>Select Products:</label>
+                    <Multiselect
+                      options={inventoryData}
+                      showSearch={true}
+                      onSelect={handleProductSelect}
+                      onRemove={handleProductSelect}
+                      displayValue="value"
+                      placeholder="Select Product"
+                      showCheckbox={true}
+                      selectedValues={product_value}
+                      className='sar-product'
+                    />
                   </div>
-                )}
-
-                <div className="gbform-group" style={{ marginTop: '10px' }}>
-                    <label htmlFor="comments">Comment:</label>
-                <input id="comments" type='text' className="gb_input-field" placeholder='Enter Comment' onChange={(e) => setComments(e.target.value)}></input>
-                 </div>
-                {/* <div className="gbform-group-radio radio_gi">
-                            <input type="radio" id="gstYes" name="gst" value="Yes" onChange={handleGSTChange} />
-                            <label>GST Number?</label>
-                        </div> */}
-                        {isGST && (
-                            <div className="gbform-group">
-                                <label htmlFor="gstNumber" style={{marginRight:'25px'}}>GST No:</label>
-                                <input type="text" id="gstNumber" className="gb_input-field" placeholder='Enter GST Number' required onChange={(e)=>setGSTNumber(e.target.value)} />
-                            </div>
-                        )}
-                        </div>
-                <div className='gb_btn_contain'>
-                <button className='gb_button' onClick={handleGenerateInvoice}>Generate Invoice</button>
                 </div>
+              </div>
+
+              {value.length > 0 && (
+                <div className='gb_services-table'>
+                  <table className='gb_services-table-content'>
+                    <thead>
+                      <tr>
+                        <th>Service Name</th>
+                        <th>Quantity</th>
+                        <th>GST</th>
+                        <th>Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {value.map((service, index) => (
+                        <tr key={index}>
+                          <td>{service.value}</td>
+                          <td>
+                            <input
+                              type='number'
+                              className="gb_service-table-field"
+                              placeholder='Enter Quantity'
+                              required
+                              onChange={handleInputChange}
+                            />
+                          </td>
+                          <td className='gb_service_dp'>
+                            <select
+                              className='gb_status-dropdowns'
+                              required
+                              onChange={(e) => handleGST(e, index)}
+                            >
+                              <option value="">Select GST</option>
+                              <option value='No GST'>No GST</option>
+                              <option value='Inclusive'>Inclusive</option>
+                              <option value='Exclusive'>Exclusive</option>
+                            </select>
+                          </td>
+                          <td>
+                            {service.gst === 'Inclusive' ? (
+                              <>{(service.price / 1.18).toFixed(2)}</>
+                            ) : service.gst === 'Exclusive' ? (
+                              <>{service.price}</>
+                            ) : (
+                              <>{service.price}</>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {product_value.length > 0 && (
+                <div className='gb_services-table'>
+                  <table className='gb_services-table-content'>
+                    <thead>
+                      <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Available</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {product_value.map((product, index) => (
+                        <tr key={index}>
+                          <td>{product.value}</td>
+                          <td>
+                            <input
+                              type='number'
+                              className="gb_service-table-field"
+                              placeholder='Enter Quantity in ml/gm'
+                              required
+                              onChange={(e) => handleProductInputChange(index, e.target.value)}
+                              style={{ borderColor: product.quantity === 0 ? 'red' : 'black' }}
+                            />
+                          </td>
+                          <td>{product.unit}</td>
+                          <td>{product.quantity}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+             
+  
+              {/* Served By, Schedule, Discounts, Comments */}
+              <div className='form-section'>
+                <div className='form-row'>
+                  <div className='forms-groups'>
+                    <label>Served By:</label>
+                    <Multiselect
+                      options={staffData}
+                      showSearch={true}
+                      onSelect={handleServedSelect}
+                      onRemove={handleServedSelect}
+                      displayValue="label"
+                      placeholder="Select Served By"
+                    />
+                  </div>
+                </div>
+
+                 {/* Points Input Field */}
+              {membershipStatus && (
+                <div className="gbform-group">
+                  <label htmlFor="points">Points:</label>
+                  <input
+                    type="number"
+                    id="points"
+                    className="gb_input-field"
+                    placeholder='Enter Points'
+                    onChange={(e) => setDeductedPoints(e.target.value)}
+                  />
+                </div>
+              )}
+                <div className='form-row'>
+                  <div className='form-groups'>
+                    <label>Discount</label>
+                    <input type="number" placeholder='Enter Discount' onChange={(e) => setDiscount(e.target.value)} />
+                  </div>
+                  <div className='form-groups'>
+                    <label>Comments</label>
+                    <input type="text" placeholder='Enter Comments' onChange={(e) => setComments(e.target.value)} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className='gb_right'>
-  <h2 className='gb_appoint'>Billing:</h2>
-  <hr className='gb_hr' />
-  <div className='gb_table_wrapper'>
-    <table className='gb_table'>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Mobile No.</th>
-          <th>Amount</th>
-          <th>Services</th>
-          <th>View</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {loading ? (
-          <tr>
-            <td colSpan="6" style={{ textAlign: 'center' }}>
-              <CircularProgress sx={{ color: 'black' }} />
-            </td>
-          </tr>
-        ) : (
-          // Ensure get_persent_day_bill is an array and has data
-          (mobile_no === '' ? get_persent_day_bill : get_persent_day_bill.filter(item => item.mobile_no === mobile_no)).map((item, index) => (
-            <tr key={index}>
-              <td>{item.customer_name}</td>
-              <td>{item.mobile_no}</td>
-              <td>{item.grand_total}</td>
-              <td>
-                {(() => {
-                  try {
-                    const servicesArray = JSON.parse(item.services);
-                    if (servicesArray.length > 1) {
-                      return (
-                        <select className='status-dropdown'>
-                          {servicesArray.map((service, index) => (
-                            <option key={index} value={service.Description}>{service.Description}</option>
-                          ))}
-                        </select>
-                      );
-                    } else if (servicesArray.length === 1) {
-                      return <span>{servicesArray[0].Description}</span>;
-                    } else {
-                      return null;
-                    }
-                  } catch (error) {
-                    console.error('JSON parsing error:', error);
-                    return null;
-                  }
-                })()}
-              </td>
-              <td>
-                <Tooltip title="View Invoice">
-                  <PictureAsPdfIcon style={{ cursor: "pointer" }} onClick={() => handleShowInvoice(item.id)} />
-                </Tooltip>
-              </td>
-              <td>
-                <Tooltip title="Delete Invoice">
-                  <DeleteIcon style={{ cursor: "pointer" }} onClick={() => handleDeleteClick(item.id)} />
-                </Tooltip>
-              </td>
-            </tr>
-          ))
-        )}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-        </div>
-
-        </div>
-
-        {showDeletePopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>Confirm Delete</h3>
-            <p>Are you sure you want to delete this invoice?</p>
-            <div className="popup-buttons">
-              <button onClick={handleDeleteConfirm}>Yes</button>
-              <button onClick={() => setShowDeletePopup(false)}>No</button>
+            {isGST && (
+                <div className="gbform-group">
+                  <label htmlFor="gstNumber" style={{marginRight: '25px'}}>GST No:</label>
+                  <input
+                    type="text"
+                    id="gstNumber"
+                    className="gb_input-field"
+                    placeholder='Enter GST Number'
+                    required
+                    onChange={(e) => setGSTNumber(e.target.value)}
+                  />
+                </div>
+              )}
+  
+            {/* Generate Invoice Button */}
+            <div className='button-row'>
+            <button className='generate-button-invoice' onClick={handleGenerateInvoice}>Create Invoice</button>
             </div>
           </div>
         </div>
-      )}
-
-<CustomDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        title={dialogTitle}
-        message={dialogMessage}
-      />
+      </div>
+      
     </div>
-  )
-}
+    </>
+  );
+  
+  
+  }
+  
+  
 
 export default GenerateInvoice
 
 
 
+{/* <div className='gb_right'>
+<h2 className='gb_appoint'>Billing:</h2>
+<hr className='gb_hr' />
+<div className='gb_table_wrapper'>
+  <table className='gb_table'>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Mobile No.</th>
+        <th>Amount</th>
+        <th>Services</th>
+        <th>View</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {loading ? (
+        <tr>
+          <td colSpan="6" style={{ textAlign: 'center' }}>
+            <CircularProgress sx={{ color: 'black' }} />
+          </td>
+        </tr>
+      ) : (
+        // Ensure get_persent_day_bill is an array and has data
+        (mobile_no === '' ? get_persent_day_bill : get_persent_day_bill.filter(item => item.mobile_no === mobile_no)).map((item, index) => (
+          <tr key={index}>
+            <td>{item.customer_name}</td>
+            <td>{item.mobile_no}</td>
+            <td>{item.grand_total}</td>
+            <td>
+              {(() => {
+                try {
+                  const servicesArray = JSON.parse(item.services);
+                  if (servicesArray.length > 1) {
+                    return (
+                      <select className='status-dropdown'>
+                        {servicesArray.map((service, index) => (
+                          <option key={index} value={service.Description}>{service.Description}</option>
+                        ))}
+                      </select>
+                    );
+                  } else if (servicesArray.length === 1) {
+                    return <span>{servicesArray[0].Description}</span>;
+                  } else {
+                    return null;
+                  }
+                } catch (error) {
+                  console.error('JSON parsing error:', error);
+                  return null;
+                }
+              })()}
+            </td>
+            <td>
+              <Tooltip title="View Invoice">
+                <PictureAsPdfIcon style={{ cursor: "pointer" }} onClick={() => handleShowInvoice(item.id)} />
+              </Tooltip>
+            </td>
+            <td>
+              <Tooltip title="Delete Invoice">
+                <DeleteIcon style={{ cursor: "pointer" }} onClick={() => handleDeleteClick(item.id)} />
+              </Tooltip>
+            </td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+</div>
+</div> */}
+
+
+// {showDeletePopup && (
+//   <div className="popup">
+//     <div className="popup-content">
+//       <h3>Confirm Delete</h3>
+//       <p>Are you sure you want to delete this invoice?</p>
+//       <div className="popup-buttons">
+//         <button onClick={handleDeleteConfirm}>Yes</button>
+//         <button onClick={() => setShowDeletePopup(false)}>No</button>
+//       </div>
+//     </div>
+//   </div>
+// )}
+
+// <CustomDialog
+//   open={dialogOpen}
+//   onClose={() => setDialogOpen(false)}
+//   title={dialogTitle}
+//   message={dialogMessage}
+// />

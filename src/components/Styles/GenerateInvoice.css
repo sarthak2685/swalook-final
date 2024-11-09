@@ -1,358 +1,414 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
-body {
-  font-family: 'Montserrat', sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.gbform-group, .gbform-groups {
-  display: flex;
-  align-items: center; /* Center align vertically */
-  width: 500px; /* Keep width as needed */
-  margin-left: 60px; /* Adjust as necessary */
-}
-
-.gbform-group label, .gbform-groups label,gb_select-field {
-  margin-right: 10px; /* Space between label and input */
-  color: #091A44; /* Label color */
-  width: 150px; /* Adjusted width for label */
-}
-
-.gb_input-field, .gb_input-fields {
-  padding: 8px;
-  border: 1px solid #CFD3D4; /* General border */
-  border-radius: 8px;
-  height: 58px;
-  flex: 1; /* Makes input fields take remaining space */
-}
-
-.gb_select-field {
+.gb_dash_main {
   display: flex;
   flex-direction: column;
-  width: 350px;
-  margin-left: 220px;
-  height:80px;
+  align-items: center;
+  width: 100% !important;
+  padding-top: 20px;
+  margin: 0 0 0 10rem;
+  overflow: auto;
 }
+ /* Base container styles */
+
+
+.invoice-section,
+.user-info {
+  width: 100%; /* Set to full width within the container */
+  max-width: 100%; /* Ensure max-width covers the container */
+}
+
+/* Responsive settings */
+@media (min-width: 1200px) {
+  .invoice-section,
+.user-info {
+    width: 92rem;
+
+  }
+}
+
+@media (max-width: 1024px) {
+  .gb_dash_main,
+  .invoice-section,
+  .user-info {
+    width: auto; /* Adjust width for smaller screens */
+  }
+}
+
 
 .gb_horizontal {
-  height: 90vh;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  width: auto !important;
+  padding: 20px;
+  margin-top: 3rem;
 }
 
-input, select {
-  font-family: 'Montserrat', sans-serif;
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* General Styling */
-.GI {
-  color: #091A44;
-}
 
 .gb_h1, .gb_h2 {
-  background-color: white;
+  width: auto;
+  text-align: center; /* Center-align headings for a cleaner look */
 }
 
-.gb_h1 {
-  flex: 0 0 70px;
+.gb_ver_nav {
+  width: auto;
 }
 
-.gb_h2 {
-  flex: 1;
+/* User Info Container */
+.user-info {
   display: flex;
-  justify-content: space-around;
-  height: 100vh;
-  transition: background-color 0.3s ease;
-}
-
-/* Layout */
-.gb_left, .gb_right {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.gb_appoint{
-  color: #091A44;
-}
-
-.gb_left {
-  margin-top: 60px;
-  width: 700px;
+  flex-direction: column;
+  gap: 20px;  /* Increased gap for better spacing */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  margin-right: 10px;
-  height: 1450px;
-  margin-left: 180px;
-  border-radius: 30px;
+  margin-bottom: 20px;
+  width: auto !important;;
 }
 
-.gb_right {
-  margin-top: 80px;
-  width: 700px;
-  margin-left: 100px;
-  height: 1450px;
-  border-radius: 30px;
-}
-
-.gb_btn_contain {
-  padding: 10px;
+.user-info .user-stats {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;  /* Distribute items evenly across the container */
+  gap: 2.5rem;  /* Ensure equal spacing between the stat items */
 }
 
-.gb_button {
-  width: 50%; 
-  padding: 10px 16px; 
-  background-color: #5570F1; 
-  color: #fff;
-  border: none;
-  border-radius: 8px; 
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.user-info .user-stats .edit-button {
+  background: none;        /* Removes the background color */
+  border: none;            /* Removes the border */
+  color: blue;             /* Sets the text color to blue */
+  text-decoration: underline;  /* Optionally adds an underline for clarity */
+  font-size: 16px;         /* Adjust font size as needed */
+  cursor: pointer;        /* Makes the button clickable */
+  padding: 0;              /* Optional, to adjust button padding */
+  margin-top: 10px;        /* Optional, space above the button */
 }
 
-.gb_button:hover {
-  background-color: #0b2158;
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  text-align: left;      /* Center text for better alignment */
 }
 
-/* Table Styles */
-.gb_table {
-  width: 100%;
-  border-collapse: collapse;
+.stat-item span {
+  font-weight: bold;
+  font-size: 18px; 
+  color: #888888;
+  /* Slightly bigger for better readability */
 }
 
-.gb_table th, .gb_table td {
-  padding: 10px; 
-  text-align: center;
-  border: 1px solid #dddddd;
-}
+.stat-item h2 {
+  font-size: 18px;
+    font-weight: 500;
+    margin: 16px 0 ;
+    color: #333;
 
-.gb_table th {
-  font-family: 'Poppins', sans-serif; 
-  font-weight: 500;
-  color: #B5B7C0; 
-  background-color: transparent;
-}
-
-.gb_table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.gb_table tbody tr:hover {
-  background-color: #e2e2e2;
-}
-
-/* Media Queries */
-@media only screen and (max-width: 768px) {
-  .gb_right {
-    display: none; 
   }
 
-  .gb_left {
-    width: 100%; 
-  }
-
-  .gb_button {
-    width: 60%; 
-  }
+.stat-item small {
+  font-size: 14px;         /* Slightly bigger small text */
+  color: #007bff;
 }
-.membership-container {
-  margin: 20px 0;
+
+
+/* Invoice Section */
+.invoice-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px; /* Added more padding for better layout */
+  margin-bottom: 20px;
+  /* width: 80%;
+  margin: 0 auto; */
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Increased gap for better spacing */
+}
+.form-titles{
+  color: black;
+  text-align: left;
+}
+
+.form-section {
   display: flex;
   flex-direction: column;
 }
 
-.membership-label {
-  font-size: 16px;
+.form-row {
+  display: flex;
+  gap: 6rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+.form-groups {
+  flex: 1;
+  min-width: 220px; /* Adjusted min-width */
+  max-width: 300px; /* Added max-width for consistent sizing */
+  display: flex;
+  flex-direction: column;
   font-weight: bold;
-  margin-bottom: 8px;
-  color: #333;
+}
+.type-time{
+margin-top: 3rem;
+}
+.forms-groups
+{
+  flex: 1;
+  min-width: 220px; /* Adjusted min-width */
+  max-width: 300px; /* Added max-width for consistent sizing */
+  display: flex;
+  flex-direction: column;
+  font-weight: bold; 
 }
 
-.membership-select {
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
+.form-groups label {
+  font-size: 17px;
+  margin-bottom: 30px;
+  text-align: left;
+}
+.forms-groups label {
+  font-size: 17px;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+/* Make the selector more specific */
+.form-container .form-groups input, 
+.form-container .form-groups select {
+  padding: 10px; /* Increased padding for a cleaner input feel */
+  border: 1px solid #ddd;
   border-radius: 4px;
-  background-color: #fff;
-  transition: border-color 0.3s ease;
-  width:350px;
-  margin-left: 220px;
+  font-size: 18px;
+  font-weight: bold;
+  width: auto;
+}
+.form-container .forms-groups input, 
+.form-container .forms-groups select {
+  padding: 10px; /* Increased padding for a cleaner input feel */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: bold;
+  width: auto;
+  border: none;
 }
 
-.membership-select:focus {
-  border-color: #007bff; /* Change to your primary color */
-  outline: none;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+
+.generate-button-invoice {
+  width: auto;
+  padding: 14px; /* Increased padding for a better look */
+  background-color: #3a6eff;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 0;
+
 }
 
-.membership-select option {
-  padding: 10px;
+.generate-button-invoice:hover {
+  background-color: #2f55cc;
+}
+.button-row{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* Responsive settings */
+@media (max-width: 1024px) {
+  .user-info, .invoice-section {
+    width: auto; /* Adjust container width */
+  }
+  .user-info .user-stats {
+     /* Distribute items evenly across the container */
+    gap: 1.5rem;  /* Ensure equal spacing between the stat items */
+  }
+
+  .form-row {
+    /* flex-direction: column; */
+    gap: 15px; /* Adjust gap */
+  }
+
+  .form-groups {
+    min-width: 200px; /* Adjust min-width */
+  }
+  .forms-groups {
+    min-width: 200px; /* Adjust min-width */
+  }
+  /* .gb_dash_main {
+    margin: 0 0 0 13rem
+  } */
+}
+
+
+@media (max-width: 768px) {
+  .user-details h3 {
+    font-size: 14px;
+  }
+
+  .form-groups {
+    min-width: 180px; /* Further reduce min-width */
+  }
+  .forms-groups {
+    min-width: 180px; /* Further reduce min-width */
+  }
+
+  .generate-button-invoice {
+    font-size: 12px;
+  }
+  .gb_dash_main {
+   width: min-content;
+  }
+}
+ 
+/* Product Table Styles */
 .services-table {
-  margin: 20px auto;
-  width: 90%;
-  max-width: 800px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-top: 20px;
 }
-
+.gb_services-table-content
+{
+  width: 100%;
+  text-align: left;
+}
+.gb_service-table-field{
+  width: auto;
+}
 .services-table-content {
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.services-table-content th, .services-table-content td {
+.services-table-content th,
+.services-table-content td {
   padding: 12px 15px;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
+  text-align: left;
+  border: 1px solid #ddd;
 }
 
 .services-table-content th {
   background-color: #f4f4f4;
-  color: #B5B7C0;
   font-weight: bold;
-}
-
-.services-table-content tr:hover {
-  background-color: #f1f1f1;
 }
 
 .service-table-field {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ccc;
+  font-size: 16px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  transition: border-color 0.3s;
 }
 
-.service-table-field:focus {
-  border-color: #007BFF;
-  outline: none;
-}
-
-.service_dp{
-padding-right: 30px;
-}
-
-.status-dropdown:focus {
-  border-color: #007BFF;
-  outline: none;
-}
-
-@media (max-width: 600px) {
-  .services-table {
-    width: 100%;
-  }
-}
-/* Remove extra padding in GST cell container */
 .service_dp {
-  padding-right: 0;
+  width: 100%;
+  padding: 0;
 }
 
-/* Full width dropdown styling */
 .status-dropdowns {
-  width: 100px;  /* Set specific width */
+  width: 100%;
   padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #fff;
-  cursor: pointer;
-  box-sizing: border-box;
-  padding-right: 60px;
-  height: 40px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+/* Points Input Section */
+.gbform-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-
-.status-dropdown:focus {
-  border-color: #007BFF;
-  outline: none;
+.gb_input-field {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
 }
-/* Existing CSS remains unchanged */
+/* GST Input Section */
+.gbform-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
 
-@media only screen and (max-width: 1000px) {
-  body {
-    flex-direction: column; /* Stack items vertically */
-    height: auto; /* Allow height to adjust */
-  }
+.gb_input-field {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
 
-  .gbform-group, .gbform-groups {
-    width: 90%; /* Reduce width of input field sections */
-    margin-left: auto; /* Center align the container */
-    margin-right: auto; /* Center align the container */
-  }
+.gbform-group label {
+  font-size: 17px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: left;
+}
+.gb_membership-select{
+  padding: 0.6rem;
+    align-items: end;
+    display: flex;
+    /* gap: 21rem; */
+    margin-top: 1rem;
+    width: 20%;
+}
+.gb_membership-label{
+  text-align: left;
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+}
+#points{
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: fit-content;
+}
+#memebership_points
+{
+  margin-top: 1rem;
+  width: 30%;
+}
+.gb_services-table-content {
+  width: 100%;
+  border-collapse: collapse; /* Ensures borders are collapsed between cells */
+  margin: 20px 0; /* Adds space above and below the table */
+}
 
-  .gbform-group label, .gbform-groups label {
-    width: auto; /* Allow labels to size based on content */
-    margin-right: 5px; /* Reduce space between label and input */
-  }
+.gb_services-table-content th, .gb_services-table-content td {
+  padding: 12px 20px; /* Adds padding for better spacing inside cells */
+  text-align: left; /* Aligns text to the left */
+  border: 1px solid #ddd; /* Adds a light border around each cell */
+}
 
-  .gb_input-field, .gb_input-fields {
-    height: 48px; /* Adjust input field height */
-  }
+.gb_services-table-content th {
+  background-color: #f4f4f4; /* Light background for header */
+  font-weight: bold; /* Makes header text bold */
+}
 
-  .gb_select-field {
-    width: 100%; /* Use full width for select fields */
-    margin-left: 0; /* Reset left margin */
-    height: 60px; /* Adjust height */
-  }
+.gb_services-table-content tr:nth-child(even) {
+  background-color: #f9f9f9; /* Alternates row colors for readability */
+}
 
-  .gb_left {
-    width: 90%; /* Reduce width for left container */
-    margin-left: auto; /* Center align the container */
-    margin-right: auto; /* Center align the container */
-    height: auto; /* Adjust height */
-  }
-
-  .gb_right {
-    display: none; /* Hide right container on smaller screens */
-  }
-
-  .gb_btn_contain {
-    flex-direction: column; /* Stack buttons vertically */
-  }
-
-  .gb_button {
-    width: 100%; /* Full width for button */
-    margin: 10px 0; /* Add vertical spacing */
-  }
-
-  .membership-select {
-    width: 100%; /* Use full width for select */
-    margin-left: 0; /* Reset left margin */
-  }
-
-  .services-table {
-    width: 90%; /* Reduce width for services table */
-    margin-left: auto; /* Center align the table */
-    margin-right: auto; /* Center align the table */
-  }
-
-  .services-table-content {
-    font-size: 12px; /* Reduce font size for table */
-  }
-
-  .services-table-content th, .services-table-content td {
-    padding: 8px; /* Reduce padding */
-  }
-
-  .status-dropdowns {
-    width: 100%; /* Full width for dropdown */
-  }
+.gb_services-table-content tr:hover {
+  background-color: #f1f1f1; /* Highlights rows when hovered */
 }

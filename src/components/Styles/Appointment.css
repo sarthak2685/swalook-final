@@ -1,258 +1,292 @@
-/* General Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
-body {
-  font-family: 'Montserrat', sans-serif;
-}
-
-html,
-body {
-  height: 100%;
-}
-
-/* Main Layout */
-.appoint_horizontal {
-  height: 100vh;
-  display: flex;
-  margin-left: 90px;
-}
-
-.appoint_h1 {
-  flex: 0 0 70px;
-  background-color: white;
-}
-
-.appoint_h2 {
-  flex: 1;
-  background-color: white;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 20px;
-  padding-right: 20px;
-  margin-top: 20px;
-}
-
-.appoint_left {
-  width: 700px;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-left: 50px;
-  margin-top: 30px;
-  height: 825px;
-}
-
-.appoint_right {
-  width: 700px;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-left: 50px;
-  margin-top: 60px;
-  height: 825px;
-}
-
-/* Appointment Left Side */
-.appoint_left {
-  height: auto;
-}
-
-.h_appoint {
-  margin-top: 10px;
-  text-align: center;
-  color: #091A44;
-}
-
-/* Form Styles */
-.appointform-group,
-.appointform-groups,
-.schedule_form-group {
-  display: flex;
-  align-items: center; /* Center align vertically */
-  width: 100%; /* Make full width */
-  max-width: 400px; /* Set max width */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.appointform-group label,
-.appointform-groups label,
-.schedule_form-group label {
-  margin-right: 10px; /* Space between label and input */
-  color: #091A44; /* Label color */
-  width: 100px;
-}
-
-.appoint_input,
-.appoint_input-s,
-.appoint_inputs,
-.schedule_date-input {
-  flex: 1; /* Allow inputs to take full available width */
-  padding: 10px; /* Consistent padding */
-  border: 1px solid #CFD3D4;
-  border-radius: 8px;
-  height: 58px;
-  margin: 10px 0; /* Consistent vertical spacing */
-  margin-left: 20px;
-  margin-bottom: 10px;
-  margin-top: 10px;
-}
-
-.schedule_time-dropdown,
-.status-dropdown {
-  flex: 1; /* Allow dropdowns to take full available width */
-  height: 40px; /* Consistent height */
-  padding: 10px; /* Consistent padding */
-  border: 1px solid #CFD3D4;
-  border-radius: 8px;
-  margin-left: 100px;
-  width: 120px;
-  margin-top: 20px;
-}
-
-.schedule_time-selection {
-  margin-top: 20px;
-}
-
-.appoint_select-field-cont {
+/* Base container styles */
+.appointment-dashboard {
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
-  max-width: 300px;
-  margin-top: 20px;
-}
+  padding-top: 6rem;
+  margin: 0 0 0 125px; /* Adjust this value based on your header height */
+  overflow: auto;
 
-.appoint_select-field {
-  margin-left: 160px;
-  width: 270px;
 }
-
-/* Schedule and Button Styles */
-.schedule_form-group {
-  margin-top: 10px;
+.filters-wrapper{
+  width: 100%;
+  height: 50rem;
+}
+.schedule-section {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 15px; /* Space between rows */
+  align-items: flex-start;
+  width: 100%;
+}
+.forms-sections labels {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+.appoint-button-containers {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+.appointform-groups {
+  /* display: flex; */
+  gap: 10px; 
 }
 
-.appoint_button-container {
-  display: flex;
-  justify-content: center;
+/* Main content container */
+.headers-container, .new-appointment-wrapper {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
   margin-bottom: 20px;
 }
-
-.appoint_submit-button {
-  width: 300px;
-  padding: 10px; /* Consistent padding */
-  font-size: 16px;
-  background-color: #5570F1;
-  color: #fff;
+.user-info-appn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.edit-details-btn {
+  padding: 10px 20px;
+  font-size:  1rem;
+  color: #ffffff;
+  background-color: #007bff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-left: 200px;
-  margin-top: 30px;
-  margin-bottom: 20px;
 }
 
-.appoint_submit-button:hover {
-  background-color: #0b2158;
+/* Responsive max-width settings */
+@media (min-width: 320px) {
+  .headers-container, .new-appointment-wrapper {
+    max-width: 90%; /* For very small screens */
+  }
+}
+@media (min-width: 768px) and (max-width: 1024px) {
+  .appointform-groups {
+    gap: 10px;
+  }
+  .schedule_time-dropdown, .schedule_date-input {
+    min-width: 100px; /* Slightly larger for mid-sized screens */
+  }
+ 
+}
+@media (min-width: 480px) {
+  .headers-container, .new-appointment-wrapper {
+    max-width: 95%; /* Slightly larger on small screens */
+  }
+  /* .appointment-dashboard{
+    margin-top: 5rem;
+
+  } */
 }
 
-/* Right Side Table Styles */
-.appoint_table_wrapper {
-  margin-top: 10px;
-  max-height: 80vh; /* Increased max height */
-  overflow-y: auto;
+@media (min-width: 768px) {
+  .headers-container, .new-appointment-wrapper {
+    max-width: 750px; /* For tablets and small laptops */
+  }
+  /* .appointment-dashboard{
+    margin: 0 0 0 0px;
+  } */
+ 
 }
 
-.appoint_table {
-  width: 800px;
-  border-collapse: collapse;
-  margin-bottom: 200px;
-  height: 450px;
-  margin-top: 30px;
+@media (min-width: 1024px) {
+  .headers-container, .new-appointment-wrapper {
+    max-width: 800px; /* For larger laptops */
+  }
+  .appointment-dashboard{
+    margin: 0 0 0 155px;
+  }
 }
 
-.appoint_table th,
-.appoint_table td {
-  border: 1px solid #dddddd;
-  padding: 20px; /* Increased padding for more space inside the columns */
+@media (min-width: 1280px) {
+  .headers-container, .new-appointment-wrapper {
+    max-width: 1000px; /* For desktops */
+    
+  }
+  /* .appointment-dashboard{
+    padding-top: 6rem;
+
+  } */
+}
+
+@media (min-width: 1440px) {
+  .headers-container, .new-appointment-wrapper {
+    max-width: 1420px; /* For large desktops */
+  }
+  /* .appointment-dashboard{
+    padding-top: 7rem;
+
+  } */
+}
+
+/* Additional styling for alignment */
+.user-info-appn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.stat-card span {
+  color: grey; /* Change the color to grey */
+  font-weight: 500;
+  
+}
+
+.stat-card p {
+text-align: left;  
+font-weight: bold;
+}
+.custom-multiselect {
+  border: none; /* Remove border */
+  outline: none; /* Remove outline */
+  width: 30%;
+  margin-top: 2rem;
+}
+
+.appnt-heading{
   text-align: center;
-  font-size: 14px;
-  color: #B5B7C0;
 }
 
-/* Responsive Styles */
-@media screen and (max-width: 1300px) {
-  .appoint_horizontal {
-    margin-left: 20px; /* Reduce margin on medium screens */
-  }
-
-  .appoint_left {
-    width: calc(100% - 10px); /* Adjust width to fit the screen */
-    margin-left: 0; /* Reset margin */
-    height: auto; /* Allow height to adjust */
-  }
-  .appoint_right {
-    width: calc(100% - 10px); /* Adjust width to fit the screen */
-    margin-left: 50px; /* Reset margin */
-    height: auto; /* Allow height to adjust */
-  }
-  .appointform-group,
-  .appointform-groups,
-  .appoint_select-field-cont {
-    max-width: 90%; /* Use wider input fields */
-    margin-left: auto; /* Center align */
-    margin-right: auto;
-  }
-
-  .appoint_table {
-    width: 100%; /* Adjust the table to fit the screen */
-    font-size: 12px; /* Reduce font size in tables for medium screens */
-  }
-
-  .appoint_table th,
-  .appoint_table td {
-    padding: 10px; /* Reduce padding for table cells */
-  }
-
-  .appoint_submit-button {
-    width: 90%; /* Adjust button width for smaller screens */
-    margin-left: 0; /* Reset margin for center alignment */
-  }
+.edit-details-btn {
+  color: #007bff;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size:  1rem;
+  padding: 0.5rem;
+  text-align: center;
+}
+.edit-details-btn:hover {
+  text-decoration: underline;
 }
 
-@media screen and (max-width: 768px) {
-  .appoint_right {
-    display: none; /* Hide the right side on smaller screens */
-  }
-
-  .appoint_left {
-    width: 100%; /* Full width for the left side */
-    margin-left: 0; /* Reset margin */
-  }
+.overview-stats {
+  display: flex;
+  flex-wrap: wrap; /* Wrap items to fit smaller screens */
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-@media screen and (max-width: 480px) {
-  .appoint_input,
-  .schedule_date-input,
-  .schedule_time-dropdown,
-  .status-dropdown {
-    width: 100%; /* Full width for inputs */
+.stat-card {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  font-size: 1rem;
+}
+.stat-card p {
+  font-size: 1rem;
+  color: #888888;
+  margin-bottom: 5px;
+}
+.stat-card h3 {
+  font-size:  1.25rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0.5rem 0;
+  text-align: left;
+}
+.stat-card span {
+  font-size: 0.9rem;
+  color: #007bff; /* Green color for percentage */
+  margin-left: 0.5rem;
+}
+
+.new-appointment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 2rem;
+}
+
+.forms-sections,
+.forms-groups-appn {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+.customer-details {
+  display: flex;
+  gap: 100px;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+#search_input{
+  border: none !important;
+}
+
+.customer-details input,
+.schedule-section input,
+.forms-groups-appn select,
+.schedule-section select {
+  flex: 1;
+  min-width: 200px;
+  padding: 15px;
+  font-size: 18px; 
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: 2rem;
+}
+.custom-select {
+  width: 30%; /* Set width to 30% */
+  padding: 8px; /* Optional: add some padding for better appearance */
+  border: 1px solid #ddd; /* Optional: add a border */
+  border-radius: 5px; /* Optional: add border radius for rounded corners */
+  appearance: none; /* Optional: remove default browser styling */
+  margin-top: 2rem;
+}
+
+.forms-groups-appn labels {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.submits-buttons {
+  width: 35%;
+  padding: 12px;
+  background-color: #3a6eff;
+  color: #fff;
+  font-size: 18px; 
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0;
+}
+
+.submits-buttons:hover {
+  background-color: #2f55cc;
+}
+
+@media (max-width: 768px) {
+  .overview-stats {
+    flex-direction: column;
+    gap: 15px;
   }
 
-  .appoint_submit-button {
-    width: 100%; /* Full width for the button */
-    padding: 15px; /* Increase padding for better touch targets */
+  .customer-details {
+    flex-direction: column;
   }
 
-  .appoint_table {
-    font-size: 12px; /* Reduce font size in tables for smaller screens */
+  .headers-container,
+  .new-appointment-wrapper {
+    padding: 15px;
   }
 }

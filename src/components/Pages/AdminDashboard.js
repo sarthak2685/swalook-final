@@ -238,9 +238,7 @@ function AdminDashboard() {
                         <th>Date</th>
                         <th>Services</th>
                         <th>Mobile No</th>
-                        <th></th>
                         <th>Actions</th>
-                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -265,30 +263,26 @@ function AdminDashboard() {
                               ) : row.services.split(',')[0]}
                             </td>
                             <td>{row.mobile_no}</td>
-                            <td>
-                              <Tooltip title="Edit Appointment" arrow>
-                                <EditIcon
-                                  onClick={() => handleEditClick(row)}
-                                  style={{ cursor: "pointer" }}
-                                />
-                              </Tooltip>
-                            </td>
-                            <td>
-                              <Tooltip title="Delete Appointment" arrow>
-                                <DeleteIcon
-                                  onClick={() => handleDeleteClick(row.id, 'appointment')}
-                                  style={{ cursor: "pointer" }}
-                                />
-                              </Tooltip>
-                            </td>
-                            <td>
-                              <Tooltip title="Generate Invoice">
-                                <ArrowCircleRightIcon
-                                  onClick={() => handleArrowClick(row)}
-                                  style={{ cursor: "pointer" }}
-                                />
-                              </Tooltip>
-                            </td>
+                            <td className="action-cell">
+    <Tooltip title="Edit Appointment" arrow>
+      <EditIcon
+        onClick={() => handleEditClick(row)}
+        style={{ cursor: "pointer" }}
+      />
+    </Tooltip>
+    <Tooltip title="Delete Appointment" arrow>
+      <DeleteIcon
+        onClick={() => handleDeleteClick(row.id, 'appointment')}
+        style={{ cursor: "pointer" }}
+      />
+    </Tooltip>
+    <Tooltip title="Generate Invoice">
+      <ArrowCircleRightIcon
+        onClick={() => handleArrowClick(row)}
+        style={{ cursor: "pointer" }}
+      />
+    </Tooltip>
+  </td>
                           </tr>
                         ))
                       }
@@ -325,9 +319,7 @@ function AdminDashboard() {
                         <th>Billing Amount</th>
                         <th>Date</th>
                         <th>Services</th>
-                        <th></th>
-                        <th style={{paddingLeft:'30px'}}>Actions</th>
-                        <th></th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -350,7 +342,7 @@ function AdminDashboard() {
                                   const servicesArray = JSON.parse(row.services);
                                   if (servicesArray.length > 1) {
                                     return (
-                                      <select className='status-dropdown'>
+                                      <select className='status-dropdowns'>
                                         {servicesArray.map((service, index) => (
                                           <option key={index} value={service.Description}>{service.Description}</option>
                                         ))}
@@ -367,30 +359,26 @@ function AdminDashboard() {
                                 }
                               })()}
                             </td>
-                            <td>
-                              <Tooltip title="View Invoice" arrow>
-                                <PictureAsPdfIcon
-                                  onClick={() => handleShowInvoice(row.id)}
-                                  style={{ cursor: "pointer" }}
-                                />
-                              </Tooltip>
-                            </td>
-                            <td>
-                              <Tooltip title="Share on WhatsApp" arrow>
-                                <AiOutlineWhatsApp
-                                  onClick={() => handleShareOnWhatsApp(row)}
-                                  style={{ cursor: "pointer", fontSize: "24px", marginLeft: "2rem" }}
-                                />
-                              </Tooltip>
-                            </td>
-                            <td>
-                              <Tooltip title="Delete Invoice" arrow>
-                                <DeleteIcon
-                                  onClick={() => handleDeleteClick(row.id, 'invoice')}
-                                  style={{ cursor: "pointer" }}
-                                />
-                              </Tooltip>
-                            </td>
+                            <td className="action-cell">
+          <Tooltip title="View Invoice" arrow>
+            <PictureAsPdfIcon
+              onClick={() => handleShowInvoice(row.id)}
+              style={{ cursor: "pointer" }}
+            />
+          </Tooltip>
+          <Tooltip title="Share on WhatsApp" arrow>
+            <AiOutlineWhatsApp
+              onClick={() => handleShareOnWhatsApp(row)}
+              style={{ cursor: "pointer", fontSize: "24px", marginLeft: "1rem" }}
+            />
+          </Tooltip>
+          <Tooltip title="Delete Invoice" arrow>
+            <DeleteIcon
+              onClick={() => handleDeleteClick(row.id, 'invoice')}
+              style={{ cursor: "pointer", marginLeft: "1rem" }}
+            />
+          </Tooltip>
+        </td>
                           </tr>
                         ))
                       }

@@ -149,3 +149,13 @@
 .nav-link:focus {
   outline: 2px dashed var(--primary-color); 
 }
+@media (min-width: 1800px) {
+  .vert_nav_main_c {
+    width: 400px; /* Increased width on large screens */
+  }
+
+  .nav-link,
+  .nav-button {
+    width: 360px; /* Adjust link and button width accordingly */
+  }
+}

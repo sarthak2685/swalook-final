@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Multiselect from 'multiselect-react-dropdown';
-import '../Styles/Appointment.css';
+import '../Styles/Appointment.css'; // Adjust styling here
 import Header from './Header';
 import VertNav from './VertNav';
+import AdminPanelSettingsIcon from '@mui/icons-material/PeopleOutlined';
 import Popup from './Popup';
 import { Helmet } from 'react-helmet';
 import config from '../../config';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
-import Tooltip from '@mui/material/Tooltip';
 import CircularProgress from '@mui/material/CircularProgress';
 import CustomDialog from './CustomDialog';
 
@@ -29,7 +27,9 @@ function Appointment() {
   const [mobileNo, setMobileNo] = useState('');
   const [email, setEmail] = useState('');
   const [bookingDate, setBookingDate] = useState('');
-  const [bookingTime, setBookingTime] = useState('');
+  const [bookingTime, setBookingTime] = useState(''); // Time format: HH:MM AM/PM
+  const [selectedHour, setSelectedHour] = useState(''); // New state for selected hour
+  const [selectedMinute, setSelectedMinute] = useState('00'); // New state for selected minute
   const [selectedAMPM, setSelectedAMPM] = useState('');
   const [presetAppointments, setPresetAppointments] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -43,8 +43,10 @@ function Appointment() {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deleteInvoiceId, setDeleteInvoiceId] = useState(null);
   const sname = localStorage.getItem("sname");
-const branchName = localStorage.getItem("branch_name");
-
+  const branchName = localStorage.getItem("branch_name");
+  const [staffData, setStaffData] = useState([]);
+  const [service_by, setServiceBy] = useState([]);
+  const [userExists, setUserExists] = useState(false);
 
   const currentDate = getCurrentDate();
   const bid = localStorage.getItem('branch_id');
@@ -78,26 +80,71 @@ const branchName = localStorage.getItem("branch_name");
 
   const handleTimeChange = event => {
     const { id, value } = event.target;
-    const prevTime = bookingTime.split(':');
-    const hour = prevTime[0] || '';
-    const minute = prevTime[1] || '00';
-    const ampm = selectedAMPM;
 
     switch (id) {
       case 'hours':
-        setBookingTime(`${value || ''}:${minute} ${ampm}`);
+        setSelectedHour(value); // Update selectedHour state
+        setBookingTime(`${value || ''}:${selectedMinute} ${selectedAMPM}`);
         break;
       case 'minutes':
-        setBookingTime(`${hour}:${value || '00'} ${ampm}`);
+        setSelectedMinute(value); // Update selectedMinute state
+        setBookingTime(`${selectedHour}:${value || '00'} ${selectedAMPM}`);
         break;
       case 'am_pm':
         setSelectedAMPM(value || '');
-        setBookingTime(`${hour}:${minute} ${value || ''}`);
+        setBookingTime(`${selectedHour}:${selectedMinute} ${value || ''}`);
         break;
       default:
         break;
     }
   };
+  const fetchStaffData = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const staffResponse = await fetch(`${config.apiUrl}/api/swalook/staff/?branch_name=${bid}`, {
+        headers: {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+        // console.log('kya hau', )
+      if (!staffResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const staffData = await staffResponse.json();
+      const staffArray = Array.isArray(staffData.table_data) ? staffData.table_data : [];
+      
+      // Check if any staff name has a space and format accordingly
+      const formattedOptions = staffArray.map(staff => {
+        const hasSpaceInName = typeof staff.staff_name === 'string' && /\s/.test(staff.staff_name);
+        return {
+          label: hasSpaceInName
+            ? `${staff.staff_name} (${staff.staff_role})` // Format for names with spaces
+            : `${staff.staff_name} (${staff.staff_role})`       // Format for names without spaces
+        };
+      });
+      
+      console.log(staffData);
+      console.log(staffArray);
+      console.log("Formatted Options:", formattedOptions);
+      
+      setStaffData(formattedOptions);
+      
+
+    } catch (error) {
+      console.error('Error fetching staff data:', error);
+      setStaffData([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchStaffData();
+  }, []);
+
+  const handleServedSelect = (selectedList) => {
+    setServiceBy(selectedList);
+}
 
   const handleAddAppointment = async e => {
     e.preventDefault();
@@ -153,6 +200,48 @@ const branchName = localStorage.getItem("branch_name");
     }
   };
 
+  const handlePhoneBlur = async () => {
+      try {
+        const branchName = localStorage.getItem('branch_id');
+  
+        const response = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${branchName}`, {
+          headers: {
+            'Authorization': `Token ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        console.log("kya ua response", response);
+  
+        if (response.data.status) {
+          // User exists, populate membership details
+         
+  
+          // Fetch additional user details
+          const userDetailsResponse = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/get_details/?branch_name=${branchName}&mobile_no=${mobileNo}`, {
+            headers: {
+              'Authorization': `Token ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          });
+  
+          if (userDetailsResponse.data) {
+            const userData = userDetailsResponse.data.data;
+            setUserExists(true);
+            setCustomerName(userData.name);
+            setEmail(userData.email);
+          }
+        } else {
+          // User does not exist, clear membership details and fetch membership options
+          setUserExists(false);
+          // setMembershipType('None');
+        }
+      } catch (error) {
+        console.error('Error checking membership status:', error);
+      }
+    
+  };
+  
+
   useEffect(() => {
     const fetchPresetAppointments = async () => {
       try {
@@ -195,180 +284,156 @@ const branchName = localStorage.getItem("branch_name");
       setShowDeletePopup(false);
     }
   };
-  // Add this before `return` in your component
-const handleArrowClick = (appointment) => {
-  console.log("Generate invoice for appointment:", appointment);
-  // Add logic for generating invoice, if needed
-};
-
 
 
   return (
-    <div className='appoint_dash_main'>
-      <Helmet>
-        <title>Book Appointment</title>
-      </Helmet>
+    <>
+       <div className="filters-wrapper">
       <Header />
-      <div className='appoint_horizontal'>
-        <div className='appoint_h1'>
-          <div className='appoint_ver_nav'>
-            <VertNav />
-          </div>
-        </div>
-        <div className='appoint_h2'>
-          <div className='appoint_left'>
-            <form onSubmit={handleAddAppointment}>
-              <h2 className='h_appoint'>Book Appointment</h2>
-              <hr className='appoint_hr' />
-              <div className='ba_con'>
-                <h3 className='cd'>Customer Details</h3>
-                <div className='app'>
-                  <div className="appointform-group">
-                    <label htmlFor="name">Name:</label>
-                    <input type="text" id="name" className="appoint_input" placeholder='Enter Full Name' required onChange={e => setCustomerName(e.target.value)} />
-                  </div>
-                  <div className="appointform-groups">
-                    <label htmlFor="email">Email:</label>
-                    <input type="email" id="email" className="appoint_input-s" placeholder='Enter Email Address' onChange={e => setEmail(e.target.value)} />
-                  </div>
-                  <div className="appointform-groups">
-                    <label htmlFor="phone">Phone:</label>
-                    <input type="number" id="phone" className="appoint_input-s" placeholder='Enter Mobile Number' required onChange={e => setMobileNo(e.target.value)} maxLength={10} />
-                  </div>
-                </div>
-                <h3 className='sts'>Select Service</h3>
-                <div className='appoint_select-field-cont'>
-                  <Multiselect
-                    options={serviceOptions}
-                    showSearch={true}
-                    onSelect={handleSelect}
-                    onRemove={handleSelect}
-                    displayValue="value"
-                    placeholder="Select Service"
-                    className="appoint_select-field"
-                    showCheckbox={true}
-                  />
-                </div>
-                <div className="appointform-group" style={{ marginTop: '10px' }}>
-                  <label htmlFor="comments">Comment:</label>
-                  <input id="comments" type='text' className="appoint_inputs" placeholder='Enter Comment' onChange={e => setComments(e.target.value)} />
-                </div>
-                <h3 className='sch'>Schedule</h3>
+      <VertNav />
+      <div className="appointment-dashboard">
+      {userExists && (
+        <header className="headers-container">
+            <div className="overview-stats">
+              <div className="stat-card">
+                <p>Business</p>
+                <h3>Rs. 15,000 <span>+0.00%</span></h3>
               </div>
-              <div className='ap-p-parent'>
-                <div className='ap-p'>
-                  <div className="appointform-groups">
-                    <label htmlFor="date" className="schedule_date-label">Date:</label>
-                    <input type='date' id='date' className='schedule_date-input' onChange={e => setBookingDate(e.target.value)} />
-                  </div>
-                  <div className="schedule_time-selection">
-                    <label htmlFor="hours" className="schedule_time-label">Time:</label>
-                    <select id="hours" className="schedule_time-dropdown" onChange={handleTimeChange}>
-                      <option value="" disabled selected>Hours</option>
-                      {[...Array(12).keys()].map(hour => (
-                        <option key={hour + 1} value={hour + 1}>{hour + 1}</option>
-                      ))}
-                    </select>
-                    <select id="minutes" className="schedule_time-dropdown" onChange={handleTimeChange}>
-                      <option value="" disabled selected>Minutes</option>
-                      {['00', '15', '30', '45'].map(minute => (
-                        <option key={minute} value={minute}>{minute}</option>
-                      ))}
-                    </select>
-                    <select id="am_pm" className="schedule_time-dropdown" onChange={handleTimeChange}>
-                      <option value="" disabled selected>AM/PM</option>
-                      {['AM', 'PM'].map(ampm => (
-                        <option key={ampm} value={ampm}>{ampm}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+              <div className="stat-card">
+                <p>Number of Appointments</p>
+                <h3>15 <span>+0.00%</span></h3>
               </div>
-              <div className="appoint-button-container">
-                <button className="appoint_submit-button" disabled={bookAppointment}>
-                  {bookAppointment ? <CircularProgress size={20} color="inherit" /> : 'Submit'}
-                </button>
+              <div className="stat-card">
+                <p>Number of Invoices</p>
+                <h3>12 <span>+0.00%</span></h3>
               </div>
-            </form>
-          </div>
-          <div className='appoint_right'>
-            <h2 className='h_appoint'>Booked Appointment: ({currentDate})</h2>
-            <hr className='appoint_hr' />
-            <div className='appoint_table_wrapper'>
-              <table className='appoint_table'>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Mobile No.</th>
-                    <th>Time</th>
-                    <th>Services</th>
-                    <th>Status</th>
-                    <th></th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan="6" style={{ textAlign: 'center' }}>
-                        <CircularProgress />
-                      </td>
-                    </tr>
-                  ) : presetAppointments.map(row => (
-                    <tr key={row.id}>
-                      <td>{row.customer_name}</td>
-                      <td>{row.mobile_no}</td>
-                      <td>{row.booking_time}</td>
-                      <td>
-                        {row.services.split(',').length > 1 ? (
-                          <select className='status-dropdown'>
-                            {row.services.split(',').map((service, index) => (
-                              <option key={index} value={service}>{service}</option>
-                            ))}
-                          </select>
-                        ) : row.services.split(',')[0]}
-                      </td>
-                      <td>
-                        <select className="status-dropdown">
-                          <option value="pending" selected>Pending</option>
-                          <option value="completed">Completed</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                      <td>
-                        <Tooltip title="Delete Appointment" arrow>
-                          <DeleteIcon onClick={() => handleDeleteClick(row.id)} style={{ cursor: "pointer" }} />
-                        </Tooltip>
-                      </td>
-                      <td>
-                        <Tooltip title="Generate Invoice">
-                          <ArrowCircleRightIcon onClick={() => handleArrowClick(row)} style={{ cursor: "pointer" }} />
-                        </Tooltip>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="user-info-appn">
+                <button className="edit-details-btn">View Details</button>
+              </div>
             </div>
-          </div>
+        
+        </header>
+          )}
+  
+        <div className="new-appointment-wrapper">
+          <h2 className='appnt-heading'> Appointment</h2>
+          <form onSubmit={handleAddAppointment} className="new-appointment-form">
+            <div className="forms-sections">
+              <labels>Customer Details:</labels>
+              <div className="customer-details">
+              <div className='form-groups'>
+                <input type="text" placeholder="Phone Number*" required  onBlur={handlePhoneBlur} 
+                onChange={e => setMobileNo(e.target.value)} maxLength={10} />
+                </div>
+                <div className='form-groups'>
+
+                <input type="text" placeholder="Name" required value={customerName} onChange={e => setCustomerName(e.target.value)} />
+                </div>
+                <div className='form-groups'>
+
+                <input type="email" placeholder="Email ID" required  value={email}  onChange={e => setEmail(e.target.value)}/>
+                </div>
+              </div>
+            </div>
+  
+            <div className="forms-groups-appn">
+  <labels>Select Services</labels>
+  <Multiselect
+  options={serviceOptions}
+  showSearch={true}
+  onSelect={handleSelect}
+  onRemove={handleSelect}
+  displayValue="value"
+  placeholder="Select Service"
+  className="custom-multiselect" // Apply the custom class here
+  />
+</div>
+  
+<div className="forms-groups-appn">
+  <labels>To be Served by:</labels>
+  <select
+    onChange={(e) => setServiceBy([{ label: e.target.value }])}
+    className="custom-select"
+  >
+    <option value="" disabled selected>Select Served By</option>
+    {staffData.map((staff, index) => (
+      <option key={index} value={staff.label}>
+        {staff.label}
+      </option>
+    ))}
+  </select>
+</div>
+
+
+  
+<div className="forms-groups-appn">
+  <h3 className='sch'>Schedule:</h3>
+  <div className="schedule-section">
+    <div className="appointform-groups">
+      <input 
+        type='date' 
+        id='date' 
+        className='schedule_date-input' 
+        onChange={e => setBookingDate(e.target.value)} 
+      />
+      
+      <select 
+        id="hours" 
+        className="schedule_time-dropdown" 
+        onChange={handleTimeChange}
+        value={selectedHour}
+      >
+        <option value="" disabled>Select Hour</option>
+        {[...Array(12).keys()].map(hour => (
+          <option key={hour + 1} value={hour + 1}>{hour + 1}</option>
+        ))}
+      </select>
+
+      <select 
+        id="minutes" 
+        className="schedule_time-dropdown" 
+        onChange={handleTimeChange}
+        value={selectedMinute}
+      >
+        <option value="" disabled>Select Minutes</option>
+        {['00', '15', '30', '45'].map(minute => (
+          <option key={minute} value={minute}>{minute}</option>
+        ))}
+      </select>
+
+      <select 
+        id="am_pm" 
+        className="schedule_time-dropdown" 
+        onChange={handleTimeChange}
+        value={selectedAMPM}
+      >
+        <option value="" disabled>Select AM/PM</option>
+        {['AM', 'PM'].map(ampm => (
+          <option key={ampm} value={ampm}>{ampm}</option>
+        ))}
+      </select>
+    </div>
+  </div>
+</div>
+
+            <div className="forms-groups-appn">
+            <h3 className='sch'>Comments:</h3>
+              <input type="text" placeholder="Comments" onChange={e => setComments(e.target.value)}/>
+            </div>
+            <div className="appoint-button-containers">
+
+            <button type="submit" className="submits-buttons" disabled={bookAppointment}>
+              {/* Replace with button text if loading not needed */}
+              {bookAppointment ? <CircularProgress size={20} color="inherit" /> : 'Create  Appointment'}
+              </button>
+            </div>
+          </form>
+        </div>
         </div>
       </div>
-      {showPopup && <Popup message={popupMessage} onClose={() => { setShowPopup(false); navigate(`/${sname}/${branchName}/dashboard`); }} />}
-      {showDeletePopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>Confirm Delete</h3>
-            <p>Are you sure you want to delete this appointment?</p>
-            <div className="popup-buttons">
-              <button onClick={handleDeleteConfirm}>Yes</button>
-              <button onClick={() => setShowDeletePopup(false)}>No</button>
-            </div>
-          </div>
-        </div>
-      )}
-      <CustomDialog open={dialogOpen} onClose={() => setDialogOpen(false)} title={dialogTitle} message={dialogMessage} />
-    </div>
+    </>
   );
+  
 }
 
 export default Appointment;

@@ -1,0 +1,24 @@
+details-dropdown {
+    position: absolute;
+    top: 50px; /* Adjust based on your button position */
+    left: 0;
+    background-color: #f1f1f1;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 250px;
+    z-index: 1000;
+  }
+  
+  .details-content h3 {
+    margin: 0;
+    font-size: 18px;
+  }
+  
+  .details-content p {
+    margin: 5px 0;
+  }
+  
+  button {
+    margin: 5px 0;
+  }

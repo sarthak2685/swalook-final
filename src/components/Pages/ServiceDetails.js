@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import '../Styles/ServiceDetails.css';
 import Header from './Header';
@@ -18,48 +18,45 @@ function ServiceDetails() {
     const [fetchService, setFetchService] = useState([]);
     const [loading, setLoading] = useState(true);
     const bid = localStorage.getItem('branch_id');
+    const [editServiceData, setEditServiceData] = useState(null);
+    const hasFetched = useRef(false);  // <-- Track if data is already fetched
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await axios.get(`${config.apiUrl}/api/swalook/table/services/?branch_name=${bid}`, {
-                    headers: {
-                        'Authorization': `Token ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+        if (!hasFetched.current && fetchService.length === 0) {
+            const fetchData = async () => {
+                setLoading(true);
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await axios.get(`${config.apiUrl}/api/swalook/table/services/?branch_name=${bid}`, {
+                        headers: {
+                            'Authorization': `Token ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    setFetchService(response.data.data.map(service => ({
+                        id: service.id,
+                        service: service.service,
+                        service_duration: service.service_duration,
+                        service_price: service.service_price
+                    })));
+                    hasFetched.current = true;  // <-- Mark as fetched
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
 
-                setFetchService(response.data.data.map((service) => ({
-                    id: service.id,
-                    service: service.service,
-                    service_duration: service.service_duration,
-                    service_price: service.service_price
-                })));
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-    
-        fetchData();
-    }, []);
-    
-    const AddtogglePopup = () => {
-        setIsAddPopupOpen(!isAddPopupOpen);
-    };
+            fetchData();
+        }
+    }, [bid]);  // Fetch only when `bid` changes
 
-    const DeletetogglePopup = () => {
-        setIsDeletePopupOpen(!isDeletePopupOpen);
-    };
-
-    const EdittogglePopup = (id, serviceName, serviceDuration, servicePrice) => { 
-        setIsEditPopupOpen(!isEditPopupOpen);
+    const AddtogglePopup = () => setIsAddPopupOpen(prev => !prev);
+    const DeletetogglePopup = () => setIsDeletePopupOpen(prev => !prev);
+    const EdittogglePopup = (id, serviceName, serviceDuration, servicePrice) => {
+        setIsEditPopupOpen(prev => !prev);
         setEditServiceData({ id, serviceName, serviceDuration, servicePrice });
-    }
-    
-    const [editServiceData, setEditServiceData] = useState(null);
+    };
 
     return (
         <div className='admin_service_container'>
@@ -68,7 +65,7 @@ function ServiceDetails() {
             </Helmet>
             <div className='c_header'>
                 <Header />
-                <VertNav/>
+                <VertNav />
             </div>
             <div className="service_details_header">
                 <h1>Service Details</h1>
@@ -88,17 +85,23 @@ function ServiceDetails() {
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? 
-                            <tr><td colSpan="4"><CircularProgress /></td></tr> :
+                        {loading ? (
+                            <tr><td colSpan="4"><CircularProgress /></td></tr>
+                        ) : (
                             fetchService.length > 0 && fetchService.map((ser) => (
                                 <tr key={ser.id}>
                                     <td>{ser.service}</td>
                                     <td>{ser.service_duration}</td>
                                     <td>{ser.service_price}</td>
-                                    <td><EditIcon onClick={() => EdittogglePopup(ser.id, ser.service, ser.service_duration, ser.service_price)} style={{ cursor: 'pointer' }} /></td>
+                                    <td>
+                                        <EditIcon
+                                            onClick={() => EdittogglePopup(ser.id, ser.service, ser.service_duration, ser.service_price)}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    </td>
                                 </tr>
                             ))
-                        }
+                        )}
                     </tbody>
                 </table>
             </div>

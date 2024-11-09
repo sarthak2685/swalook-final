@@ -11,7 +11,7 @@
   font-weight: 600;
   margin-bottom: 16px;
   margin-top: 100px;
-  margin-left: 80px;
+  margin-left: 140px;
 }
 
 .staff-table {
@@ -133,4 +133,87 @@
 
 .table_responsive {
   overflow-x: auto;
+}
+/* Responsive adjustments for tablet view (1024px and below) */
+@media (max-width: 1400px) and (min-width: 900px) {
+  .staff-management-container {
+      width: 100%;
+      margin-left: 300px;
+      padding: 10px;
+  }
+
+  .staff-title {
+      font-size: 1.4rem;
+      margin-left: 50px;
+  }
+
+  .staff-table {
+      width: 1200px;
+      margin-left: 50px;
+  }
+
+  .attendance-button {
+      font-size: 11px;
+      padding: 8px 12px;
+  }
+}
+
+/* Adjustments for screens less than 920px */
+@media (max-width: 1150px) {
+  .staff-management-container {
+      margin: 0 auto;
+      padding: 8px;
+      margin-left:300px;
+      margin-bottom: 400px;
+  }
+
+  .staff-title {
+      font-size: 1.25rem;
+      margin-left: 20px;
+  }
+
+  .staff-table {
+      width: 100%;
+      margin-left: 20px;
+      font-size: 13px;
+  }
+
+  .staff-table th,
+  .staff-table td {
+      padding: 8px;
+  }
+
+  .attendance-button {
+      padding: 6px 10px;
+      font-size: 10px;
+  }
+}
+
+/* Mobile view adjustments (768px and below) */
+@media (max-width: 768px) {
+  .staff-management-container {
+      margin: 0 auto;
+      padding: 5px;
+  }
+
+  .staff-title {
+      font-size: 1.1rem;
+      margin-left: 10px;
+  }
+
+  .staff-table {
+      width: 100%;
+      font-size: 12px;
+      margin-left: 0;
+  }
+
+  .staff-table th,
+  .staff-table td {
+      padding: 6px;
+  }
+
+  .attendance-button {
+      font-size: 10px;
+      padding: 4px 8px;
+  }
 }

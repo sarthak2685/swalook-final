@@ -6,8 +6,8 @@
     background-color: white;
     margin-top: 200px;
     width: 1400px;
-    margin-right: 100px;
-    margin-left: 200px;
+    margin-right: 50px;
+    margin-left: 350px;
 }
 
 /* Main area for the customer list */
@@ -122,14 +122,14 @@
 }
 
 /* Responsive adjustments for tablet view (1024px and below) */
-@media (max-width: 1300px) {
+@media (max-width: 1400px) and (min-width: 900px) {
     .cl_container {
         width: 100%;
         margin-left: 300px;
         margin-right: 10px;
         max-width:1200px;
     }
-    
+
     .cl_searchBar {
         width: 80%; /* Reduce search bar width */
     }
@@ -144,29 +144,44 @@
     }
 }
 
-/* Responsive adjustments for mobile view (768px and below) */
-@media (max-width: 768px) {
+
+/* Adjustments for screens less than 920px */
+@media (max-width: 1150px) {
     .cl_container {
-        margin-left: 5px;
-        margin-right: 5px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 10px;
+        margin-left:240px;
+        overflow-x: auto;
     }
 
     .cl_searchBar {
-        width: 100%; /* Full width on mobile */
+        width: 80%; /* Full width search bar */
     }
 
     .cl_add {
-        width: 100%; /* Full width on mobile */
-        margin-bottom: 15px;
+        width: 20%; /* Full width button */
+        font-size: 12px; /* Smaller font */
+        padding: 8px 16px;
+    }
+
+    .cl_table_wrapper {
+        overflow-x: auto;
+        width: 100%;
     }
 
     .cl_table {
-        width: 100%; /* Full width for mobile */
-        font-size: 12px; /* Smaller font for mobile */
+        width: 800px; /* Reduced table width for screens less than 920px */
+        font-size: 12px; /* Adjusted font size */
     }
 
     .cl_table th,
     .cl_table td {
-        padding: 8px;
+        padding: 8px; /* Smaller padding for better fit */
+        font-size: 12px;
+    }
+
+    .cl_divider {
+        margin: 15px 0;
     }
 }

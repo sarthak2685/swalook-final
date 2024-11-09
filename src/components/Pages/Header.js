@@ -51,7 +51,7 @@ function Header() {
           {profileImage ? (
             <img src={URL.createObjectURL(profileImage)} alt="Profile" className="profile-image" />
           ) : (
-            <AccountCircleIcon className="account-icon" />
+            <AccountCircleIcon className="account" />
           )}
           <div className="down-arrow"></div>
           {showDropdown && (
