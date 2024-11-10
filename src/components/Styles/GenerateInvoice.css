@@ -21,7 +21,7 @@
 @media (min-width: 1200px) {
   .invoice-section,
 .user-info {
-    width: 92rem;
+    width: 75rem;
 
   }
 }
@@ -411,4 +411,120 @@ margin-top: 3rem;
 
 .gb_services-table-content tr:hover {
   background-color: #f1f1f1; /* Highlights rows when hovered */
+}
+
+/* Popup Styling */
+.popups {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Ensure the popup is on top of other content */
+}
+
+.popups-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 900px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow-y: auto; /* Allow scrolling inside the popup */
+  max-height: 80vh; /* Limit the height of the popup */
+}
+
+/* Close Button */
+#close-btns {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff4c4c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Table Styles */
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.responsive-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.responsive-table th,
+.responsive-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.responsive-table th {
+  background-color: #3f51b5;
+  color: white;
+  font-size: 16px;
+}
+
+.responsive-table td {
+  background-color: #fff;
+}
+
+.responsive-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.responsive-table td div {
+  padding: 5px;
+  border: 1px solid #ddd;
+  margin: 2px 0;
+}
+
+/* Ensure Content Behind the Popup Is Accessible */
+body {
+  overflow: auto;
+  height: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .popups-content {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .responsive-table th, .responsive-table td {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  #close-btns {
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-table th, .responsive-table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .popups-content {
+    width: 95%;
+    padding: 10px;
+  }
 }
