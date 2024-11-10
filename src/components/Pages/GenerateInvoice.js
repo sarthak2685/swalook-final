@@ -21,7 +21,7 @@ function getCurrentDate() {
   return `${day}/${month}/${year}`;
 }
 
-function GenerateInvoice({onViewDetailsClick}) {
+function GenerateInvoice() {
   const navigate = useNavigate();
    const [serviceOptions, setServiceOptions] = useState([]);
    const [customer_name , setCustomer_Name] = useState('');
@@ -62,10 +62,11 @@ console.log(sname);
    const [showPopup, setShowPopup] = useState(false);
    const [popupMessage, setPopupMessage] = useState('');
    const [staffData, setStaffData] = useState([]);
+   const [isPopupVisible, setIsPopupVisible] = useState(false);
+   const [customerData, setCustomerData] = useState(null);
 
     const bid = localStorage.getItem('branch_id');
 
-    console.log("ye hai jo v hai",onViewDetailsClick);
 
     useEffect(() => {
       const fetchData = async () => {
@@ -423,27 +424,27 @@ console.log(sname);
 
   const [get_persent_day_bill, setGet_persent_day_bill] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${config.apiUrl}/api/swalook/billing/?branch_name=${bid}`, {
-          headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        setGet_persent_day_bill(response.data.table_data);
-        // //console.log(response.data.current_user_data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       const response = await axios.get(`${config.apiUrl}/api/swalook/billing/?branch_name=${bid}`, {
+  //         headers: {
+  //           'Authorization': `Token ${token}`,
+  //           'Content-Type': 'application/json'
+  //         }
+  //       });
+  //       setGet_persent_day_bill(response.data.table_data);
+  //       // //console.log(response.data.current_user_data);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
   
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
   
 
   const handleShowInvoice = (id) => {
@@ -549,7 +550,52 @@ console.log(sname);
       }
     }
   };
-  
+  const fetchCustomerData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`, {
+        headers: {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      setCustomerData(response.data);
+    } catch (error) {
+      console.error('Error fetching customer data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomerData();
+  }, [mobile_no]); // Dependency on mobile_no to refetch data when it changes
+
+  const handleViewDetailsClick = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`,{
+        headers: {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json'
+        }}
+      );
+      
+      // Store the retrieved data
+      setCustomerData(response.data);
+      console.log("user data:", response.data);
+      
+      // Show the popup
+      setIsPopupVisible(true);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupVisible(false);
+  };
 
  
 
@@ -633,31 +679,85 @@ const handleMembershipChange = async (selectMembership) => {
             </div>
           </div> */}
           {userExists ? (
+
                 <div className='user-info'>
+                  {customerData && (
                   <div className='user-stats'>
                     <div className='stat-item'>
                       <span>Business</span>
-                      <h2>Rs. 15,000 <small>+0.00%</small></h2>
+                      <h2>Rs {customerData.total_billing_amount} <small>+0.00%</small></h2>
                     </div>
                     <div className='stat-item'>
                       <span>Number of Appointments</span>
-                      <h2>15 <small>+0.00%</small></h2>
+                      <h2>{customerData.total_appointment} <small>+0.00%</small></h2>
                     </div>
                     <div className='stat-item'>
                       <span>Number of Invoices</span>
-                      <h2>12  <small>+0.00%</small></h2>
+                      <h2>{customerData.total_invoices}  <small>+0.00%</small></h2>
                     </div>
                     <div className='stat-item'>
                       <button
                       variant="outlined"
-                      onClick={onViewDetailsClick}
+                      onClick={handleViewDetailsClick}
                        className='edit-button'>
                         View Details
                         </button>
                     </div>
                   </div>
+                  )}
                 </div>
               ) : null}
+{isPopupVisible && (
+  <div className="popups">
+    <div className="popups-content">
+      <buttons id="close-btns" onClick={handleClosePopup}>X</buttons>
+      <h2>Customer Bill Data</h2>
+      {customerData ? (
+        <div className="table-container">
+          <table className="responsive-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Mobile No</th>
+                <th>Billing Amount</th>
+                <th>Served By</th>
+                <th>Services</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customerData.previous_invoices && customerData.previous_invoices.length > 0 ? (
+                customerData.previous_invoices.map((item, index) => (
+                  <tr key={index}>
+                    <td>{customerData.customer_name}</td>
+                    <td>{customerData.customer_mobile_no}</td>
+                    <td>{item.grand_total}</td>
+                    <td>{item.service_by}</td>
+                    <td>
+                      {JSON.parse(item.services).map((service, idx) => (
+                        <div key={idx}>
+                          {service.Description} 
+                        </div>
+                      ))}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No invoices available</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p>Loading data...</p>
+      )}
+    </div>
+  </div>
+)}
+
+
+
   
           {/* Invoice Form Section */}
           <div className='invoice-section'>

@@ -92,6 +92,12 @@
   .headers-container, .new-appointment-wrapper {
     max-width: 750px; /* For tablets and small laptops */
   }
+  .customer-details{
+    gap: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
   /* .appointment-dashboard{
     margin: 0 0 0 0px;
   } */
@@ -105,6 +111,12 @@
   .appointment-dashboard{
     margin: 0 0 0 155px;
   }
+  .customer-details{
+    gap: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -116,6 +128,12 @@
     padding-top: 6rem;
 
   } */
+  .customer-details{
+    gap: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
 }
 
 @media (min-width: 1440px) {
@@ -126,6 +144,12 @@
     padding-top: 7rem;
 
   } */
+  .customer-details{
+    gap: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
 }
 
 /* Additional styling for alignment */
@@ -217,7 +241,7 @@ font-weight: bold;
 
 .customer-details {
   display: flex;
-  gap: 100px;
+  /* gap: 100px; */
   flex-wrap: wrap;
   margin-top: 2rem;
 }
@@ -289,4 +313,16 @@ font-weight: bold;
   .new-appointment-wrapper {
     padding: 15px;
   }
+}
+#close-invoice-btns
+{
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  background: #ff4c4c !important;
+  color: white !important;
+  border: none !important;
+  padding: 5px 10px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
 }
