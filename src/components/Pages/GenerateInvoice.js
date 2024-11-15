@@ -690,13 +690,16 @@ function GenerateInvoice() {
                     <div className='stat-item'>
                       <span>Business</span>
                       <h2>Rs {customerData.total_billing_amount} <small>+0.00%</small></h2>
+                      <h2>Rs {customerData.total_billing_amount} <small>+0.00%</small></h2>
                     </div>
                     <div className='stat-item'>
                       <span>Number of Appointments</span>
                       <h2>{customerData.total_appointment} <small>+0.00%</small></h2>
+                      <h2>{customerData.total_appointment} <small>+0.00%</small></h2>
                     </div>
                     <div className='stat-item'>
                       <span>Number of Invoices</span>
+                      <h2>{customerData.total_invoices}  <small>+0.00%</small></h2>
                       <h2>{customerData.total_invoices}  <small>+0.00%</small></h2>
                     </div>
                     <div className='stat-item'>
