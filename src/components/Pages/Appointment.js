@@ -49,8 +49,7 @@ function Appointment() {
   const [userExists, setUserExists] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [customerData, setCustomerData] = useState(null);
-  const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [customerData, setCustomerData] = useState(null);
+
 
   const currentDate = getCurrentDate();
   const bid = localStorage.getItem('branch_id');
@@ -125,7 +124,7 @@ function Appointment() {
       const formattedOptions = staffArray.map(staff => {
         const hasSpaceInName = typeof staff.staff_name === 'string' && /\s/.test(staff.staff_name);
         return {
-          label: hasSpaceInName
+          labels: hasSpaceInName
             ? `${staff.staff_name} (${staff.staff_role})` // Format for names with spaces
             : `${staff.staff_name} (${staff.staff_role})`       // Format for names without spaces
         };
@@ -154,7 +153,7 @@ function Appointment() {
   const handleServedSelect = (selectedList) => {
     setServiceBy(selectedList);
   }
-  }
+  
 
   const handleAddAppointment = async e => {
     e.preventDefault();
@@ -318,51 +317,12 @@ function Appointment() {
     setDeleteInvoiceId(id);
     setShowDeletePopup(true);
   };
-  const fetchCustomerData = async () => {
-    try {
-      const token = localStorage.getItem('token');
-
-      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      setCustomerData(response.data);
-    } catch (error) {
-      console.error('Error fetching customer data:', error);
-    }
-  };
+  
 
   useEffect(() => {
     fetchCustomerData();
   }, [mobileNo]);
-  const handleViewDetailsClick = async () => {
-    try {
-      const token = localStorage.getItem('token');
 
-      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-      );
-
-      // Store the retrieved data
-      setCustomerData(response.data);
-      console.log("user data:", response.data);
-
-      // Show the popup
-      setIsPopupVisible(true);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-  const handleClosePopup = () => {
-    setIsPopupVisible(false);
-  };
 
   const fetchCustomerData = async () => {
     try {
@@ -437,190 +397,135 @@ function Appointment() {
         <div className="appointment-dashboard">
           {userExists && (
             <header className="headers-container">
-               {customerData && (
-              <div className="overview-stats">
-                <div className="stat-card">
-                  <p>Business</p>
-                  <h3>Rs. Rs {customerData.total_billing_amount} <span>+0.00%</span></h3>
+              {customerData && (
+                <div className="overview-stats">
+                  <div className="stat-card">
+                    <p>Business</p>
+                    <h3>
+                      Rs. {customerData.total_billing_amount} <span>+0.00%</span>
+                    </h3>
+                  </div>
+                  <div className="stat-card">
+                    <p>Number of Appointments</p>
+                    <h3>
+                      {customerData.total_appointment} <span>+0.00%</span>
+                    </h3>
+                  </div>
+                  <div className="stat-card">
+                    <p>Number of Invoices</p>
+                    <h3>
+                      {customerData.total_invoices} <span>+0.00%</span>
+                    </h3>
+                  </div>
+                  <div className="user-info-appn">
+                    <button
+                      className="edit-details-btn"
+                      onClick={handleViewDetailsClick}
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
-                <div className="stat-card">
-                  <p>Number of Appointments</p>
-                  <h3>{customerData.total_appointment} <span>+0.00%</span></h3>
-                </div>
-                <div className="stat-card">
-                  <p>Number of Invoices</p>
-                  <h3>{customerData.total_invoices} <span>+0.00%</span></h3>
-                </div>
-                <div className="user-info-appn">
-                  <button className="edit-details-btn"
-                    onClick={handleViewDetailsClick}
-                  >View Details</button>
-                </div>
-      <div className="filters-wrapper">
-        <Header />
-        <VertNav />
-        <div className="appointment-dashboard">
-          {userExists && (
-            <header className="headers-container">
-               {customerData && (
-              <div className="overview-stats">
-                <div className="stat-card">
-                  <p>Business</p>
-                  <h3>Rs. Rs {customerData.total_billing_amount} <span>+0.00%</span></h3>
-                </div>
-                <div className="stat-card">
-                  <p>Number of Appointments</p>
-                  <h3>{customerData.total_appointment} <span>+0.00%</span></h3>
-                </div>
-                <div className="stat-card">
-                  <p>Number of Invoices</p>
-                  <h3>{customerData.total_invoices} <span>+0.00%</span></h3>
-                </div>
-                <div className="user-info-appn">
-                  <button className="edit-details-btn"
-                    onClick={handleViewDetailsClick}
-                  >View Details</button>
-                </div>
-              </div>
-               )}
+              )}
             </header>
           )}
+  
           {isPopupVisible && (
-  <div className="popups">
-    <div className="popups-content">
-      <buttons id="close-invoice-btns" onClick={handleClosePopup}>X</buttons>
-      <h2>Customer Bill Data</h2>
-      {customerData ? (
-        <div className="table-container">
-          <table className="responsive-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Mobile No</th>
-                <th>Time</th>
-                <th>Date</th>
-                <th>Services</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customerData.previous_appointments && customerData.previous_appointments.length > 0 ? (
-                customerData.previous_appointments.map((item, index) => (
-                  <tr key={index}>
-                    <td>{customerData.customer_name}</td>
-                    <td>{customerData.customer_mobile_no}</td>
-                    <td>{item.time}</td>
-                    <td>{item.Date}</td>
-                    <td>
-                      {JSON.parse(item.services).map((service, idx) => (
-                        <div key={idx}>
-                          {service.Description} 
-                        </div>
-                      ))}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5">No invoices available</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p>Loading data...</p>
-      )}
-    </div>
-  </div>
-)}
-
+            <div className="popups">
+              <div className="popups-content">
+                <button id="close-invoice-btns" onClick={handleClosePopup}>
+                  X
+                </button>
+                <h2>Customer Bill Data</h2>
+                {customerData ? (
+                  <div className="table-container">
+                    <table className="responsive-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Mobile No</th>
+                          <th>Time</th>
+                          <th>Date</th>
+                          <th>Services</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {customerData.previous_appointments &&
+                        customerData.previous_appointments.length > 0 ? (
+                          customerData.previous_appointments.map(
+                            (item, index) => (
+                              <tr key={index}>
+                                <td>{customerData.customer_name}</td>
+                                <td>{customerData.customer_mobile_no}</td>
+                                <td>{item.time}</td>
+                                <td>{item.Date}</td>
+                                <td>
+                                  {JSON.parse(item.services).map(
+                                    (service, idx) => (
+                                      <div key={idx}>
+                                        {service.Description}
+                                      </div>
+                                    )
+                                  )}
+                                </td>
+                              </tr>
+                            )
+                          )
+                        ) : (
+                          <tr>
+                            <td colSpan="5">No invoices available</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>Loading data...</p>
+                )}
+              </div>
+            </div>
+          )}
+  
           <div className="new-appointment-wrapper">
-            <h2 className='appnt-heading'> Appointment</h2>
-            <form onSubmit={handleAddAppointment} className="new-appointment-form">
+            <h2 className="appnt-heading">Appointment</h2>
+            <form
+              onSubmit={handleAddAppointment}
+              className="new-appointment-form"
+            >
               <div className="forms-sections">
                 <labels>Customer Details:</labels>
                 <div className="customer-details">
-                  <div className='form-groups'>
-                    <input type="text" placeholder="Phone Number*" required onBlur={handlePhoneBlur}
-                      onChange={e => setMobileNo(e.target.value)} maxLength={10} />
+                  <div className="form-groups">
+                    <input
+                      type="text"
+                      placeholder="Phone Number*"
+                      required
+                      onBlur={handlePhoneBlur}
+                      onChange={(e) => setMobileNo(e.target.value)}
+                      maxLength={10}
+                    />
                   </div>
-                  <div className='form-groups'>
-               )}
-            </header>
-          )}
-          {isPopupVisible && (
-  <div className="popups">
-    <div className="popups-content">
-      <buttons id="close-invoice-btns" onClick={handleClosePopup}>X</buttons>
-      <h2>Customer Bill Data</h2>
-      {customerData ? (
-        <div className="table-container">
-          <table className="responsive-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Mobile No</th>
-                <th>Time</th>
-                <th>Date</th>
-                <th>Services</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customerData.previous_appointments && customerData.previous_appointments.length > 0 ? (
-                customerData.previous_appointments.map((item, index) => (
-                  <tr key={index}>
-                    <td>{customerData.customer_name}</td>
-                    <td>{customerData.customer_mobile_no}</td>
-                    <td>{item.time}</td>
-                    <td>{item.Date}</td>
-                    <td>
-                      {JSON.parse(item.services).map((service, idx) => (
-                        <div key={idx}>
-                          {service.Description} 
-                        </div>
-                      ))}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5">No invoices available</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p>Loading data...</p>
-      )}
-    </div>
-  </div>
-)}
-
-          <div className="new-appointment-wrapper">
-            <h2 className='appnt-heading'> Appointment</h2>
-            <form onSubmit={handleAddAppointment} className="new-appointment-form">
-              <div className="forms-sections">
-                <labels>Customer Details:</labels>
-                <div className="customer-details">
-                  <div className='form-groups'>
-                    <input type="text" placeholder="Phone Number*" required onBlur={handlePhoneBlur}
-                      onChange={e => setMobileNo(e.target.value)} maxLength={10} />
+                  <div className="form-groups">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      required
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                    />
                   </div>
-                  <div className='form-groups'>
-
-                    <input type="text" placeholder="Name" required value={customerName} onChange={e => setCustomerName(e.target.value)} />
-                  </div>
-                  <div className='form-groups'>
-                    <input type="text" placeholder="Name" required value={customerName} onChange={e => setCustomerName(e.target.value)} />
-                  </div>
-                  <div className='form-groups'>
-
-                    <input type="email" placeholder="Email ID" required value={email} onChange={e => setEmail(e.target.value)} />
+                  <div className="form-groups">
+                    <input
+                      type="email"
+                      placeholder="Email ID"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
-
+  
               <div className="forms-groups-appn">
                 <labels>Select Services</labels>
                 <Multiselect
@@ -630,91 +535,50 @@ function Appointment() {
                   onRemove={handleSelect}
                   displayValue="value"
                   placeholder="Select Service"
-                  className="custom-multiselect" // Apply the custom class here
+                  className="custom-multiselect"
                 />
               </div>
-
+  
               <div className="forms-groups-appn">
                 <labels>To be Served by:</labels>
                 <select
-                  onChange={(e) => setServiceBy([{ label: e.target.value }])}
+                  onChange={(e) => setServiceBy([{ labels: e.target.value }])}
                   className="custom-select"
                 >
-                  <option value="" disabled selected>Select Served By</option>
+                  <option value="" disabled selected>
+                    Select Served By
+                  </option>
                   {staffData.map((staff, index) => (
-                    <option key={index} value={staff.label}>
-                      {staff.label}
+                    <option key={index} value={staff.labels}>
+                      {staff.labels}
                     </option>
                   ))}
                 </select>
               </div>
-                    <input type="email" placeholder="Email ID" required value={email} onChange={e => setEmail(e.target.value)} />
-                  </div>
-                </div>
-              </div>
-
-              <div className="forms-groups-appn">
-                <labels>Select Services</labels>
-                <Multiselect
-                  options={serviceOptions}
-                  showSearch={true}
-                  onSelect={handleSelect}
-                  onRemove={handleSelect}
-                  displayValue="value"
-                  placeholder="Select Service"
-                  className="custom-multiselect" // Apply the custom class here
-                />
-              </div>
-
-              <div className="forms-groups-appn">
-                <labels>To be Served by:</labels>
-                <select
-                  onChange={(e) => setServiceBy([{ label: e.target.value }])}
-                  className="custom-select"
-                >
-                  <option value="" disabled selected>Select Served By</option>
-                  {staffData.map((staff, index) => (
-                    <option key={index} value={staff.label}>
-                      {staff.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-
-
+  
               <div className="forms-groups-appn">
                 <labels>Schedule:</labels>
                 <div className="schedule-section">
                   <div className="appointform-groups">
                     <input
-                      type='date'
-                      id='date'
-                      className='schedule_date-input'
-                      onChange={e => setBookingDate(e.target.value)}
+                      type="date"
+                      id="date"
+                      className="schedule_date-input"
+                      onChange={(e) => setBookingDate(e.target.value)}
                     />
-
                     <select
                       id="hours"
                       className="schedule_time-dropdown"
                       onChange={handleTimeChange}
                       value={selectedHour}
                     >
-                      <option value="" disabled>Select Hour</option>
-                      {[...Array(12).keys()].map(hour => (
-                        <option key={hour + 1} value={hour + 1}>{hour + 1}</option>
-                      ))}
-                    </select>
-
-                    <select
-                      id="minutes"
-                      className="schedule_time-dropdown"
-                      onChange={handleTimeChange}
-                      value={selectedMinute}
-                    >
-                      <option value="" disabled>Select Minutes</option>
-                      {['00', '15', '30', '45'].map(minute => (
-                        <option key={minute} value={minute}>{minute}</option>
+                      <option value="" disabled>
+                        Select Hour
+                      </option>
+                      {[...Array(12).keys()].map((hour) => (
+                        <option key={hour + 1} value={hour + 1}>
+                          {hour + 1}
+                        </option>
                       ))}
                     </select>
                     <select
@@ -723,57 +587,55 @@ function Appointment() {
                       onChange={handleTimeChange}
                       value={selectedMinute}
                     >
-                      <option value="" disabled>Select Minutes</option>
-                      {['00', '15', '30', '45'].map(minute => (
-                        <option key={minute} value={minute}>{minute}</option>
+                      <option value="" disabled>
+                        Select Minutes
+                      </option>
+                      {["00", "15", "30", "45"].map((minute) => (
+                        <option key={minute} value={minute}>
+                          {minute}
+                        </option>
                       ))}
                     </select>
-
                     <select
                       id="am_pm"
                       className="schedule_time-dropdown"
                       onChange={handleTimeChange}
                       value={selectedAMPM}
                     >
-                      <option value="" disabled>Select AM/PM</option>
-                      {['AM', 'PM'].map(ampm => (
-                        <option key={ampm} value={ampm}>{ampm}</option>
+                      <option value="" disabled>
+                        Select AM/PM
+                      </option>
+                      {["AM", "PM"].map((ampm) => (
+                        <option key={ampm} value={ampm}>
+                          {ampm}
+                        </option>
                       ))}
                     </select>
                   </div>
                 </div>
               </div>
-                    <select
-                      id="am_pm"
-                      className="schedule_time-dropdown"
-                      onChange={handleTimeChange}
-                      value={selectedAMPM}
-                    >
-                      <option value="" disabled>Select AM/PM</option>
-                      {['AM', 'PM'].map(ampm => (
-                        <option key={ampm} value={ampm}>{ampm}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
+  
               <div className="forms-groups-appn">
                 <labels>Comments:</labels>
-                <input id='inputss' type="text" placeholder="Comments" onChange={e => setComments(e.target.value)} />
+                <input
+                  id="inputss"
+                  type="text"
+                  placeholder="Comments"
+                  onChange={(e) => setComments(e.target.value)}
+                />
               </div>
+  
               <div className="appoint-button-containers">
-
-                <button type="submit" className="submits-buttons" disabled={bookAppointment}>
-                  {/* Replace with button text if loading not needed */}
-                  {bookAppointment ? <CircularProgress size={20} color="inherit" /> : 'Create  Appointment'}
-                </button>
-              </div>
-            </form>
-          </div>
-                <button type="submit" className="submits-buttons" disabled={bookAppointment}>
-                  {/* Replace with button text if loading not needed */}
-                  {bookAppointment ? <CircularProgress size={20} color="inherit" /> : 'Create  Appointment'}
+                <button
+                  type="submit"
+                  className="submits-buttons"
+                  disabled={bookAppointment}
+                >
+                  {bookAppointment ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    "Create Appointment"
+                  )}
                 </button>
               </div>
             </form>
@@ -782,8 +644,6 @@ function Appointment() {
       </div>
     </>
   );
-
-
 }
 
 export default Appointment;
