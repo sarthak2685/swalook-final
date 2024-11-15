@@ -34,7 +34,7 @@
   justify-content: center;
 }
 .appointform-groups {
-  /* display: flex; */
+  display: flex;
   gap: 10px; 
 }
 
@@ -71,6 +71,7 @@
 }
 @media (min-width: 768px) and (max-width: 1024px) {
   .appointform-groups {
+    display: block;
     gap: 10px;
   }
   .schedule_time-dropdown, .schedule_date-input {
@@ -173,6 +174,7 @@ font-weight: bold;
   outline: none; /* Remove outline */
   width: 30%;
   margin-top: 2rem;
+  padding: 0px
 }
 
 .appnt-heading{
@@ -247,6 +249,11 @@ font-weight: bold;
 }
 #search_input{
   border: none !important;
+  font-weight: bold;
+}
+#inputss{
+  margin-top: 2rem;
+  font-weight: bold;
 }
 
 .customer-details input,
@@ -260,6 +267,8 @@ font-weight: bold;
   border: 1px solid #ddd;
   border-radius: 5px;
   margin-top: 2rem;
+  color: #CCCCCF;
+  font-weight: bold;
 }
 .custom-select {
   width: 30%; /* Set width to 30% */

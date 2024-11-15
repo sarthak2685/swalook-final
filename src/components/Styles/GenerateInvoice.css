@@ -128,8 +128,8 @@
   flex-direction: column;
   gap: 20px; /* Increased gap for better spacing */
 }
-.form-titles{
-  color: black;
+#form-titles{
+  color: #333;
   text-align: left;
 }
 
@@ -153,6 +153,8 @@
   display: flex;
   flex-direction: column;
   font-weight: bold;
+  margin-top: 1rem;
+
 }
 .type-time{
 margin-top: 3rem;
@@ -187,10 +189,12 @@ margin-top: 3rem;
   font-size: 18px;
   font-weight: bold;
   width: auto;
+  color: #CCCCCF;
+
 }
 .form-container .forms-groups input, 
 .form-container .forms-groups select {
-  padding: 10px; /* Increased padding for a cleaner input feel */
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 18px;
