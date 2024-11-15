@@ -24,28 +24,6 @@ function Invoice() {
   const [loading, setLoading] = useState(false);
   const bid = localStorage.getItem('branch_id');
 
-  // const handlePrint = () => {
-  //   const capture = document.querySelector('.invoice_main');
-  //   const margin = 10; // Adjust margin size as needed
-  //   const pageWidth = 300; // A4 page width in mm
-  //   const increasedWidth = pageWidth + (2 * margin); // Increased width with margins
-  
-  //   html2canvas(capture).then(canvas => {
-  //     const imgData = canvas.toDataURL('image/png');
-  //     const pdf = new jsPDF('p', 'mm', [increasedWidth, 297]); // [width, height]
-  //     const componentWidth = pdf.internal.pageSize.getWidth();
-  //     const componentHeight = pdf.internal.pageSize.getHeight();
-  
-      
-  //     const posX = margin;
-  //     const posY = margin;
-  //     const imgWidth = componentWidth - (2 * margin);
-  //     const imgHeight = componentHeight - (2 * margin);
-  
-  //     pdf.addImage(imgData, 'PNG', posX, posY, imgWidth, imgHeight);
-  //     pdf.save(`Invoice${getInvoiceId}.pdf`);
-  //   });
-  // };
   
   const location = useLocation();
   const getCurrentDate = () => {
@@ -83,22 +61,12 @@ function Invoice() {
   const gst_number = location.state.gst_number;
   const comments = location.state.comments;
   const invoiceId = location.state.InvoiceId;
-  // const membership = location.state.selectMembership;
-
-  
- 
-  // console.log('hiii-',membership);
-  // const deductedPoint = location.state.deductedPoints ? location.state.deductedPoints : 0;
-
-  // const deductedPoint = 0;
+  const payment_mode = location.state.PaymentMode;
+  const sname = localStorage.getItem('s-name');
   const [deductedPoint, setDeductedPoint] = useState(0);
 
   const initialPrices = services.map(service => parseFloat(service.finalPrice));
   const [prices, setPrices] = useState(initialPrices);
-
-  // const [prices, setPrices] = useState(Array(services.length).fill(services.map(service => service.price)));
-  // const [quantities, setQuantities] = useState(Array(services.length).fill(1));
-
   const initialQuantity = services.map(service => parseFloat(service.inputFieldValue));
   const [quantities, setQuantities] = useState(initialQuantity);
 
@@ -129,7 +97,6 @@ function Invoice() {
   const CGST_RATE = GST_RATE / 2; // 9% CGST
   const SGST_RATE = GST_RATE / 2; // 9% SGST
   const roundToTwoDecimals = (num) => {
-    // Ensure num is a number and not NaN or undefined
     if (isNaN(num) || num === undefined || num === null) {
       return 0;
     }
@@ -144,7 +111,7 @@ function Invoice() {
   
   useEffect(() => {
     const fetchProductData = async () => {
-      const token = localStorage.getItem('token'); 
+      const token = localStorage.getItem('token'); // Ensure token is defined
     
       try {
         const response = await axios.get(apipoint, {
@@ -208,13 +175,10 @@ function Invoice() {
   
  // Add dependencies for useEffect
 
- console.log(service_by)
-
  const [membershipPrice, setMembershipPrice] = useState(0);
 
   const [membership, setMembership] = useState(location.state?.selectMembership);
   const branchId = localStorage.getItem('branch_id');
-  // const token = localStorage.getItem('token');
 
   const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/view/?branch_name=${branchId}`;
 
@@ -226,18 +190,26 @@ function Invoice() {
             'Authorization': `Token ${token}`,
           },
         });
-
-        const membershipData = response.data.data; 
-        console.log("membership", membershipData)
-
+  
+        const membershipData = response.data.data;
+        console.log("membership", membershipData);
+  
         // Ensure membershipData is an array
         if (Array.isArray(membershipData)) {
+          // If membership is "None" or not valid, skip fetching
+          if (membership === "None" || !membership) {
+            setMembershipPrice(0);
+            return;
+          }
+          console.log("Fetching members",membership,setMembershipPrice);
+  
           // Find the selected membership price
           const selectedMembership = membershipData.find(m => m.program_type === membership);
-          console.log("haa", selectedMembership)
+          console.log("selectedMembership", selectedMembership);
+  
           const price = selectedMembership ? selectedMembership.price : 0;
           console.log("price-", price);
-
+  
           setMembershipPrice(price);
         } else {
           console.error('Unexpected response format:', response.data);
@@ -246,95 +218,13 @@ function Invoice() {
         console.error('Error fetching membership data:', error);
       }
     };
-
-    if (membership) {
+  
+    // Only fetch data if membership is not "None" or invalid
+    if (membership && membership !== "None") {
       fetchMembershipData();
     }
   }, [membership, apiEndpoint, token]);
-
-  // const grand_total = totalAmts.reduce((acc, totalAmt) => acc + parseFloat(totalAmt), 0);
-
-// useEffect(() => {
-//   // Calculate and set total price
-//   const totalPrice = prices.reduce((acc, price) => acc + parseFloat(price), 0);
-//   setTotalPrice(totalPrice);
   
-
-//   // Calculate and set total quantity
-//   const totalQuantity = quantities.reduce((acc, quantity) => acc + parseFloat(quantity), 0);
-//   setTotalQuantity(totalQuantity);
-
-//   // Calculate and set total discount
-//   const totalDiscount = discounts.reduce((acc, discount) => acc + parseFloat(discount), 0);
-//   setTotalDiscount(totalDiscount);
-
-//   // Calculate and set taxes, cgst, and sgst
-//   const updatedTaxes = prices.map((price, index) => {
-//     const currPrice = (price * quantities[index]) - discounts[index];
-//     // const gst_value = (currPrice * 5) / 105;
-//     // const taxAmount = currPrice - gst_value;
-
-//     let taxAmount = 0; // Initialize tax amount to zero
-
-//     // if (isGST) {
-//     //   const gst_value = (currPrice * 5) / 105;
-//     //   taxAmount = currPrice - gst_value;
-//     // }
-
-//     if (services[index].gst !== "No GST") {
-//       const gst_value = (currPrice * 18) / 100;
-//       taxAmount = gst_value;
-//     }
-
-//     // Calculate CGST and SGST for the current service
-//     // const cgstValue = (taxAmount * 2.5) / 100;
-//     // const sgstValue = (taxAmount * 2.5) / 100;
-
-//     const cgstValue = taxAmount / 2;
-//     const sgstValue = taxAmount / 2;
-
-//     // Update total CGST and SGST
-//     setCGST(prevCGST => {
-//       const updatedCGST = [...prevCGST];
-//       updatedCGST[index] = cgstValue.toFixed(2);
-//       return updatedCGST;
-//     });
-
-//     setSGST(prevSGST => {
-//       const updatedSGST = [...prevSGST];
-//       updatedSGST[index] = sgstValue.toFixed(2);
-//       return updatedSGST;
-//     });
-
-//     const totalAmt = (parseFloat((price * quantities[index] - discounts[index]).toFixed(2)) + taxAmount).toFixed(2);
-//       setTotalAmts(prevTotalAmts => {
-//         const updatedTotalAmts = [...prevTotalAmts];
-//         updatedTotalAmts[index] = totalAmt;
-//         return updatedTotalAmts;
-//       });
-
-//     return taxAmount.toFixed(2);
-//   });
-//   setTaxes(updatedTaxes);
-
-//   // Calculate and set total tax
-//   const totalTax = updatedTaxes.reduce((acc, tax) => acc + parseFloat(tax), 0);
-//   setTotalTax(totalTax.toFixed(2));
-
-//   // Calculate and set total CGST
-//   const totalCGST = cgst.reduce((acc, tax) => acc + parseFloat(tax), 0);
-//   setTotalCGST(totalCGST.toFixed(2));
-
-//   // Calculate and set total SGST
-//   const totalSGST = sgst.reduce((acc, tax) => acc + parseFloat(tax), 0);
-//   setTotalSGST(totalSGST.toFixed(2));
-
-//   // Calculate and set grand total
-//   const grandTotal = totalAmts.reduce((acc, totalAmt) => acc + parseFloat(totalAmt), 0);
-//     setGrandTotal(grandTotal.toFixed(2));
-
-// }, [prices, quantities, discounts , cgst, sgst , totalAmts]);
-
 
 useEffect(() => {
   const GST_RATE = 0.18;
@@ -398,16 +288,6 @@ useEffect(() => {
   });
   
 
-  // Calculate membership taxes (applying "No GST" logic if applicable)
-  // let membershipTax = 0;
-  // let membershipTotal = membershipPrice;
-  // console.log("Members", membershipTax, membershipTotal);
-  // if (!noGSTApplied) {
-  //   membershipTax = membershipPrice * GST_RATE;
-  //   membershipTotal = membershipPrice + membershipTax;
-  //   console.log("Members", membershipTax, membershipTotal);
-
-  // }
   let membershipTotal = membershipPrice;
   let membershipTax = 0;
   let membershipCGST = 0;
@@ -419,7 +299,7 @@ useEffect(() => {
     const membershipSGST = membershipPrice * SGST_RATE;
     membershipTax = membershipCGST + membershipSGST;
     membershipTotal = membershipPrice + membershipTax;
-    console.log("sahil",membershipSGST,membershipCGST);
+    // console.log("sahil",membershipSGST,membershipCGST);
   }
   // Aggregate totals for services and products
   const totalServicePrices = prices.reduce((acc, price, index) => acc + (price * quantities[index] - discounts[index]), 0);
@@ -478,11 +358,7 @@ const handlePriceBlur = (index, value) => {
     setQuantities(newQuantities);
   };
 
-  // const handleDiscountBlur = (index, value) => {
-  //   const newDiscounts = [...discounts];
-  //   newDiscounts[index] = parseFloat(value);
-  //   setDiscounts(newDiscounts);
-  // };
+
 
   const handleDiscountBlur = (index, value) => {
     // If the value is null or undefined, set it to 0
@@ -550,23 +426,9 @@ const handlePriceBlur = (index, value) => {
   const bname = atob(localStorage.getItem('branch_name'));  
 
   const final_price = Math.ceil(parseFloat(grand_total) - parseFloat(deductedPoint));
-//   console.log('Grand Total:', grand_total);
-// console.log('Deducted Points:', deductedPoint);
-// console.log('Final Price (Rounded Up):', final_price);
+
   const grandTotalInWords = numberToWords(final_price);
 
-
-// console.log("kuch v ho mtlb",productDetails.name);
-// const membershipData = {
-//   Description: membership,
-//   Price: membershipPrice,
-//   Quantity: 1,
-//   Discount: 0,
-//   Tax_amt: membershipTax,
-//   CGST: membershipCGST,
-//   SGST: membershipSGST,
-//   Total_amount: membershipTotal,
-// };
 
 const [invoiceGenerated, setInvoiceGenerated] = useState(false); 
 
@@ -633,14 +495,12 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
     }
   ]
   
-
     setInvoice(newInvoice);
   
     const token = localStorage.getItem('token');
-    console.log(token);
+    console.log("token",totalAmts);
   console.log(final_price);
-    // Check if membership details exist
-    console.log('Membership data:', membership);
+  
   
     const data = {
       customer_name: customer_name,
@@ -648,7 +508,7 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
       email: email,
       services: JSON.stringify(newInvoice),
       address: address,
-      service_by:service_by.map(item => item.label.replace(/\s*\(.*?\)$/, ''))[0],
+      service_by: service_by.map(service => service.label).toString(),
       total_prise: total_prise,
       total_quantity: total_quantity,
       total_discount: total_discount,
@@ -661,19 +521,16 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
       slno: invoiceId,
       json_data: producData,
       loyalty_points_deducted: deductedPoint,
+      payment_mode: payment_mode
     };
-
-    console.log(service_by.map(item => item.label.replace(/\s*\(.*?\)$/, ''))[0]);
-
-
   
     try {
       // Make the POST request
       const response = await axios.post(`${config.apiUrl}/api/swalook/billing/?branch_name=${bid}`, data, {
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
-        }
+        },
       });
   
       // Handle success
@@ -698,12 +555,7 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
 
   };
   
-  
-
-  
-
-    // console.log('Invoice:' , invoice);
-    // console.log('Invoice:json' , JSON.stringify(invoice));
+  console.log("service",service_by)
 
   const [getInvoiceId , setInvoiceId] = useState(invoiceId);
 
@@ -713,72 +565,6 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
   })
 
   const branchName = localStorage.getItem('branch_name');
-  const sname = localStorage.getItem('s-name');
-
-
-//   const handlePrint = () => {
-//     const capture = document.querySelector('.invoice_main');
-    
-//     html2canvas(capture).then(canvas => {
-//       const imgData = canvas.toDataURL('image/jpeg', 0.7);
-      
-//       // Create PDF with A4 size
-//       const pdf = new jsPDF('l', 'mm', 'a4');
-//       const pdfWidth = pdf.internal.pageSize.getWidth();
-//       const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-//       // Define padding and margin
-//       const padding = 10; // 10mm padding
-//       const margin = 10;  // 10mm margin
-      
-//       // Calculate the available width and height for the image
-//       const availableWidth = pdfWidth - 2 * margin;
-//       const availableHeight = pdfHeight - 2 * margin;
-      
-//       // Calculate the image width and height to fit within the available area
-//       const imgWidth = availableWidth - 2 * padding;
-//       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-//       // Position the image with padding and margin
-//       const posX = margin + padding ;
-//       const posY = margin + padding ;
-      
-//       // Add image to PDF
-//       pdf.addImage(imgData, 'JPEG', posX, posY, imgWidth , imgHeight);
-//       pdf.compress = true;
-//       pdf.save(`Invoice-${getInvoiceId}.pdf`);  
-
-//       // const pdfBlob = pdf.output('blob');
-//       // const formData = new FormData();
-//       // formData.append('file', pdfBlob, `Invoice-${getInvoiceId}.pdf`);
-
-//       // const data = {
-//       //   customer_name: customer_name,
-//       //   mobile_no: mobile_no,
-//       //   email: email,
-//       //   vendor_branch_name: bname,
-        // invoice_id: getInvoiceId,
-        // file: pdfBlob
-//       // }
-
-//       // axios.post(`${config.apiUrl}/api/swalook/save-pdf`, formData, {
-//       //   headers: {
-//       //     'Authorization': `Token ${token}`,
-//       //     'Content-Type': 'multipart/form-data'
-//       //   }
-//       // })
-//       // .then(response => {
-//       //   console.log('PDF saved successfully');
-//       // })
-//       // .catch(error => {
-//       //   console.error('Error saving PDF', error);
-//       // });
-
-//     });
-// };
-
-
-
 // Calculate taxes and totals for the membership
 let membershipTotal = membershipPrice;
 let membershipTax = 0;
@@ -794,45 +580,6 @@ if (isGST) {
   console.log("shjbfhbhgbefbehjbfhjdb",cgsts,sgsts);
 }
 
-// const handlePrint = async () => {
-//   const capture = document.querySelector('.invoice_main');
-  
-//   html2canvas(capture).then(async (canvas) => {
-//     const imgData = canvas.toDataURL('image/jpeg', 0.7);
-    
-//     const pdf = new jsPDF('l', 'mm', 'a4');
-//     const pdfWidth = pdf.internal.pageSize.getWidth();
-//     const pdfHeight = pdf.internal.pageSize.getHeight();
-    
-//     const padding = 10;
-//     const margin = 10;
-//     const availableWidth = pdfWidth - 2 * margin;
-//     const availableHeight = pdfHeight - 2 * margin;
-//     const imgWidth = availableWidth - 2 * padding;
-//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-//     const posX = margin + padding;
-//     const posY = margin + padding;
-    
-//     pdf.addImage(imgData, 'JPEG', posX, posY, imgWidth, imgHeight);
-//     pdf.compress = true;
-//     pdf.save(`Invoice-${getInvoiceId}.pdf`);
-    
-//     const pdfBlob = pdf.output('blob');
-    
-//     // Initialize formData
-//     const formData = new FormData();
-//     formData.append('file', pdfBlob, `Invoice-${getInvoiceId}.pdf`);
-//     formData.append('customer_name', customer_name);
-//     formData.append('mobile_no', mobile_no);
-//     formData.append('email', email);
-//     formData.append('vendor_branch_name', bname);
-//     formData.append('invoice', getInvoiceId);
-
-//     // Call the function to send invoice
-//     await handleSendInvoice(formData);
-//   });
-// };
 
 const handlePrint = async () => {
   const capture = document.querySelector('.invoice_main');
@@ -904,39 +651,7 @@ const handleSendInvoice = async (formData) => {
     console.error('Error saving PDF:', error);
   }
 };
-
-
-
-
-
-
-// const handleSendInvoice = async (formData) => {
-//   const token = localStorage.getItem('token');
-  
-//   // No need to create `data` object since `formData` will include everything
-//   console.log("FormData:", formData);
-  
-//   // You already have FormData, just append customer details to it
-//   formData.append('customer_name', customer_name);
-//   formData.append('mobile_no', mobile_no);
-//   formData.append('email', email);
-//   formData.append('vendor_branch_name', bname);
-//   formData.append('invoice', getInvoiceId);
-
-//   try {
-//     const response = await axios.post(`${config.apiUrl}/api/swalook/save-pdf/`, formData, {
-//       headers: {
-//         'Authorization': `Token ${token}`,
-//         'Content-Type': 'multipart/form-data',  // Required for sending files
-//       },
-//     });
-//     console.log('PDF saved successfully', response.data);
-//   } catch (error) {
-//     console.error('Error saving PDF:', error);
-//   }
-// };
-
-
+console.log("hero hu ",typeof membership, membership, membershipPrice);
   return (
     
     <div className='invoice_container'>
@@ -949,7 +664,7 @@ const handleSendInvoice = async (formData) => {
           <div>
         <div className='invoice_header'>
           {/* <img src={Logo1} alt='Logo' className='invoice_logo' /> */}
-          <div className='invoice_name'>{getSaloonName}</div>
+          <div className='invoice_name'>{sname}</div>
         </div>
         <div className='invoice_content'>
           <div className='invoice_left'>
@@ -958,6 +673,7 @@ const handleSendInvoice = async (formData) => {
             <p>{address}</p>
             <p>{email}</p>
             <p>{mobile_no}</p>
+            <p><b>Payment Mode:</b> {payment_mode}</p>
           </div>
           <div className='invoice_right'>
             <div className='invoice-invoice_id'>
@@ -1022,7 +738,7 @@ const handleSendInvoice = async (formData) => {
     </tr>
   ))}
 
-  {membership && (
+  {membership && membership!=="None" &&(
     <tr style={{ border: '1px solid #787871', padding: '3px', backgroundColor: '#fff' }}>
       <td scope='col' style={{ textAlign: 'center' }}>{services.length + 1}</td>
       <td scope='col' className='text-center' style={{ textAlign: 'center' }}>{membership}</td>
@@ -1086,7 +802,9 @@ const handleSendInvoice = async (formData) => {
 <tr style={{ border: '1px solid #787871', padding: '3px', backgroundColor: '#fff' }}>
   <th colSpan='2' style={{ width: '20%', color: 'white', fontWeight: 500, fontSize: 15, backgroundColor: '#0d6efd' }}>TOTAL</th>
   <th style={{ width: '5%', padding: '0.7%' }} className='text-center'>{total_prise}</th>
-  <th style={{ width: '10%', padding: '0.7%' }} className='text-center'>{total_quantity}</th>
+  <th style={{ width: '10%', padding: '0.7%' }} className="text-center">
+  {membership === 'None' ? total_quantity - 1 : total_quantity}
+</th>
   <th style={{ width: '10%', padding: '0.7%' }} className='text-center'>{total_discount}</th>
   {isGST ? (
     <>

@@ -130,6 +130,6 @@ textarea {
   }
 }
 .generate-button{
-  margin-left: 500px;
   height: 60px;
+  width: auto;
 }

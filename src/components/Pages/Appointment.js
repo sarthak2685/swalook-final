@@ -466,7 +466,7 @@ function Appointment() {
 
 
               <div className="forms-groups-appn">
-                <h3 className='sch'>Schedule:</h3>
+                <labels>Schedule:</labels>
                 <div className="schedule-section">
                   <div className="appointform-groups">
                     <input
@@ -516,8 +516,8 @@ function Appointment() {
               </div>
 
               <div className="forms-groups-appn">
-                <h3 className='sch'>Comments:</h3>
-                <input type="text" placeholder="Comments" onChange={e => setComments(e.target.value)} />
+                <labels>Comments:</labels>
+                <input id='inputss' type="text" placeholder="Comments" onChange={e => setComments(e.target.value)} />
               </div>
               <div className="appoint-button-containers">
 
