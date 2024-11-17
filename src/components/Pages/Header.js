@@ -43,7 +43,6 @@ function Header() {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <h1 className="dashboard-heading">Dashboard</h1>
         <hr className="divider-line" />
       </div>
       <div className="navbar-right">

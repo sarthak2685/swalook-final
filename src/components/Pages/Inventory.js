@@ -116,9 +116,6 @@ function Inventory() {
                 </div>
             </div>
            
-            <div className="horizontal_line_container">
-                <hr className="horizontal_line" />
-            </div>
             
             <div className='update'>
                 <div className="admin_inventory_table_container">
