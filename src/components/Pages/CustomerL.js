@@ -134,7 +134,6 @@ function CustomerL() {
                                 Add Customer
                             </button>
                         </div>
-                        <hr className='cl_divider'/> 
 
                         <div className='cl_table_wrapper'>
                             <table className='cl_table'>

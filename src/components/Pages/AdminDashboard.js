@@ -219,6 +219,7 @@ function AdminDashboard() {
           <div className="content-body">
             <div className='billing_table_container'>
               <div className="content-box">
+                <div className='header-search-container'>
                 <h2>Appointments</h2>
                 <div className="US_search-bar">
                   <input
@@ -228,7 +229,8 @@ function AdminDashboard() {
                     onChange={handleSearchChange}
                     className='appint_sea'
                   />
-                </div>
+                  </div>
+                  </div>
                 <hr/>
                 <div className='US-con'>
                   <table>
@@ -299,15 +301,17 @@ function AdminDashboard() {
 
             <div className='billing_table_container'>
               <div className="content-box">
-                <h2>Billing Table</h2>
+              <div className='header-search-container'>
+                <h2>Invoices</h2>
                 <div className="billing_search-bar">
                   <input
                     type="text"
-                    placeholder="Search Billing"
+                    placeholder="Search Invoice"
                     className="search-Billing"
                     value={searchBillTerm}
                     onChange={handleBillSearchChange}
                   />
+                </div>
                 </div>
                 <hr/>
                 <div className='BT-con'>

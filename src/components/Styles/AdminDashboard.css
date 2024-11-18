@@ -14,9 +14,19 @@ body {
 }
 
 .content-box h2, .content-footer h2 {
-  margin-left: 1380px;
-  padding-top: 20px;
+  font-size: 1.5rem; /* Adjust font size */
+  margin: 0; /* Remove extra margin */
+  padding: 0; /* Remove padding */
+  font-weight: 600; /* Make it bold */
 }
+.header-search-container {
+  display: flex;
+  align-items: center; /* Align items vertically at the center */
+  justify-content: space-between; /* Space out heading and search bar */
+  margin: 20px 0; /* Add spacing above and below */
+  padding-left: 20px; /* Adjust as needed for alignment */
+}
+
 
 /* Main Dashboard Layout */
 .horizontal-container {
@@ -108,6 +118,7 @@ body {
   width: 100%; /* Make tables responsive */
   margin: 0 auto; /* Center tables */
   padding-bottom: 30px; /* Bottom padding for the table */
+  margin-top: 30px;
 }
 
 .US-con th,
@@ -149,11 +160,10 @@ body {
 /* Search Bar */
 .billing_search-bar,
 .US_search-bar {
+  width: 250px; /* Set a fixed width */
   display: flex;
-  align-items: center;
-  margin-left: 20px; /* Move search bars to the left */
-  width: 250px;
-  margin-bottom: 20px;
+  align-items: center; /* Align search bar content vertically */
+  margin: 0; /* Remove extra margin */
 }
 
 .search-Billing,
@@ -211,7 +221,8 @@ body {
   margin: 40px 0; /* Increased margin above and below each table */
   border: 1px solid #e0e0e0;
   padding: 20px; /* Added padding inside the table section */
-  margin-left: 280px; /* Adjusted left margin */
+  margin-left: 310px; /* Adjusted left margin */
+  margin-top: 80px;
 }
 
 .para {
@@ -224,9 +235,7 @@ body {
   margin-right: 15px;
   padding-top: 10px;
 }
-.actions-th{
 
-}
 /* Tablet View */
 @media (max-width: 1500px) {
   /* Stack content boxes vertically */
@@ -271,11 +280,6 @@ body {
     gap: 30px; /* Adjust space between icons */
   }
 
-  /* Consistent padding for content box and footer */
-  .content-box,
-  .content-footer {
-    padding: 10px;
-  }
 
   /* Adjust popup content width */
   .popup-content {
@@ -300,8 +304,10 @@ body {
   /* Adjust margin for content footer heading */
   .content-box h2,
   .content-footer h2 {
-    margin-left: 80%;
-    transform: translateX(-50%); /* Center heading */
+    font-size: 1.5rem; /* Adjust font size */
+    margin: 0; /* Remove extra margin */
+    padding: 0; /* Remove padding */
+    font-weight: 600; /* Make it bold */
   }
 
   /* Adjust popup buttons */
@@ -313,11 +319,12 @@ body {
   /* Search bar adjustments */
   .billing_search-bar,
   .US_search-bar {
-    width: 80%;
-    max-width: 200px;
-    margin-left: 100px;
-    margin-right: auto;
+    width: 250px; /* Set a fixed width */
+    display: flex;
+    align-items: center; /* Align search bar content vertically */
+    margin: 0; /* Remove extra margin */
   }
+  
 }
 
 /* Media Queries for Small Screens */

@@ -22,14 +22,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
     width: 100%;
     max-width: 1500px; /* Increased max width */
 }
 
 .inventory_details_header h1 {
-    margin: 0;
     white-space: nowrap;
+    margin-right: 20px;
 }
 
 .add_inventory_button {
@@ -38,10 +37,10 @@ body {
     padding: 8px 16px;
     border-radius: 5px;
     cursor: pointer;
-    width: 200px;
-    margin-right: 20px;
+    width: 160px;
     font-family: 'Montserrat', sans-serif;
     background-color:#5570F1;
+    margin-left: 40px;
 }
 
 .add_inventory_button:hover {
@@ -71,15 +70,21 @@ body {
 
 .admin_inventory_table {
     width: 100%; /* Table will take the full width of its container */
-    border-collapse: collapse;
+    border-collapse: separate; /* Prevent borders from collapsing */
+    margin-top: 20px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: auto; /* Center the table */
+    border: 1px solid #e0e0e0; /* Light border for the table */
 }
 
 .admin_inventory_table th,
 .admin_inventory_table td {
     padding: 12px 8px;
-    border-bottom: 1px solid #ddd;
-    text-align: center; /* Changed to left alignment */
-    border: 1px solid #ddd;
+    text-align: center; /* Maintain center alignment */
+    border: none; /* Remove lines between cells */
 }
 
 .admin_inventory_table th {
@@ -93,14 +98,15 @@ body {
 }
 
 .admin_inventory_table td {
-    background:#ffffff ; /* Updated background color for data cells */
-    color:#292D32 ; /* Font color for data */
+    background: #ffffff; /* Updated background color for data cells */
+    color: #292D32; /* Font color for data */
     font-family: 'Poppins', sans-serif; /* Updated font family */
     font-size: 14px; /* Updated font size */
     font-weight: 500; /* Updated font weight */
     line-height: 21px; /* Updated line height */
     letter-spacing: -0.01em; /* Updated letter spacing */
 }
+
 
 /* Responsive adjustments for tablet view (1024px and below) */
 
@@ -124,8 +130,9 @@ body {
     }
 
     .inventory_details_header h1 {
-        margin-left: 100px;
-    }
+        margin-left: 150px;
+        font-size: 1.5rem;
+    }   
 
     .add_inventory_button {
         width: 100px;
@@ -136,8 +143,8 @@ body {
         border-radius: 5px;
         cursor: pointer;
         transition: background-color 0.3s;
-        margin-left: auto; /* Align to the right */
         background-color:#5570F1 ;
+        margin-right: 140px;
     }
 
     .add_inventory_button:hover {
@@ -161,25 +168,41 @@ body {
     .admin_inventory_table {
         width: 1200px;
         border-collapse: collapse;
+        margin-top: 20px;
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-right: auto; /* Center the table */
+        border: 1px solid #e0e0e0; /* Light border for the table */
     }
 
     .admin_inventory_table th,
     .admin_inventory_table td {
         padding: 10px;
         text-align: center;
-        border: 1px solid #ddd;
+        border: none; /* Remove lines between cells */
+
     }
 
     .admin_inventory_table th {
-        background-color: white;
-        color: #B5B7C0;
-        font-size: 14px;
+        background-color: #ffffff; /* Updated color */
+        color: #B5B7C0; /* Font color for headings */
+        font-family: 'Poppins', sans-serif; /* Updated font family */
+        font-size: 14px; /* Updated font size */
+        font-weight: 500; /* Updated font weight */
+        line-height: 21px; /* Updated line height */
+        letter-spacing: -0.01em; /* Updated letter spacing */
     }
-
+    
     .admin_inventory_table td {
-        background: #ffffff;
-        color: #292D32;
-        font-size: 14px;
+        background: #ffffff; /* Updated background color for data cells */
+        color: #292D32; /* Font color for data */
+        font-family: 'Poppins', sans-serif; /* Updated font family */
+        font-size: 14px; /* Updated font size */
+        font-weight: 500; /* Updated font weight */
+        line-height: 21px; /* Updated line height */
+        letter-spacing: -0.01em; /* Updated letter spacing */
     }
 
     /* Adjustments for better readability on smaller screens */
@@ -210,7 +233,7 @@ body {
 
     .inventory_details_header h1 {
         padding-top: 40px;
-        margin-left: 160px;
+        margin-left: 280px;
         font-size: 1.4rem;
     }
 
@@ -220,7 +243,7 @@ body {
         padding: 2px 6px;
         margin-left: auto; /* Align to the right */
         align-self: flex-start;
-        margin-right: 100px;
+        margin-right: 180px;
     }
 
     .horizontal_line {

@@ -80,15 +80,22 @@
 /* Table styling */
 .cl_table {
     width: 1600px;
-    border-collapse: collapse;
+    border-collapse: separate; /* Prevent borders from collapsing */
     margin-top: 20px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: auto; /* Center the table */
+    border: 1px solid #e0e0e0; /* Light border for the table */
 }
 
+/* Table header and cell styling */
 .cl_table th,
 .cl_table td {
     padding: 10px;
     text-align: center;
-    border: 1px solid #ddd;
+    border: none; /* Remove cell borders */
 }
 
 /* Table header styling */
