@@ -28,6 +28,7 @@ import StaffManagement from './components/Pages/StaffManagement';
 import AdminManagement from './components/Pages/AdminManagement';
 import StaffSetting from './components/Pages/StaffSetting';
 import "./index.css"; // Assuming you have global styles
+import ExpensesManagement from './components/Pages/ExpenseMnt';
 
 function App() {
   const isLoggedIn = Cookies.get('loggedIn') === 'true';
@@ -60,6 +61,8 @@ function App() {
             <Route path="/:salon_name/:branchName/attendance" element={<StaffManagement />} />
             <Route path="/:salon_name/:branchName/staff" element={<AdminManagement />} />
             <Route path="/:salon_name/:branchName/staffSettings" element={<StaffSetting />} />
+            <Route path="/:salon_name/:branchName/expense" element={<ExpensesManagement />} />
+
           </Route>
           
           <Route path="*" element={<ErrorPage />} />

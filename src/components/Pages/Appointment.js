@@ -272,13 +272,26 @@ function Appointment() {
             'Content-Type': 'application/json',
           },
         });
+        const userDataArray = userDetailsResponse.data.data;
+        console.log("User Data Array:", userDataArray);
 
-        if (userDetailsResponse.data) {
-          const userData = userDetailsResponse.data.data;
+        if (Array.isArray(userDataArray) && userDataArray.length > 0) {
+          const userData = userDataArray[0]; // Access the first object in the array
+          console.log("Setting Name:", userData.name); 
+          console.log("Setting Email:", userData.email);
+
           setUserExists(true);
-          setCustomerName(userData.name);
-          setEmail(userData.email);
+          setCustomerName(userData.name || ""); // Safely assign name
+          setEmail(userData.email || "");       // Safely assign email
+          setCustomerData(userData);           // Populate other fields
         }
+
+        // if (userDetailsResponse.data) {
+        //   const userData = userDetailsResponse.data.data;
+        //   setUserExists(true);
+        //   (userData.name);
+        //   setEmail(userData.email);
+        // }
       } else {
         // User does not exist, clear membership details and fetch membership options
         setUserExists(false);
@@ -319,31 +332,67 @@ function Appointment() {
   };
   
 
-  useEffect(() => {
-    fetchCustomerData();
-  }, [mobileNo]);
+  // const fetchCustomerData = async () => {
+  //   try {
+  //     const token = localStorage.getItem('token');
 
+  //     const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}`, {
+  //       headers: {
+  //         'Authorization': `Token ${token}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+      
+  //     setCustomerId(response.data);
+  //     console.log("hey",response.data)
+  //   } catch (error) {
+  //     console.error('Error fetching customer data:', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchCustomerData();
+  // }, [mobileNo]);
+
+  const [customerId, setCustomerId] = useState('');
 
   const fetchCustomerData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      if (mobileNo.length === 10) { 
+        const token = localStorage.getItem('token');
 
-      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      setCustomerData(response.data);
+        const response = await axios.get(
+          `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}`,
+          {
+            headers: {
+              'Authorization': `Token ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        setCustomerId(response.data);
+        console.log('Fetched data:', response.data);
+      }
     } catch (error) {
       console.error('Error fetching customer data:', error);
     }
   };
 
+
+  // Debounced effect
   useEffect(() => {
-    fetchCustomerData();
+    if (mobileNo.length === 10) { 
+      // Ensure a valid 10-digit number
+      const timeoutId = setTimeout(() => {
+        fetchCustomerData();
+      }, 500); // Debounce time
+
+      return () => clearTimeout(timeoutId); // Cleanup timeout on input change
+    }
   }, [mobileNo]);
+
+
   const handleViewDetailsClick = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -356,11 +405,9 @@ function Appointment() {
       }
       );
 
-      // Store the retrieved data
       setCustomerData(response.data);
       console.log("user data:", response.data);
 
-      // Show the popup
       setIsPopupVisible(true);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -397,24 +444,24 @@ function Appointment() {
         <div className="appointment-dashboard">
           {userExists && (
             <header className="headers-container">
-              {customerData && (
+              {customerId && (
                 <div className="overview-stats">
                   <div className="stat-card">
                     <p>Business</p>
                     <h3>
-                      Rs. {customerData.total_billing_amount} <span>+0.00%</span>
+                      Rs. {customerId.total_billing_amount} <span>+0.00%</span>
                     </h3>
                   </div>
                   <div className="stat-card">
                     <p>Number of Appointments</p>
                     <h3>
-                      {customerData.total_appointment} <span>+0.00%</span>
+                      {customerId.total_appointment} <span>+0.00%</span>
                     </h3>
                   </div>
                   <div className="stat-card">
                     <p>Number of Invoices</p>
                     <h3>
-                      {customerData.total_invoices} <span>+0.00%</span>
+                      {customerId.total_invoices} <span>+0.00%</span>
                     </h3>
                   </div>
                   <div className="user-info-appn">
@@ -433,10 +480,10 @@ function Appointment() {
           {isPopupVisible && (
             <div className="popups">
               <div className="popups-content">
-                <button id="close-invoice-btns" onClick={handleClosePopup}>
+                <buttons id="close-invoice-btns" onClick={handleClosePopup}>
                   X
-                </button>
-                <h2>Customer Bill Data</h2>
+                </buttons>
+                <h2>Customer Appointment Data</h2>
                 {customerData ? (
                   <div className="table-container">
                     <table className="responsive-table">

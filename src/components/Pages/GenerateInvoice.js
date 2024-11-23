@@ -508,71 +508,115 @@ function GenerateInvoice() {
 
 
   const handlePhoneBlur = async () => {
-    if (mobile_no && (mobile_no.length === 10 || mobile_no.length === 12)) {
+    if (mobile_no && mobile_no.length === 10) {
       try {
         const branchName = localStorage.getItem('branch_id');
-
         const response = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${branchName}`, {
           headers: {
-            'Authorization': `Token ${localStorage.getItem('token')}`,
+            Authorization: `Token ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
           },
         });
-        console.log("kya ua response", response);
-
+  
         if (response.data.status) {
-          // User exists, populate membership details
-
-
-          // Fetch additional user details
+          // User exists, fetch details
           const userDetailsResponse = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/get_details/?branch_name=${branchName}&mobile_no=${mobile_no}`, {
             headers: {
-              'Authorization': `Token ${localStorage.getItem('token')}`,
+              Authorization: `Token ${localStorage.getItem('token')}`,
               'Content-Type': 'application/json',
             },
           });
-
-          if (userDetailsResponse.data) {
-            const userData = userDetailsResponse.data.data;
+          const userDataArray = userDetailsResponse.data.data;
+          console.log("User Data Array:", userDataArray);
+  
+          if (Array.isArray(userDataArray) && userDataArray.length > 0) {
+            const userData = userDataArray[0]; // Access the first object in the array
+            console.log("Setting Name:", userData.name); 
+            console.log("Setting Email:", userData.email);
+  
             setUserExists(true);
-            setMembershipStatus(true);
-            setCustomer_Name(userData.name);
-            setEmail(userData.email);
-            setMembershipType(userData.membership);
-            setUserPoints(userData.loyality_profile.current_customer_points);
+            setCustomer_Name(userData.name || ""); // Safely assign name
+            setEmail(userData.email || "");       // Safely assign email
+            setCustomerData(userData);           // Populate other fields
           }
         } else {
-          // User does not exist, clear membership details and fetch membership options
+          // New user
           setUserExists(false);
-          setMembershipStatus(false);
-          // setMembershipType('None');
-          await fetchMembershipOptions();
+          setCustomer_Name(""); // Clear fields
+          setEmail("");
+          setCustomerData(null); // Clear user info section
         }
       } catch (error) {
-        console.error('Error checking membership status:', error);
+        console.error('Error fetching customer data:', error);
       }
+    } else {
+      // Invalid number
+      setUserExists(false);
+      setCustomer_Name("");
+      setEmail("");
+      setCustomerData(null);
     }
   };
+  
+  
+  // const fetchCustomerData = async () => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+
+  //     const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`, {
+  //       headers: {
+  //         'Authorization': `Token ${token}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+
+  //     setCustomerData(response.data);
+  //   } catch (error) {
+  //     console.error('Error fetching customer data:', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchCustomerData();
+  // }, [mobile_no]); 
+
+  const [customerId, setCustomerId] = useState('');
+
   const fetchCustomerData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      if (mobile_no.length === 10) { 
+        const token = localStorage.getItem('token');
 
-      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+        const response = await axios.get(
+          `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`,
+          {
+            headers: {
+              'Authorization': `Token ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
 
-      setCustomerData(response.data);
+        setCustomerId(response.data);
+        console.log('Fetched data:', response.data);
+      }
     } catch (error) {
       console.error('Error fetching customer data:', error);
     }
   };
 
+
+  // Debounced effect
   useEffect(() => {
-    fetchCustomerData();
-  }, [mobile_no]); // Dependency on mobile_no to refetch data when it changes
+    if (mobile_no.length === 10) { 
+      const timeoutId = setTimeout(() => {
+        fetchCustomerData();
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [mobile_no]);
+
 
   const handleViewDetailsClick = async () => {
     try {
@@ -659,59 +703,36 @@ function GenerateInvoice() {
         </Helmet>
         <div className='gb_horizontal'>
           <div className='gb_h2'>
-            {/* User Info Section */}
-            {/* <div className='user-info'>
-            <div className='user-stats'>
-              <div className='stat-item'>
-                <span>Business</span>
-                <h2>Rs. 15,000 <small>+0.00%</small></h2>
-                
-              </div>
-              <div className='stat-item'>
-                <span>Number of Appointments</span>
-                <h2>15 <small>+0.00%</small></h2>
-                
-              </div>
-              <div className='stat-item'>
-                <span>Number of Invoices</span>
-                <h2>12  <small>+0.00%</small></h2>
-               
-              </div>
-              <div className='stat-item'>
-              <button className='edit-button'>View Details</button>
-              </div>
-            </div>
-          </div> */}
+        
             {userExists ? (
 
               <div className='user-info'>
-                {customerData && (
-                  <div className='user-stats'>
-                    <div className='stat-item'>
-                      <span>Business</span>
-                      <h2>Rs {customerData.total_billing_amount} <small>+0.00%</small></h2>
-                      <h2>Rs {customerData.total_billing_amount} <small>+0.00%</small></h2>
-                    </div>
-                    <div className='stat-item'>
-                      <span>Number of Appointments</span>
-                      <h2>{customerData.total_appointment} <small>+0.00%</small></h2>
-                      <h2>{customerData.total_appointment} <small>+0.00%</small></h2>
-                    </div>
-                    <div className='stat-item'>
-                      <span>Number of Invoices</span>
-                      <h2>{customerData.total_invoices}  <small>+0.00%</small></h2>
-                      <h2>{customerData.total_invoices}  <small>+0.00%</small></h2>
-                    </div>
-                    <div className='stat-item'>
-                      <button
-                        variant="outlined"
-                        onClick={handleViewDetailsClick}
-                        className='edit-button'>
-                        View Details
-                      </button>
-                    </div>
-                  </div>
-                )}
+                {customerId && (
+  <div className="user-stats">
+    <div className="stat-item">
+      <span>Business</span>
+      <h2>Rs {customerId.total_billing_amount} <small>+0.00%</small></h2>
+    </div>
+    <div className="stat-item">
+      <span>Number of Appointments</span>
+      <h2>{customerId.total_appointment} <small>+0.00%</small></h2>
+    </div>
+    <div className="stat-item">
+      <span>Number of Invoices</span>
+      <h2>{customerId.total_invoices} <small>+0.00%</small></h2>
+    </div>
+    <div className="stat-item">
+      <button
+        variant="outlined"
+        onClick={handleViewDetailsClick}
+        className="edit-button"
+      >
+        View Details
+      </button>
+    </div>
+  </div>
+)}
+
               </div>
             ) : null}
             {isPopupVisible && (
@@ -778,13 +799,27 @@ function GenerateInvoice() {
                       <input type="number" id="phone" placeholder='Phone Number' required onBlur={handlePhoneBlur} onChange={(e) => setMobileNo(e.target.value)} />
                     </div>
                     <div className='form-groups'>
-                      <input type="text" id="name" placeholder='Full Name' value={customer_name} readOnly={userExists} required onChange={(e) => setCustomer_Name(e.target.value)
-
-                      } />
+                    <input
+    type="text"
+    id="name"
+    placeholder="Full Name"
+    value={customer_name}
+    readOnly={userExists} // Read-only for existing user
+    required
+    onChange={(e) => !userExists && setCustomer_Name(e.target.value)} // Editable only for new user
+  />
                     </div>
 
                     <div className='form-groups'>
-                      <input type="email" id="email" placeholder='Email Address' value={email} readOnly={userExists} required onChange={(e) => setEmail(e.target.value)} />
+                    <input
+    type="email"
+    id="email"
+    placeholder="Email Address"
+    value={email}
+    readOnly={userExists} // Read-only for existing user
+    required
+    onChange={(e) => !userExists && setEmail(e.target.value)} // Editable only for new user
+  />
                     </div>
                   </div>
                 </div>

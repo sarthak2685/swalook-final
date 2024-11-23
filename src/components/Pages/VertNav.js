@@ -11,7 +11,8 @@ import {
   SettingsSharp as SettingsSharpIcon,
   Headphones as HeadphonesIcon,
   People as PeopleIcon, // Import PeopleIcon
-  EventAvailable as EventAvailableIcon // Import EventAvailableIcon
+  EventAvailable as EventAvailableIcon ,
+  AccountBalanceWallet
 } from '@mui/icons-material';
 import Logo from '../../assets/header_crm_logo.webp';
 
@@ -153,6 +154,13 @@ const VertNav = () => {
           label="Attendance" 
           isActive={activeLink === 'attendance'}
           onClick={() => handleLinkClick('attendance', `/${sname}/${branchName}/attendance`)}
+        />
+        <NavItem 
+          to={`/${sname}/${branchName}/expense`} 
+          icon={AccountBalanceWallet} 
+          label="Expense" 
+          isActive={activeLink === 'expense'}
+          onClick={() => handleLinkClick('expense', `/${sname}/${branchName}/expense`)}
         />
       </div>
       <SupportButton sname={sname} branchName={branchName} />

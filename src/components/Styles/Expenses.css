@@ -1,0 +1,182 @@
+/* Main Container */
+.expenses-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f6fa;
+}
+
+/* Sidebar */
+.vertnav {
+  flex: 0 0 250px;
+}
+
+/* Main Content */
+.mains-contents {
+  flex: 1 1;
+    background-color: #f9f9f9;
+    justify-content: center;
+    align-items: center;
+    margin-left: 25rem;
+    margin-right: 7rem;
+    margin-top: 8rem;
+    overflow: auto;
+}
+
+/* Expenses Management Section */
+.expenses-management {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #2b2b2b;
+}
+.filter{
+  margin-top: 1rem;
+}
+
+.filter-add {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#filter-label {
+  font-size: 18px;
+  margin-right: 5px;
+  color: #9C9D9E;
+
+}
+
+.filter-select {
+  padding: 8px 12px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.new-expense-btn {
+  background-color: #4a90e2;
+  color: #fff;
+  padding: 10px 15px;
+  font-size: 18px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.new-expense-btn:hover {
+  background-color: #357ac8;
+}
+
+/* Table */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.expenses-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 20px;
+}
+
+.expenses-table th,
+.expenses-table td {
+  padding: 19px 15px;
+  border-bottom: 1px solid #eaeaea;
+  font-weight: 500;
+}
+
+.expenses-table th {
+  text-align: left;
+  font-weight: 600;
+  color: #9C9D9E;
+}
+
+.expenses-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Pagination */
+/* Pagination Buttons */
+#pagination-controls {
+  display: flex;
+  align-items: end;
+  justify-content: end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+#page-btn {
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+#page-btn.active {
+  background-color: #4a90e2;
+  color: #fff;
+  border-color: #4a90e2;
+}
+
+#page-btn:hover {
+  background-color: #ddd;
+}
+
+#pagination-info {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .expenses-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  #pagination-controls {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .filter-select,
+  .new-expense-btn {
+    width: 100%;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+}
+@media (max-width: 1400px)
+{
+  .mains-contents {
+    flex: 1 1;
+      background-color: #f9f9f9;
+      justify-content: center;
+      align-items: center;
+      margin-left: 20rem;
+      margin-right: 2rem;
+      margin-top: 8rem;
+      overflow: auto;
+  }
+}
