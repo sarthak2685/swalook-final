@@ -65,83 +65,104 @@ function GenerateInvoice() {
   const [staffData, setStaffData] = useState([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [customerData, setCustomerData] = useState(null);
+  const [apiCalled, setApiCalled] = useState(false);
+  const [staffApiCalled, setStaffApiCalled] = useState(false);
 
   const bid = localStorage.getItem('branch_id');
+  const token = localStorage.getItem('token');
 
 
   const fetchData = async () => {
     try {
+      if (apiCalled) return; // Prevent redundant API calls
+  
       const branchName = localStorage.getItem('branch_name');
       const token = localStorage.getItem('token');
   
+      // Validate necessary data
       if (!branchName || !token) {
-        throw new Error('Branch name or token is missing.');
+        console.error('Branch name or token is missing.');
+        return;
       }
   
-      const response = await fetch(`${config.apiUrl}/api/swalook/inventory/product/?branch_name=${bid}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${token}`
-        },
-      });
+      const response = await fetch(
+        `${config.apiUrl}/api/swalook/inventory/product/?branch_name=${bid}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
   
       if (!response.ok) {
-        throw new Error('Network response was not ok.');
+        console.error(`API Error: ${response.status} - ${response.statusText}`);
+        return;
       }
   
       const data = await response.json();
-      setInventoryData(data.data.map((product) => ({
+  
+      // Transform and set inventory data
+      const formattedData = data.data?.map((product) => ({
         key: product.id,
         value: product.product_name,
         unit: product.unit,
-        quantity: product.stocks_in_hand
-      })));
+        quantity: product.stocks_in_hand,
+      })) || [];
+  
+      setInventoryData(formattedData);
+      setApiCalled(true); // Mark API as called
+  
     } catch (error) {
       console.error('Error fetching inventory data:', error);
     }
   };
+  
 
 
   const fetchStaffData = async () => {
-    const token = localStorage.getItem('token');
     try {
-      const staffResponse = await fetch(`${config.apiUrl}/api/swalook/staff/?branch_name=${bid}`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      // console.log('kya hau', )
-      if (!staffResponse.ok) {
-        throw new Error('Network response was not ok');
+      if (staffApiCalled) return; // Prevent redundant API calls
+  
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Token is missing.');
+        return;
       }
-
-      const staffData = await staffResponse.json();
-      const staffArray = Array.isArray(staffData.table_data) ? staffData.table_data : [];
-
-      // Check if any staff name has a space and format accordingly
-      const formattedOptions = staffArray.map(staff => {
-        const hasSpaceInName = typeof staff.staff_name === 'string' && /\s/.test(staff.staff_name);
-        return {
-          label: hasSpaceInName
-            ? `${staff.staff_name} (${staff.staff_role})` // Format for names with spaces
-            : `${staff.staff_name} (${staff.staff_role})`       // Format for names without spaces
-        };
-      });
-
-      console.log(staffData);
-      console.log(staffArray);
-      console.log("Formatted Options:", formattedOptions);
-
+  
+      const response = await fetch(
+        `${config.apiUrl}/api/swalook/staff/?branch_name=${bid}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      if (!response.ok) {
+        console.error(`API Error: ${response.status} - ${response.statusText}`);
+        return;
+      }
+  
+      const data = await response.json();
+      const staffArray = Array.isArray(data.table_data) ? data.table_data : [];
+  
+      // Format staff data
+      const formattedOptions = staffArray.map((staff) => ({
+        label: `${staff.staff_name} (${staff.staff_role})`,
+      }));
+  
       setStaffData(formattedOptions);
-
-
+      setStaffApiCalled(true); // Mark API as called
     } catch (error) {
       console.error('Error fetching staff data:', error);
-      setStaffData([]);
+      setStaffData([]); // Reset staff data on error
     }
   };
+  
 
 
 
@@ -151,8 +172,8 @@ function GenerateInvoice() {
       const response = await fetch(`${config.apiUrl}/api/swalook/table/services/?branch_name=${bid}`, {
         headers: {
           'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
   
       if (!response.ok) {
@@ -198,7 +219,6 @@ function GenerateInvoice() {
     })));
   };
 
-  //console.log(productData , "productData");
 
   const handleProductInputChange = (index, value) => {
     const updatedProductData = [...productData];
@@ -262,27 +282,49 @@ function GenerateInvoice() {
 
   const [deductedPoints, setDeductedPoints] = useState('');
 
-  useEffect(() => {
-    axios.get(`${config.apiUrl}/api/swalook/get_specific_slno/`, {
-      headers: {
-        'Authorization': `Token ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json'
+  const fetchSpecificSerial = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Token is missing.');
+        return;
       }
-    })
-      .then(response => {
-        //console.log(response.data);
-        setInvoiceId(response.data.slno);
-      })
-      .catch(error => {
-        console.error('Error fetching invoice id:', error);
-      });
-  }
-    , []);
+  
+      const response = await axios.get(
+        `${config.apiUrl}/api/swalook/get_specific_slno/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      if (response?.data?.slno) {
+        setInvoiceId(response.data.slno); // Set invoice ID if 'slno' exists
+      } else {
+        console.error('Invalid response format:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching invoice ID:', error);
+    }
+  };
+  
+  
 
 
   //console.log(servicesTableData, "servicesTableData");
 
   const handleGenerateInvoice = async () => {
+    await fetchSpecificSerial(); // Wait for InvoiceId to be set
+    
+    if (!InvoiceId) {
+      setDialogTitle('Error');
+      setDialogMessage('Failed to generate Invoice ID. Please try again.');
+      setDialogOpen(true);
+      return;
+    }
+  
     // Validate services and service_by selections
     if (GBselectedServices.length === 0) {
       setDialogTitle('Error');
@@ -290,14 +332,14 @@ function GenerateInvoice() {
       setDialogOpen(true);
       return;
     }
-
+  
     if (service_by.length === 0) {
       setDialogTitle('Error');
       setDialogMessage('Please select service by!');
       setDialogOpen(true);
       return;
     }
-
+  
     // Validate mobile number
     const mobileNoPattern = /^[0-9]{10}$/;
     if (!mobileNoPattern.test(mobile_no)) {
@@ -306,7 +348,7 @@ function GenerateInvoice() {
       setDialogOpen(true);
       return;
     }
-
+  
     // Validate services table data
     for (let i = 0; i < servicesTableData.length; i++) {
       if (servicesTableData[i].inputFieldValue === '') {
@@ -322,7 +364,7 @@ function GenerateInvoice() {
         return;
       }
     }
-
+  
     // Validate product data
     for (let i = 0; i < productData.length; i++) {
       if (productData[i].quantity === '') {
@@ -332,7 +374,7 @@ function GenerateInvoice() {
         return;
       }
     }
-
+  
     // If user does not exist, call handleSubmit to add the user
     let submitResult = null;
     if (!userExists) {
@@ -346,11 +388,11 @@ function GenerateInvoice() {
         return;
       }
     }
-
-    // Proceed to navigate regardless of handleSubmit result (or if user exists)
+  
     try {
+      console.log("Invoice ID:", InvoiceId);
       await Promise.all([
-        submitResult,  // Only call submitResult if user doesn't exist
+        submitResult, // Only call submitResult if user doesn't exist
         navigate(`/${sname}/${branchName}/${InvoiceId}/invoice`, {
           state: {
             customer_name,
@@ -367,9 +409,9 @@ function GenerateInvoice() {
             productData,
             deductedPoints,
             selectMembership,
-            PaymentMode
-          }
-        })
+            PaymentMode,
+          },
+        }),
       ]);
     } catch (error) {
       console.error('Error navigating:', error);
@@ -379,13 +421,14 @@ function GenerateInvoice() {
     }
   };
   
+  
 
 
   const handleSubmit = async () => {
     setLoading(true);
     const token = localStorage.getItem('token');
     const bid = localStorage.getItem('branch_id');
-
+  
     try {
       const response = await axios.post(
         `${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${bid}`,
@@ -393,36 +436,36 @@ function GenerateInvoice() {
           name: customer_name,
           mobile_no: mobile_no,
           email: email,
-          membership: selectMembership
+          membership: selectMembership,
         },
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
-          }
+            'Authorization': `Token ${token}`,
+          },
         }
       );
-
-      const result = response.data;
-      console.log('API Response:', result);
-
-      if (response.status >= 200 && response.status < 300 && result.success) {
+  
+      const { status, data } = response;
+      console.log('API Response:', data);
+  
+      if (status >= 200 && status < 300 && data.success) {
         setPopupMessage('Customer added successfully!');
         setShowPopup(true);
+        return true; // Indicate success
       } else {
-        setPopupMessage('Failed to add customer.');
-        setShowPopup(true);
-        return false;  // Indicate failure
+        throw new Error(data.message || 'Failed to add customer.');
       }
     } catch (error) {
-      setPopupMessage('An error occurred.');
+      setPopupMessage(error.response?.data?.message || 'An error occurred.');
       setShowPopup(true);
-      console.error('Error:', error.response ? error.response.data : error.message);
-      return false;  // Indicate error
+      console.error('Error:', error.response?.data || error.message);
+      return false; // Indicate failure
     } finally {
       setLoading(false);
     }
   };
+  
 
 
   const [get_persent_day_bill, setGet_persent_day_bill] = useState([]);
@@ -456,19 +499,29 @@ function GenerateInvoice() {
 
   const handleDeleteInvoice = async (id) => {
     const token = localStorage.getItem('token');
+  
     try {
-      const res = await axios.get(`${config.apiUrl}/api/swalook/delete/invoice/${id}/`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
+      const response = await axios.get(
+        `${config.apiUrl}/api/swalook/delete/invoice/${id}/`,
+        {
+          headers: {
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json',
+          },
         }
-      });
-      //console.log(res.data);
-      window.location.reload();
-    } catch (err) {
-      //console.log(err);
+      );
+  
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Invoice deleted successfully');
+        window.location.reload(); // Reload only on success
+      } else {
+        throw new Error('Failed to delete invoice.');
+      }
+    } catch (error) {
+      console.error('Error deleting invoice:', error.response?.data || error.message);
     }
   };
+  
 
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deleteInvoiceId, setDeleteInvoiceId] = useState(null);
@@ -508,55 +561,72 @@ function GenerateInvoice() {
 
 
   const handlePhoneBlur = async () => {
-    if (mobile_no && mobile_no.length === 10) {
-      try {
-        const branchName = localStorage.getItem('branch_id');
-        const response = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${branchName}`, {
+    if (!mobile_no || mobile_no.length !== 10) {
+      // Invalid mobile number
+      resetCustomerFields();
+      return;
+    }
+  
+    try {
+      const branchName = localStorage.getItem('branch_id');
+      const token = localStorage.getItem('token');
+  
+      if (!branchName || !token) {
+        console.error('Branch ID or token is missing.');
+        resetCustomerFields();
+        return;
+      }
+  
+      // Check if user exists
+      const checkUserResponse = await axios.get(
+        `${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${branchName}`,
+        {
           headers: {
-            Authorization: `Token ${localStorage.getItem('token')}`,
+            Authorization: `Token ${token}`,
             'Content-Type': 'application/json',
           },
-        });
+        }
+      );
   
-        if (response.data.status) {
-          // User exists, fetch details
-          const userDetailsResponse = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/get_details/?branch_name=${branchName}&mobile_no=${mobile_no}`, {
+      if (checkUserResponse.data.status) {
+        // Fetch user details
+        const userDetailsResponse = await axios.get(
+          `${config.apiUrl}/api/swalook/loyality_program/customer/get_details/?branch_name=${branchName}&mobile_no=${mobile_no}`,
+          {
             headers: {
-              Authorization: `Token ${localStorage.getItem('token')}`,
+              Authorization: `Token ${token}`,
               'Content-Type': 'application/json',
             },
-          });
-          const userDataArray = userDetailsResponse.data.data;
-          console.log("User Data Array:", userDataArray);
-  
-          if (Array.isArray(userDataArray) && userDataArray.length > 0) {
-            const userData = userDataArray[0]; // Access the first object in the array
-            console.log("Setting Name:", userData.name); 
-            console.log("Setting Email:", userData.email);
-  
-            setUserExists(true);
-            setCustomer_Name(userData.name || ""); // Safely assign name
-            setEmail(userData.email || "");       // Safely assign email
-            setCustomerData(userData);           // Populate other fields
           }
-        } else {
-          // New user
-          setUserExists(false);
-          setCustomer_Name(""); // Clear fields
-          setEmail("");
-          setCustomerData(null); // Clear user info section
+        );
+  
+        const userDataArray = userDetailsResponse.data.data;
+        if (Array.isArray(userDataArray) && userDataArray.length > 0) {
+          const userData = userDataArray[0];
+          setCustomer_Name(userData.name || ""); // Safely assign values
+          setEmail(userData.email || "");
+          setCustomerData(userData);
+          setUserExists(true);
+          return;
         }
-      } catch (error) {
-        console.error('Error fetching customer data:', error);
       }
-    } else {
-      // Invalid number
-      setUserExists(false);
-      setCustomer_Name("");
-      setEmail("");
-      setCustomerData(null);
+  
+      // New user (if user doesn't exist)
+      resetCustomerFields();
+    } catch (error) {
+      console.error('Error fetching customer data:', error);
+      resetCustomerFields(); // Reset fields in case of error
     }
   };
+  
+  // Helper to reset customer fields
+  const resetCustomerFields = () => {
+    setUserExists(false);
+    setCustomer_Name("");
+    setEmail("");
+    setCustomerData(null);
+  };
+  
   
   
   // const fetchCustomerData = async () => {
@@ -583,27 +653,35 @@ function GenerateInvoice() {
   const [customerId, setCustomerId] = useState('');
 
   const fetchCustomerData = async () => {
+    if (!mobile_no || mobile_no.length !== 10) {
+      console.error('Invalid mobile number.');
+      return;
+    }
+  
     try {
-      if (mobile_no.length === 10) { 
-        const token = localStorage.getItem('token');
-
-        const response = await axios.get(
-          `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`,
-          {
-            headers: {
-              'Authorization': `Token ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        setCustomerId(response.data);
-        console.log('Fetched data:', response.data);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Token is missing.');
+        return;
       }
+  
+      const response = await axios.get(
+        `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      setCustomerId(response.data);
+      console.log('Fetched data:', response.data);
     } catch (error) {
       console.error('Error fetching customer data:', error);
     }
   };
+  
 
 
   // Debounced effect
@@ -619,27 +697,39 @@ function GenerateInvoice() {
 
 
   const handleViewDetailsClick = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Token is missing');
+      return;
+    }
+  
+    if (!mobile_no || mobile_no.length !== 10) {
+      console.error('Invalid mobile number');
+      return;
+    }
+  
     try {
-      const token = localStorage.getItem('token');
-
-      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
+      const response = await axios.get(
+        `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            'Content-Type': 'application/json',
+          },
         }
-      }
       );
-
+  
       // Store the retrieved data
       setCustomerData(response.data);
-      console.log("user data:", response.data);
-
+      console.log('User data:', response.data);
+  
       // Show the popup
       setIsPopupVisible(true);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
+  
 
   const handleClosePopup = () => {
     setIsPopupVisible(false);
@@ -658,31 +748,45 @@ function GenerateInvoice() {
 
 
   const fetchMembershipOptions = async () => {
+    const token = localStorage.getItem('token');
+    const branchId = localStorage.getItem('branch_id'); // Assuming 'branch_id' is stored in localStorage
+  
+    if (!token || !branchId) {
+      console.error('Missing token or branch ID');
+      return;
+    }
+  
     try {
-      const token = localStorage.getItem('token');
-      const membershipResponse = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/view/?branch_name=${bid}`, {
-        headers: {
-          'Authorization': `Token ${token}`
+      const membershipResponse = await axios.get(
+        `${config.apiUrl}/api/swalook/loyality_program/view/?branch_name=${branchId}`,
+        {
+          headers: {
+            'Authorization': `Token ${token}`,
+          },
         }
-      });
+      );
+  
       // Check if the response contains data and status is true
       if (membershipResponse.data.status && Array.isArray(membershipResponse.data.data)) {
         setMembershipOptions(membershipResponse.data.data);
       } else {
         console.error('Unexpected response format or no data:', membershipResponse.data);
-        setMembershipOptions([]); // Ensure to clear options if the format is not as expected
+        setMembershipOptions([]); // Clear options if the format is not as expected
       }
     } catch (error) {
       console.error('Error fetching membership options:', error);
+      setMembershipOptions([]); // Ensure options are cleared if an error occurs
     }
   };
-
-
+  
   useEffect(() => {
     if (mobile_no.length === 10) {
       fetchMembershipOptions();
+    } else {
+      setMembershipOptions([]); // Clear options if mobile number is invalid
     }
   }, [mobile_no]);
+  
 
 
 
@@ -711,15 +815,15 @@ function GenerateInvoice() {
   <div className="user-stats">
     <div className="stat-item">
       <span>Business</span>
-      <h2>Rs {customerId.total_billing_amount} <small>+0.00%</small></h2>
+      <h2>Rs {customerId.total_billing_amount}</h2>
     </div>
     <div className="stat-item">
       <span>Number of Appointments</span>
-      <h2>{customerId.total_appointment} <small>+0.00%</small></h2>
+      <h2>{customerId.total_appointment}</h2>
     </div>
     <div className="stat-item">
       <span>Number of Invoices</span>
-      <h2>{customerId.total_invoices} <small>+0.00%</small></h2>
+      <h2>{customerId.total_invoices}</h2>
     </div>
     <div className="stat-item">
       <button
@@ -1071,99 +1175,4 @@ function GenerateInvoice() {
 
 }
 
-
-
 export default GenerateInvoice
-
-
-
-{/* <div className='gb_right'>
-<h2 className='gb_appoint'>Billing:</h2>
-<hr className='gb_hr' />
-<div className='gb_table_wrapper'>
-  <table className='gb_table'>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Mobile No.</th>
-        <th>Amount</th>
-        <th>Services</th>
-        <th>View</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {loading ? (
-        <tr>
-          <td colSpan="6" style={{ textAlign: 'center' }}>
-            <CircularProgress sx={{ color: 'black' }} />
-          </td>
-        </tr>
-      ) : (
-        // Ensure get_persent_day_bill is an array and has data
-        (mobile_no === '' ? get_persent_day_bill : get_persent_day_bill.filter(item => item.mobile_no === mobile_no)).map((item, index) => (
-          <tr key={index}>
-            <td>{item.customer_name}</td>
-            <td>{item.mobile_no}</td>
-            <td>{item.grand_total}</td>
-            <td>
-              {(() => {
-                try {
-                  const servicesArray = JSON.parse(item.services);
-                  if (servicesArray.length > 1) {
-                    return (
-                      <select className='status-dropdown'>
-                        {servicesArray.map((service, index) => (
-                          <option key={index} value={service.Description}>{service.Description}</option>
-                        ))}
-                      </select>
-                    );
-                  } else if (servicesArray.length === 1) {
-                    return <span>{servicesArray[0].Description}</span>;
-                  } else {
-                    return null;
-                  }
-                } catch (error) {
-                  console.error('JSON parsing error:', error);
-                  return null;
-                }
-              })()}
-            </td>
-            <td>
-              <Tooltip title="View Invoice">
-                <PictureAsPdfIcon style={{ cursor: "pointer" }} onClick={() => handleShowInvoice(item.id)} />
-              </Tooltip>
-            </td>
-            <td>
-              <Tooltip title="Delete Invoice">
-                <DeleteIcon style={{ cursor: "pointer" }} onClick={() => handleDeleteClick(item.id)} />
-              </Tooltip>
-            </td>
-          </tr>
-        ))
-      )}
-    </tbody>
-  </table>
-</div>
-</div> */}
-
-
-// {showDeletePopup && (
-//   <div className="popup">
-//     <div className="popup-content">
-//       <h3>Confirm Delete</h3>
-//       <p>Are you sure you want to delete this invoice?</p>
-//       <div className="popup-buttons">
-//         <button onClick={handleDeleteConfirm}>Yes</button>
-//         <button onClick={() => setShowDeletePopup(false)}>No</button>
-//       </div>
-//     </div>
-//   </div>
-// )}
-
-// <CustomDialog
-//   open={dialogOpen}
-//   onClose={() => setDialogOpen(false)}
-//   title={dialogTitle}
-//   message={dialogMessage}
-// />
