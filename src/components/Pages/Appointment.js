@@ -49,37 +49,54 @@ function Appointment() {
   const [userExists, setUserExists] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [customerData, setCustomerData] = useState(null);
+  const[api, setAPI] = useState(null);
+  const [hasFetchedServices, setHasFetchedServices] = useState(false);
 
 
   const currentDate = getCurrentDate();
   const bid = localStorage.getItem('branch_id');
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${config.apiUrl}/api/swalook/table/services/?branch_name=${bid}`, {
-          headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json',
-          },
-          method: 'GET',
-        });
-
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const data = await response.json();
-        setServiceOptions(data.data.map(service => ({ key: service.id, value: service.service })));
-      } catch (error) {
-        console.error('Error fetching services:', error);
+  const fetchServiceData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${config.apiUrl}/api/swalook/table/services/?branch_name=${bid}`, {
+        headers: {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
-
-    fetchServices();
-  }, [bid]);
-
+  
+      const data = await response.json();
+      console.log("data",response.data)
+  
+      setServiceOptions(data.data.map((service) => ({
+        key: service.id,
+        value: service.service,
+        price: service.service_price,
+        gst: ''
+      })));
+  
+      // Set flag to true to prevent future calls
+      setHasFetchedServices(true);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
   const handleSelect = selectedList => setServices(selectedList);
+
+
+  const handleServiceClick = () => {
+    console.log('Fetching data')
+    if (!hasFetchedServices) {
+      fetchServiceData();
+      console.log('Fetching data')
+    }
+  };
+  
 
   const handleTimeChange = event => {
     const { id, value } = event.target;
@@ -101,6 +118,8 @@ function Appointment() {
         break;
     }
   };
+  const [apiCalled, setApiCalled] = useState(false); 
+
   const fetchStaffData = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -110,8 +129,7 @@ function Appointment() {
           'Content-Type': 'application/json'
         }
       });
-      // console.log('kya hau', )
-      // console.log('kya hau', )
+
       if (!staffResponse.ok) {
         throw new Error('Network response was not ok');
       }
@@ -119,41 +137,32 @@ function Appointment() {
       const staffData = await staffResponse.json();
       const staffArray = Array.isArray(staffData.table_data) ? staffData.table_data : [];
 
-
-      // Check if any staff name has a space and format accordingly
+      // Format the options
       const formattedOptions = staffArray.map(staff => {
         const hasSpaceInName = typeof staff.staff_name === 'string' && /\s/.test(staff.staff_name);
         return {
-          labels: hasSpaceInName
-            ? `${staff.staff_name} (${staff.staff_role})` // Format for names with spaces
-            : `${staff.staff_name} (${staff.staff_role})`       // Format for names without spaces
+          labels: `${staff.staff_name} (${staff.staff_role})`
         };
       });
 
-
-      console.log(staffData);
-      console.log(staffArray);
-      console.log("Formatted Options:", formattedOptions);
-
-
       setStaffData(formattedOptions);
-
-
-
     } catch (error) {
       console.error('Error fetching staff data:', error);
       setStaffData([]);
     }
   };
 
-  useEffect(() => {
-    fetchStaffData();
-  }, []);
+  const handleDropdownClick = () => {
+    if (!apiCalled) {
+      fetchStaffData();
+      setApiCalled(true); // Mark API as called
+    }
+  };
 
   const handleServedSelect = (selectedList) => {
     setServiceBy(selectedList);
   }
-  
+
 
   const handleAddAppointment = async e => {
     e.preventDefault();
@@ -277,7 +286,7 @@ function Appointment() {
 
         if (Array.isArray(userDataArray) && userDataArray.length > 0) {
           const userData = userDataArray[0]; // Access the first object in the array
-          console.log("Setting Name:", userData.name); 
+          console.log("Setting Name:", userData.name);
           console.log("Setting Email:", userData.email);
 
           setUserExists(true);
@@ -305,32 +314,32 @@ function Appointment() {
 
 
 
-  useEffect(() => {
-    const fetchPresetAppointments = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${config.apiUrl}/api/swalook/preset-day-appointment/?branch_name=${bid}`, {
-          headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json',
-          }
-        });
-        setPresetAppointments(response.data.table_data);
-      } catch (error) {
-        console.error('Error fetching preset appointments:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchPresetAppointments = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       const response = await axios.get(`${config.apiUrl}/api/swalook/preset-day-appointment/?branch_name=${bid}`, {
+  //         headers: {
+  //           'Authorization': `Token ${token}`,
+  //           'Content-Type': 'application/json',
+  //         }
+  //       });
+  //       setPresetAppointments(response.data.table_data);
+  //     } catch (error) {
+  //       console.error('Error fetching preset appointments:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchPresetAppointments();
-  }, [bid]);
+  //   fetchPresetAppointments();
+  // }, [bid]);
 
   const handleDeleteClick = id => {
     setDeleteInvoiceId(id);
     setShowDeletePopup(true);
   };
-  
+
 
   // const fetchCustomerData = async () => {
   //   try {
@@ -342,7 +351,7 @@ function Appointment() {
   //         'Content-Type': 'application/json',
   //       },
   //     });
-      
+
   //     setCustomerId(response.data);
   //     console.log("hey",response.data)
   //   } catch (error) {
@@ -358,7 +367,7 @@ function Appointment() {
 
   const fetchCustomerData = async () => {
     try {
-      if (mobileNo.length === 10) { 
+      if (mobileNo.length === 10) {
         const token = localStorage.getItem('token');
 
         const response = await axios.get(
@@ -382,7 +391,7 @@ function Appointment() {
 
   // Debounced effect
   useEffect(() => {
-    if (mobileNo.length === 10) { 
+    if (mobileNo.length === 10) {
       // Ensure a valid 10-digit number
       const timeoutId = setTimeout(() => {
         fetchCustomerData();
@@ -449,19 +458,19 @@ function Appointment() {
                   <div className="stat-card">
                     <p>Business</p>
                     <h3>
-                      Rs. {customerId.total_billing_amount} <span>+0.00%</span>
+                      Rs. {customerId.total_billing_amount} 
                     </h3>
                   </div>
                   <div className="stat-card">
                     <p>Number of Appointments</p>
                     <h3>
-                      {customerId.total_appointment} <span>+0.00%</span>
+                      {customerId.total_appointment} 
                     </h3>
                   </div>
                   <div className="stat-card">
                     <p>Number of Invoices</p>
                     <h3>
-                      {customerId.total_invoices} <span>+0.00%</span>
+                      {customerId.total_invoices} 
                     </h3>
                   </div>
                   <div className="user-info-appn">
@@ -476,7 +485,7 @@ function Appointment() {
               )}
             </header>
           )}
-  
+
           {isPopupVisible && (
             <div className="popups">
               <div className="popups-content">
@@ -498,7 +507,7 @@ function Appointment() {
                       </thead>
                       <tbody>
                         {customerData.previous_appointments &&
-                        customerData.previous_appointments.length > 0 ? (
+                          customerData.previous_appointments.length > 0 ? (
                           customerData.previous_appointments.map(
                             (item, index) => (
                               <tr key={index}>
@@ -532,7 +541,7 @@ function Appointment() {
               </div>
             </div>
           )}
-  
+
           <div className="new-appointment-wrapper">
             <h2 className="appnt-heading">Appointment</h2>
             <form
@@ -572,8 +581,8 @@ function Appointment() {
                   </div>
                 </div>
               </div>
-  
-              <div className="forms-groups-appn">
+
+              <div className="forms-groups-appn" onClick={handleServiceClick}>
                 <labels>Select Services</labels>
                 <Multiselect
                   options={serviceOptions}
@@ -585,10 +594,11 @@ function Appointment() {
                   className="custom-multiselect"
                 />
               </div>
-  
+
               <div className="forms-groups-appn">
                 <labels>To be Served by:</labels>
                 <select
+                  onClick={handleDropdownClick} // Trigger API call on click
                   onChange={(e) => setServiceBy([{ labels: e.target.value }])}
                   className="custom-select"
                 >
@@ -602,7 +612,7 @@ function Appointment() {
                   ))}
                 </select>
               </div>
-  
+
               <div className="forms-groups-appn">
                 <labels>Schedule:</labels>
                 <div className="schedule-section">
@@ -661,7 +671,7 @@ function Appointment() {
                   </div>
                 </div>
               </div>
-  
+
               <div className="forms-groups-appn">
                 <labels>Comments:</labels>
                 <input
@@ -671,7 +681,7 @@ function Appointment() {
                   onChange={(e) => setComments(e.target.value)}
                 />
               </div>
-  
+
               <div className="appoint-button-containers">
                 <button
                   type="submit"

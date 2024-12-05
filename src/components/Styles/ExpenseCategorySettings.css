@@ -1,0 +1,201 @@
+/* Overall Dashboard Container */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Dashboard Layout */
+.dashboard-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Vertical Navigation */
+.vert-nav {
+    flex-shrink: 0;
+    width: 240px; /* Fixed width for sidebar */
+    background-color: #f4f4f4;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Main Content */
+.dashboard-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content Section */
+.content-section {
+    display: flex;
+    justify-content: center; /* Center-align content with even spacing */
+    gap: 9rem; /* Increased gap for a cleaner layout */
+    flex-wrap: wrap; /* Wrap items on smaller screens */
+    align-items: flex-start;
+    margin-top: 8rem; /* Adjusted top margin for better centering */
+    padding: 0 20px;
+    margin-left: 20rem;
+}
+
+/* Left Section (Image) */
+.left-image {
+    flex: 1;
+    max-width: 400px; /* Larger size for the image container */
+    text-align: center;
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+}
+
+.left-image img {
+    width: 100%;
+    max-width: 300px; /* Larger image size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px;
+}
+
+.left-image p {
+    font-size: 16px; /* Slightly larger font for better readability */
+    color: #333;
+    font-weight: 500; /* Add weight for a professional look */
+}
+
+/* Right Section (Categories) */
+.right-content {
+    flex: 2;
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+    width: 100%;
+    max-width: 700px; /* Slightly larger max-width */
+}
+
+.right-content h2 {
+    font-size: 20px; /* Larger heading size for prominence */
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.category-item {
+    margin-bottom: 15px; /* Increase spacing between items */
+}
+
+.category-input {
+    width: 100%;
+    padding: 12px; /* Larger padding for inputs */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #ffffff;
+    font-size: 14px;
+    color: #333;
+}
+
+/* New Category Section */
+.new-category {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px; /* Increase spacing from the inputs */
+}
+
+.new-category input {
+    flex: 1;
+    padding: 12px; /* Larger padding for inputs */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.new-category button {
+    padding: 12px 20px; /* Larger button size */
+    background-color: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.new-category button:hover {
+    background-color: #357abd;
+}
+
+#categories{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    /* flex-direction: column; */
+}
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .content-section {
+        gap: 20px; /* Reduce gap on smaller screens */
+    }
+
+    .left-image {
+        max-width: 350px; /* Slightly reduce size */
+        padding: 20px; /* Adjust padding */
+    }
+
+    .right-content {
+        max-width: 600px; /* Reduce max width for smaller screens */
+        padding: 20px;
+    }
+}
+
+@media (max-width: 992px) {
+    .content-section {
+        flex-direction: column; /* Stack sections vertically */
+        align-items: center;
+        margin-top: 6rem; /* Adjust top margin */
+    }
+
+    .left-image,
+    .right-content {
+        max-width: 90%; /* Use almost full width */
+    }
+}
+
+@media (max-width: 768px) {
+    .new-category {
+        flex-direction: column; /* Stack input and button vertically */
+    }
+
+    .new-category button {
+        width: 100%; /* Full-width button */
+    }
+
+    .left-image,
+    .right-content {
+        max-width: 100%; /* Use full width on small screens */
+    }
+
+    .content-section {
+        margin-top: 4rem; /* Adjust top margin */
+    }
+}
+
+@media (max-width: 576px) {
+    .category-input {
+        font-size: 13px; /* Smaller font size */
+        padding: 10px;
+    }
+
+    .new-category input {
+        padding: 10px;
+    }
+
+    .new-category button {
+        padding: 10px 15px; /* Smaller button size */
+        font-size: 13px;
+    }
+}

@@ -112,4 +112,39 @@
     display: flex;
     justify-content: center;
   }
+
+  #salary-slip-template {
+    display: none; /* Hidden until rendering */
+    width: 210mm; /* A4 paper width */
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  
+  #salary-slip-template h1,
+  #salary-slip-template h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  #salary-slip-template p {
+    margin: 10px 0;
+  }
+  
+  #salary-slip-template table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  #salary-slip-template th,
+  #salary-slip-template td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+  }
+  
   

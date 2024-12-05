@@ -6,6 +6,7 @@ import PI from '../../assets/PI.png';
 import HD from '../../assets/HD.png';
 import SY from '../../assets/SY.png'; // Make sure to import the team image if it's not already
 import CLP from '../../assets/CLP.png';
+import ES from '../../assets/ES.png'
 import axios from 'axios';
 import config from '../../config';
 import VertNav from './VertNav';
@@ -78,6 +79,11 @@ function Settings() {
           <img src={SY} alt="Staff Working Days" /> {/* Make sure the path is correct for the team image */}
           <h2>Staff Working Days</h2>
           <p>Edit Commission</p>
+        </Link>
+        <Link to={`/${sname}/${branchName}/expenseSetting`} className="settings_box">
+          <img src={ES} alt="expense Setting" /> {/* Make sure the path is correct for the team image */}
+          <h2>Expense category Setting</h2>
+          <p>Edit Expense Category</p>
         </Link>
       </div>
     </div>

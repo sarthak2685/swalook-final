@@ -15,7 +15,7 @@ const SalarySlipPopup = ({ onClose, staffId }) => {
   const [netPay, setNetPay] = useState();
   const [netPayableAmount, setNetPayableAmount] = useState(null);
 
-  
+
   const branchName = localStorage.getItem('branch_name');
   const sname = localStorage.getItem('s-name');
 
@@ -104,7 +104,7 @@ const SalarySlipPopup = ({ onClose, staffId }) => {
     fetchSalarySlip();
   }, [staffId]);
 
- 
+
 
 
   const handleGenerateSalarySlip = async () => {
@@ -137,52 +137,63 @@ const SalarySlipPopup = ({ onClose, staffId }) => {
   const generatePDF = async (employeeData) => {
     const slipContent = document.getElementById("salary-slip-template");
   
-    // Temporarily make the slip content visible for rendering
-    slipContent.style.display = "block";
+    // Temporarily make the slip content visible
+    slipContent.style.visibility = "visible";
   
     try {
-      // Create a canvas from the slip content
       const canvas = await html2canvas(slipContent, {
         useCORS: true,
         allowTaint: true,
-        scale: 2, // Increase scale for better resolution
+        scale: 2, // Increase scale for better quality
+        backgroundColor: null, // Avoid adding unwanted backgrounds
       });
+      
   
-      // Check if canvas was created successfully
       if (!canvas) {
-        console.error("Failed to create canvas");
-        return;
+        throw new Error("Canvas rendering failed.");
       }
   
-      // Generate image data from canvas
       const imgData = canvas.toDataURL("image/png");
   
-      // Validate imgData
       if (!imgData || imgData === "data:,") {
-        console.error("Generated image data is invalid");
-        return;
+        throw new Error("Generated image data is invalid.");
       }
   
-      // Create PDF and add the image
       const pdf = new jsPDF();
-      pdf.addImage(imgData, "PNG", 10, 10, 190, 150); // Adjust position and size if necessary
+      const imgWidth = 190; // Adjusted for A4 width
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pageHeight = pdf.internal.pageSize.height;
   
-      // Save the PDF
-      pdf.save(`Salary_Slip_${employeeData?.staff_name || "Unknown"}_${currentMonth}_${currentYear}.pdf`);
+      let position = 0;
+      let heightLeft = imgHeight;
+  
+      while (heightLeft > 0) {
+        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        position -= pageHeight;
+  
+        if (heightLeft > 0) {
+          pdf.addPage();
+          position = 0;
+        }
+      }
+  
+      pdf.save(`Salary_Slip_${employeeData.staff_name || "Unknown"}_${currentMonth}_${currentYear}.pdf`);
     } catch (error) {
-      // Log the error if PDF generation fails
       console.error("Error generating PDF:", error);
     } finally {
       // Hide the slip content again
-      slipContent.style.display = "none";
+      slipContent.style.visibility = "hidden";
     }
   };
   
   
 
+
+
   // const amount = netPay?.net_payble_amount;
   // const amountInWords = toWords(amount);   
-  
+
 
   const employeeData = salarySlipData || {}; // Default to empty object to avoid errors
   console.log("Employee Data:", employeeData);
@@ -192,7 +203,7 @@ const SalarySlipPopup = ({ onClose, staffId }) => {
       <div className="popup-container2">
         <h2 className="popup-title2">Salary Slips</h2>
         {loading ? (
-          <p>Loading...</p> 
+          <p>Loading...</p>
         ) : (
           <>
             {salarySlipData ? (
@@ -241,17 +252,17 @@ const SalarySlipPopup = ({ onClose, staffId }) => {
             {/* Salary Slip Template to be captured */}
             <div
               id="salary-slip-template"
-              style={{
-                display: "none",
-                width: "210mm",
-                padding: "20px",
-                backgroundColor: "white",
-                border: "1px solid #ccc",
-                fontFamily: "Arial, sans-serif",
-              }}
+              // style={{
+              //   display: "none",
+              //   width: "210mm",
+              //   padding: "20px",
+              //   backgroundColor: "white",
+              //   border: "1px solid #ccc",
+              //   fontFamily: "Arial, sans-serif",
+              // }}
             >
-              <h1 style={{ textAlign: "center",marginBottom:"1rem" }}>Salary Slip</h1>
-              <h3 style={{ textAlign: "center", marginBottom:"1rem" }}>{sname}</h3>
+              <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>Salary Slip</h1>
+              <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>{sname}</h3>
               <p>
                 Date of Joining: {employeeData.staff_joining_date || "N/A"}
                 <span style={{ marginLeft: "300px" }}>Employee Name: {employeeData.staff_name || "N/A"}</span>
@@ -267,8 +278,8 @@ const SalarySlipPopup = ({ onClose, staffId }) => {
               <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
                 <thead>
                   <tr>
-                    <th style={{ border: "1px solid black", padding: "5px",  }}>Earnings</th>
-                    <th style={{ border: "1px solid black", padding: "5px",  }}>Amount</th>
+                    <th style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Earnings</th>
+                    <th style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -276,38 +287,37 @@ const SalarySlipPopup = ({ onClose, staffId }) => {
                     <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Basic</td>
                     <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>₹ {employeeData.staff_salary_monthly || 0}</td>
                   </tr>
-                  { employeeData.staff_commision_cap>0 &&(
-                  <tr>
-                    <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Commission</td>
-                    <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>₹{employeeData.staff_commision_cap || 0}</td>
-                  </tr>
+                  {employeeData.staff_commision_cap > 0 && (
+                    <tr>
+                      <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Commission</td>
+                      <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>₹ {employeeData.staff_commision_cap || 0}</td>
+                    </tr>
                   )}
-                  { employeeData.house_rent_allownance>0 &&(
-                  <tr>
-                    <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>House Rent Allowance</td>
-                    <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>₹ {employeeData.house_rent_allownance || 0}</td>
-                  </tr>
+                  {employeeData.house_rent_allownance > 0 && (
+                    <tr>
+                      <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>House Rent Allowance</td>
+                      <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>₹ {employeeData.house_rent_allownance || 0}</td>
+                    </tr>
                   )}
-                  { employeeData.meal_allowance>0 &&(
-                  <tr>
-                    <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Meal Allowance</td>
-                    <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>₹ {employeeData.meal_allowance || 0}</td>
-                  </tr>
+                  {employeeData.meal_allowance > 0 && (
+                    <tr>
+                      <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Meal Allowance</td>
+                      <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>₹ {employeeData.meal_allowance || 0}</td>
+                    </tr>
                   )}
                   <tr>
                     <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Total Earnings</td>
                     <td style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>₹ {netPay.earning || 0}</td>
                   </tr>
-                  
                 </tbody>
               </table>
 
-                {(employeeData.staff_provident_fund > 0 || employeeData.staff_professional_tax > 0 || employeeData.totalDeductions > 0) && (
+              {(employeeData.staff_provident_fund > 0 || employeeData.staff_professional_tax > 0 || employeeData.totalDeductions > 0) && (
                 <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
                   <thead>
                     <tr>
-                      <th style={{ border: "1px solid black", padding: "5px" }}>Deductions</th>
-                      <th style={{ border: "1px solid black", padding: "5px" }}>Amount</th>
+                      <th style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Deductions</th>
+                      <th style={{ border: "1px solid black", padding: "5px", textAlign: "center" }}>Amount</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -333,20 +343,23 @@ const SalarySlipPopup = ({ onClose, staffId }) => {
                 </table>
               )}
 
-
               <h3 style={{ textAlign: "right", marginTop: "20px" }}>
                 Net Pay: ₹ {netPay.net_payble_amount || 0}
               </h3>
 
               <div style={{ textAlign: "center", marginTop: "40px", fontSize: "16px" }}>
                 <p><strong>Net Pay in Numbers:</strong> ₹ {netPay.net_payble_amount || 0}</p>
-                <p>In Words: {toWords(Math.floor(netPayableAmount))} {netPayableAmount % 1 > 0 ? "and " + toWords(Math.round((netPayableAmount % 1) * 100)) + " Cents" : ""}</p>
-                </div>
+                <p>
+                  In Words: {toWords(Math.floor(netPay.net_payble_amount))}
+                  {netPay.net_payble_amount % 1 > 0 ? " and " + toWords(Math.round((netPay.net_payble_amount % 1) * 100)) + " Cents" : ""}
+                </p>
+              </div>
 
               <p style={{ textAlign: "center", marginTop: "20px", fontSize: "12px", color: "#888" }}>
                 [This is a system-generated Salary Slip]
               </p>
             </div>
+
           </>
         )}
       </div>
