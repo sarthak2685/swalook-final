@@ -1,29 +1,18 @@
-/* StaffManagement.css */
-
-.staff-mgmt-containers {
+.staff-mgmt-container {
   padding: 20px;
-  width: 100%;
-  margin-left: 150px;
-  margin-bottom: 350px;
-  margin-top: 100px;
+  width: 75%;
+  margin-left: 22rem;
+  margin-top: 7rem;
 }
 
 .table-responsive {
-  max-height: 450px; /* Increased max-height */
   overflow-y: auto;
-}
-
-.header-container {
-  display: flex; /* Use flexbox to arrange items side by side */
-  justify-content: space-between; /* Space between items */
-  align-items: center; /* Center items vertically */
-  margin-left: 120px; /* Adjust margin for proper alignment */
 }
 
 .staff-mgmt-title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-left:135px; /* Remove margin to prevent extra spacing */
+  margin-bottom: 16px;
 }
 
 .staff-mgmt-add-button {
@@ -31,104 +20,64 @@
   color: white;
   border: none;
   padding: 10px 20px;
+  width: auto;
   cursor: pointer;
-  border-radius: 10px;
-  width: 160px;
-  margin-right: 200px;
+  margin-bottom: 20px;
+  border-radius: 4px;
 }
 
 .add-staff {
   display: flex;
-  justify-content: flex-end; /* Align to the right */
-  align-items: center; /* Center items vertically */
+  justify-content: space-between;
+  align-items: flex-end;
 }
 
 .staff-mgmt-add-button:hover {
   background-color: #0056b3;
 }
 
-.staff-mgmt-tables {
-  width: 1400px; /* Adjusted maximum width */
-  border-collapse: separate; /* Use separate borders for spacing */
+.staff-mgmt-table {
+  width: 100%;
+  border-collapse: collapse;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
-  margin-left: 250px; /* Decreased margin-left to move table left */
-  margin-right: auto; /* Center the table */
-  border: 1px solid #e0e0e0; /* Light border for the table */
-  margin-top: 20px;
 }
 
-.staff-mgmt-tables th,
-.staff-mgmt-tables td {
-  font-family: 'Poppins', sans-serif; /* Set font family */
-  font-size: 14px; /* Set font size */
-  font-weight: 500; /* Set font weight */
-  line-height: 21px; /* Set line height */
-  letter-spacing: -0.01em; /* Set letter spacing */
-  text-align: left; /* Set text alignment */
-  border-bottom: 1px solid #e0e0e0; /* Light horizontal border for cells */
-  padding: 12px 10px; /* Increased padding for more spacing */
-  height: 40px; /* Set a fixed height for uniformity */
-  margin: 5px 0; /* Add margin to create space between rows */
+.staff-mgmt-table th,
+.staff-mgmt-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
 }
 
-.staff-mgmt-tables th {
-  background-color: #ffffff; /* Set heading color */
-  color: #B5B7C0; /* Set text color for readability */
+.staff-mgmt-table th {
+  /* background-color: #f0f0f0; */
+  color: black;
 }
 
-.staff-mgmt-tables td {
-  color: #292D32; /* Set body text color */
-  text-align: center; /* Center text for buttons */
-}
-
-.icon-containers {
-  display: flex;
-  flex-direction: column; /* Stack icons vertically */
-  align-items: center; /* Center icons horizontally */
-  width:50px;
-}
-
-.staff-mgmt-attendance-button,
-.staff-mgmt-salary-button {
-  background-color: #007bff; /* Button color */
+#staff-mgmt-attendance-button,
+#staff-mgmt-salary-button {
+  background-color: #007bff;
   color: white;
-  padding: 5px 10px; /* Adjusted padding for compactness */
-  font-size: 12px; /* Font size */
+  padding: 5px 6px;
+  font-size: 12px;
   border: none;
-  border-radius: 15px; /* Reduced border radius */
+  border-radius: 2px;
   cursor: pointer;
   transition: background-color 0.3s;
-  width: 100px;
-  display: inline-block; /* Ensure they can be centered */
-  margin: 0 5px; /* Add some margin for spacing */
+  display: inline-block;
+  min-width: 50px;
+  justify-content: center;
+    align-items: center;
+    display: flex
+;
 }
 
-.staff-mgmt-edit-button,
-.staff-mgmt-delete-button {
-  background-color: #007bff; /* Button color */
-  color: white;
-  padding: 3px 5px; /* Adjusted padding for compactness */
-  font-size: 12px; /* Font size */
-  border: none;
-  border-radius: 15px; /* Reduced border radius */
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.staff-mgmt-attendance-button:hover,
-.staff-mgmt-salary-button:hover,
-.staff-mgmt-edit-button:hover,
-.staff-mgmt-delete-button:hover {
+#staff-mgmt-attendance-button:hover,
+#staff-mgmt-salary-button:hover {
   background-color: #0056b3;
-}
-
-.button-container {
-  display: flex;
-  justify-content: center; /* Center buttons */
-  margin-top: 10px; /* Spacing above the buttons */
 }
 
 .modal-content6 {
@@ -148,27 +97,44 @@
   color: #333333;
 }
 
-.delete_icon,
-.delete_item {
+#staff-mgmt-delete-button,
+#staff-mngmt-edit-button {
+  width: 5rem;
+}
+
+.delete_icon, .delete_item {
+  width: 100%;
+  padding: 10px;
   border-radius: 6px;
   color: white;
   border: none;
-  font-size: 0.9rem; /* Slightly smaller font size */
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .delete_icon {
   background-color: #007bff;
-  color: black; /* Set the icon color to black */
 }
 
 .delete_icon:hover {
   background-color: #0056b3;
 }
 
+.delete_item {
+  background-color: #dc3545;
+}
 
+.delete_item:hover {
+  background-color: #c82333;
+}
 
+.button_responsive {
+  display: flex;
+  gap: 1rem;
+  margin-top: 20px;
+  justify-content: center;
+}
 
 .modal-overlay6 {
   position: fixed;
@@ -182,15 +148,77 @@
   align-items: center;
 }
 
+@media (max-width: 768px) {
+  .staff-mgmt-title {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+  }
+
+  .staff-mgmt-add-button {
+    padding: 8px 16px;
+  }
+
+  .staff-mgmt-table th,
+  .staff-mgmt-table td {
+    padding: 6px;
+  }
+
+  #staff-mgmt-attendance-button,
+  #staff-mgmt-salary-button {
+    font-size: 11px;
+    padding: 4px 5px;
+  }
+
+  .modal-content6 {
+    width: 80%;
+    padding: 25px;
+  }
+
+  .delete_icon, .delete_item {
+    font-size: 0.9rem;
+  }
+
+  .button_responsive {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
 @media (max-width: 500px) {
+  .staff-mgmt-title {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .staff-mgmt-add-button {
+    padding: 6px 12px;
+    width: 100%;
+  }
+
+  .staff-mgmt-table th,
+  .staff-mgmt-table td {
+    font-size: 0.875rem;
+    padding: 5px;
+  }
+
+  #staff-mgmt-attendance-button,
+  #staff-mgmt-salary-button {
+    font-size: 10px;
+    padding: 4px;
+  }
+
   .modal-content6 {
     width: 90%;
     padding: 20px;
   }
 
-  .delete_icon,
-  .delete_item {
-    font-size: 0.9rem;
+  .delete_icon, .delete_item {
+    font-size: 0.8rem;
+  }
+
+  .button_responsive {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 
@@ -199,6 +227,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin-left: -1.5rem;
 }
 
 .gb_h7 {
@@ -208,200 +237,17 @@
   height: 21vh;
   padding-right: 1rem;
 }
-/* Confirmation Popup */
-.confirmation-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 1000; /* Make sure it's above other elements */
-  text-align: center;
-  width: 90%;
-  max-width: 400px; /* Set a maximum width */
+
+@media (max-width: 400px) {
+  .gb_ver_nav2 {
+    margin-left: 0;
+  }
 }
-
-/* Popup Text */
-.confirmation-popup p {
-  margin-bottom: 20px;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-/* Button Group */
-.button-group {
-  display: flex; /* Use flexbox for side-by-side buttons */
-  justify-content: space-between; /* Space between buttons */
-  margin-top: 10px; /* Space above the button group */
-}
-
-/* Button Styles */
-.confirmation-popup button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s, transform 0.1s;
-  flex: 1; /* Allow buttons to grow equally */
-  margin: 0 5px; /* Space between buttons */
-}
-
-.confirmation-popup button:first-child {
-  background-color: black; /* Red for delete */
-  color: white;
-}
-
-.confirmation-popup button:first-child:hover {
-  background-color: black; /* Darker red on hover */
-}
-
-.confirmation-popup button:last-child {
-  background-color: #3498db; /* Blue for cancel */
-  color: white;
-}
-
-.confirmation-popup button:last-child:hover {
-  background-color: #2980b9; /* Darker blue on hover */
-}
-
-/* Overlay (if needed) */
-.confirmation-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6); /* Dark background */
-  z-index: 999; /* Below popup */
-}
-/* StaffManagement.css */
-
-/* Base styles remain unchanged */
-
-/* Responsive styles for tablet view */
-@media (max-width: 1400px) {
-  .staff-mgmt-containers {
+@media (min-width: 1550px) {
+  .staff-mgmt-container {
     padding: 20px;
-    width: 100%;
-    margin-left: 200px;
-    margin-bottom: 350px;
-    margin-top: 100px;
-  }
-
-  .staff-mgmt-tables {
-    width: 90%; /* Set a smaller width for tablet view */
-    max-width: 1600px; /* Optional: set a maximum width to limit expansion */
-    margin-left: 140px; /* Center the table */
-    margin-right: auto; /* Center the table */
-    box-shadow: none; /* Remove shadow for simplicity */
-  }
-  .staff-mgmt-add-button {
-    background-color: #007bff; /* Button background color */
-    color: white; /* Text color */
-    border: none; /* Remove border */
-    padding: 10px 20px; /* Adjust padding for better button size */
-    cursor: pointer; /* Change cursor to pointer on hover */
-    border-radius: 10px; /* Rounded corners */
-    width: 160px; /* Set button width */
-    margin-right: 10px; /* Add right margin for spacing */
-  }
-  
-
-  .staff-mgmt-tables th,
-  .staff-mgmt-tables td {
-    font-size: 12px; /* Reduce font size */
-    padding: 8px; /* Adjust padding */
-  }
-
-  .icon-container {
-    flex-direction: row; /* Align icons horizontally */
-    justify-content: center; /* Center icons */
-  }
-  .staff-mgmt-title {
-    font-size: 1.5rem; /* Larger title size */
-    font-weight: 700;
-    margin-left: 20px;
-  }
-
-  .staff-mgmt-attendance-button,
-  .staff-mgmt-salary-button,
-  .staff-mgmt-edit-button,
-  .staff-mgmt-delete-button {
-    width: 80px; /* Set a smaller width for buttons */
-    padding: 5px; /* Adjust padding */
-    font-size: 10px; /* Reduce font size */
-  }
-
-  .modal-content6 {
-    width: 90%; /* Use a percentage width */
-    padding: 20px; /* Adjust padding */
-  }
-
-  .confirmation-popup {
-    width: 90%; /* Use a percentage width */
-    padding: 15px; /* Adjust padding */
-  }
-
-  .confirmation-popup p {
-    font-size: 0.9rem; /* Reduce font size */
-  }
-
-  .button-group {
-    flex-direction: column; /* Stack buttons vertically */
-  }
-
-  .confirmation-popup button {
-    font-size: 0.9rem; /* Reduce font size for buttons */
-    padding: 8px 10px; /* Adjust padding */
-  }
-}
-
-/* Keep existing styles below */
-
-@media (max-width: 1150px) {
-  
-
-  .staff-mgmt-title {
-    font-size: 1.3rem;
-  }
-
-  .staff-mgmt-add-button {
-    width: 100%; /* Full width button */
-    font-size: 0.9rem;
-    padding: 6px;
-  }
-
-  .staff-mgmt-tables {
-    width: 90%;
-    max-width: 800px;
-    font-size: 12px;
-    margin-left: 100px;
-    margin-right: auto;
-  }
-
-  .staff-mgmt-tables th,
-  .staff-mgmt-tables td {
-    font-size: 12px;
-    padding: 8px;
-  }
-
-  /* Modal and Confirmation Popup */
-  .modal-content6, .confirmation-popup {
-    width: 95%;
-    padding: 15px;
-  }
-
-  .button-group {
-    flex-direction: column;
-    gap: 8px; /* Add gap between buttons */
-  }
-
-  .confirmation-popup button {
-    width: 100%; /* Full width buttons */
-    padding: 8px;
+    width: 75%;
+    margin-left: 30rem;
+    margin-top: 10rem;
   }
 }

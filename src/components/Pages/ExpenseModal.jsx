@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../Styles/ExpenseModal.css";
 import config from "../../config";
+import toast, { Toaster } from "react-hot-toast";
 
 const ExpenseModal = ({ onClose }) => {
     const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const ExpenseModal = ({ onClose }) => {
     const bid = localStorage.getItem('branch_id');
     const [staffData, setStaffData] = useState([]);
     const [inventoryData, setInventoryData] = useState([]);
+    const [categoryData, setCategoryData] = useState([]);
 
     useEffect(() => {
         fetchStaffData();
@@ -27,7 +29,7 @@ const ExpenseModal = ({ onClose }) => {
 
     const handleChange = (e, index = null, field = null) => {
         const { name, value } = e.target;
-    
+
         if (field === "inventory") {
             const updatedInventory = [...formData.inventory];
             updatedInventory[index][name] = value;
@@ -38,7 +40,7 @@ const ExpenseModal = ({ onClose }) => {
             setFormData({ ...formData, [name]: value });
         }
     };
-    
+
 
     const handleAddInventory = () => {
         const newInventory = { item: "", quantity: "", price: "" };
@@ -51,7 +53,7 @@ const ExpenseModal = ({ onClose }) => {
             expense_type: formData.expenseType,
             expense_account: formData.expenseAccount,
             expense_amount: parseFloat(formData.expenseAmount) || 0, // Ensure it is parsed as a number
-            expense_category: formData.expenseCategory || "",
+            expense_category: [formData.expenseCategory || null],
             invoice_id: formData.invoiceId || "",
             comment: formData.notes,
             inventory_item: formData.inventory.map((inv) => ({
@@ -63,19 +65,24 @@ const ExpenseModal = ({ onClose }) => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`${config.apiUrl}/api/swalook/vendor-expense/?branch_name=${bid}`, {
+            const response = await fetch(`${config.apiUrl}/api/swalook/expense_management/?branch_name=${bid}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Token ${token}`,
-                },                
+                },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
-                alert("Expense created successfully!");
-                onClose();
-            } else {
+                toast.success("Expense added successfully");
+            
+                setTimeout(() => {
+                    window.location.reload();
+                    onClose();
+                }, 2000); // Delay in milliseconds (2 seconds)
+            }
+             else {
                 const errorData = await response.json();
                 alert(`Error: ${errorData.message}`);
             }
@@ -157,8 +164,47 @@ const ExpenseModal = ({ onClose }) => {
         }
     };
 
+    const fetchExpenseCategory = async () => {
+        try {
+            const branchName = localStorage.getItem("branch_name");
+            const token = localStorage.getItem("token");
+
+            if (!branchName || !token) {
+                throw new Error("Branch name or token is missing.");
+            }
+
+            const response = await fetch(`${config.apiUrl}/api/swalook/expense_category/?branch_name=${branchName}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Token ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log("data", data);
+            const transformedData = data.data.map(item => ({
+                id: item.id,
+                categories: JSON.parse(item.vendor_expense_type.replace(/'/g, '"')), // Safely parse the JSON-like string
+            }));
+
+            setCategoryData(transformedData);
+        } catch (err) {
+            console.error("Error fetching expense category data:", err);
+        }
+    };
+    useEffect(() => {
+        fetchExpenseCategory();
+    }, []);
+
     return (
         <div className="modal-overlay">
+                    <Toaster />
+
             <div className="modal-content">
                 <div className="modal-header">
                     <h2 id="modal-title">New Expense</h2>
@@ -205,16 +251,28 @@ const ExpenseModal = ({ onClose }) => {
                             placeholder="Expense Amount*"
                             value={formData.expenseAmount}
                             onChange={handleChange}
-                        
-                           required
-                           style={{ color: "#9C9D9E" }}
-                       />
-                        <select id="expense-field" name="expenseCategory" value={formData.expenseCategory}
-                            onChange={handleChange} disabled={formData.expenseType === "Invoice"}
-                            required>
+
+                            required
+                            style={{ color: "#9C9D9E" }}
+                        />
+                        <select
+                            id="expense-field"
+                            name="expenseCategory"
+                            value={formData.expenseCategory}
+                            onChange={handleChange}
+                            disabled={formData.expenseType === "Invoice"}
+                            required
+                        >
                             <option value="">Expense Category*</option>
-                            <option value="Account1">Account1</option>
+                            {categoryData.flatMap(category =>
+                                category.categories.map((type, index) => (
+                                    <option key={`${category.id}-${index}`} value={category.id}>
+                                        {type}
+                                    </option>
+                                ))
+                            )}
                         </select>
+
                         <input type="text" id="expense-field" name="invoiceId"
                             value={formData.invoiceId}
                             onChange={handleChange}
@@ -227,21 +285,21 @@ const ExpenseModal = ({ onClose }) => {
                     <h3>Inventory Details:</h3>
                     {formData.inventory.map((item, index) => (
                         <div key={index} className="forms-rows">
-                          <select
-    id="inventory-field"
-    name="item" // Matches the key in `formData.inventory`
-    value={item.item} // This must match a value in `inventoryData`
-    onChange={(e) => handleChange(e, index, "inventory")}
-    disabled={formData.expenseType !== "Invoice"}
-    required
->
-    <option value="">Inventory Item*</option>
-    {inventoryData.map((inv) => (
-        <option key={inv.key} value={inv.value}>
-            {inv.value} (Stock: {inv.quantity})
-        </option>
-    ))}
-</select>
+                            <select
+                                id="inventory-field"
+                                name="item" // Matches the key in `formData.inventory`
+                                value={item.item} // This must match a value in `inventoryData`
+                                onChange={(e) => handleChange(e, index, "inventory")}
+                                disabled={formData.expenseType !== "Invoice"}
+                                required
+                            >
+                                <option value="">Inventory Item*</option>
+                                {inventoryData.map((inv) => (
+                                    <option key={inv.key} value={inv.value}>
+                                        {inv.value} (Stock: {inv.quantity})
+                                    </option>
+                                ))}
+                            </select>
 
 
                             <input type="number" id="inventory-field" name="quantity"

@@ -16,10 +16,10 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
     providentFund: '',
     professionalTax: '',
     staffSlab: '',
-    staffJoiningDate: '', // Added joining date field
   });
 
   useEffect(() => {
+    console.log("EditStaff",staffData)
     if (staffData) {
       setFormData({
         name: staffData.name,
@@ -33,7 +33,6 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
         providentFund: staffData.providentFund,
         professionalTax: staffData.professionalTax,
         staffSlab: staffData.staffSlab,
-        staffJoiningDate: staffData.staff_joining_date || '', // Capture existing joining date
       });
     }
   }, [staffData]);
@@ -49,22 +48,32 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
   const handleSave = async () => {
     const token = localStorage.getItem('token');
     const bid = localStorage.getItem('branch_id');
-
+  
     const payload = {
       staff_name: formData.name,
       staff_role: formData.role,
       mobile_no: formData.mobile || '',
       staff_salary_monthly: formData.salary ? Number(formData.salary) : 0,
       base: formData.base ? Number(formData.base) : 0,
-      house_rent_allownance: formData.houseRentAllowance ? Number(formData.houseRentAllowance) : 0,
-      incentive_pay: formData.incentivePay ? Number(formData.incentivePay) : 0,
-      meal_allowance: formData.mealAllowance ? parseFloat(formData.mealAllowance) : 0,
-      staff_provident_fund: formData.providentFund ? parseFloat(formData.providentFund) : 0,
-      staff_professional_tax: formData.professionalTax ? parseFloat(formData.professionalTax) : 0,
-      staff_slab: formData.staffSlab || '',
-      staff_joining_date: formData.joiningDate, // Ensure this is in 'YYYY-MM-DD' format
+      house_rent_allownance: formData.houseRentAllowance
+        ? Number(formData.houseRentAllowance)
+        : 0,
+      incentive_pay: formData.incentivePay
+        ? Number(formData.incentivePay)
+        : 0,
+      meal_allowance: formData.mealAllowance
+        ? parseFloat(formData.mealAllowance)
+        : 0,
+      staff_provident_fund: formData.providentFund
+        ? parseFloat(formData.providentFund)
+        : 0,
+      staff_professional_tax: formData.professionalTax
+        ? parseFloat(formData.professionalTax)
+        : 0,
+      staff_slab: formData.staffSlab || 0,
+      staff_joining_date: staffData.joiningDate,
     };
-
+  
     try {
       const response = await axios.put(
         `${config.apiUrl}/api/swalook/staff/?id=${staffData.id}&branch_name=${bid}`,
@@ -79,19 +88,22 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
       console.log(response);
       onSave(response.data);
       onClose();
-      window.location.reload();
+    window.location.reload();
+    
+
     } catch (error) {
       console.error('Error updating staff:', error);
     }
   };
+  
 
   return (
     isOpen && (
-      <div className="modal-overlay">
-        <div className="modal-content">
+      <div className="modal1-overlay">
+        <div className="modal1-content">
           <h2>Edit Staff Details</h2>
-          <div className="scrollable-form">
-            <div className="form-group">
+          <div className="scrollable1-form">
+            <div id="form1-group">
               <label>Staff Name:</label>
               <input
                 type="text"
@@ -100,7 +112,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Role:</label>
               <input
                 type="text"
@@ -109,7 +121,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Mobile Number:</label>
               <input
                 type="text"
@@ -118,7 +130,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Salary:</label>
               <input
                 type="number"
@@ -127,7 +139,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Base:</label>
               <input
                 type="number"
@@ -136,7 +148,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>House Rent Allowance:</label>
               <input
                 type="number"
@@ -145,7 +157,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Incentive Pay:</label>
               <input
                 type="number"
@@ -154,7 +166,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Meal Allowance:</label>
               <input
                 type="number"
@@ -163,7 +175,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Provident Fund:</label>
               <input
                 type="number"
@@ -172,7 +184,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Professional Tax:</label>
               <input
                 type="number"
@@ -181,7 +193,7 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
+            <div id="form1-group">
               <label>Commission:</label>
               <input
                 type="number"
@@ -190,19 +202,10 @@ const EditStaff = ({ isOpen, onClose, staffData, onSave }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="form-group">
-              <label>Joining Date:</label>
-              <input
-                type="date"
-                name="staffJoiningDate"
-                value={formData.staffJoiningDate}
-                onChange={handleChange}
-              />
-            </div>
           </div>
-          <div className="button-group">
-            <button onClick={handleSave}>Save</button>
-            <button onClick={onClose}>Cancel</button>
+          <div id="buttons-group">
+            <buttons onClick={handleSave}>Save</buttons>
+            <buttons onClick={onClose}>Cancel</buttons>
           </div>
         </div>
       </div>

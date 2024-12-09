@@ -287,7 +287,7 @@ function GenerateInvoice() {
       const token = localStorage.getItem('token');
       if (!token) {
         console.error('Token is missing.');
-        return;
+        return null; // Return null to handle error
       }
   
       const response = await axios.get(
@@ -301,12 +301,15 @@ function GenerateInvoice() {
       );
   
       if (response?.data?.slno) {
-        setInvoiceId(response.data.slno); // Set invoice ID if 'slno' exists
+        setInvoiceId(response.data.slno); // Update state for UI if needed
+        return response.data.slno; // Return the slno for immediate use
       } else {
         console.error('Invalid response format:', response.data);
+        return null; // Return null if the response is invalid
       }
     } catch (error) {
       console.error('Error fetching invoice ID:', error);
+      return null; // Return null on error
     }
   };
   
@@ -316,84 +319,85 @@ function GenerateInvoice() {
   //console.log(servicesTableData, "servicesTableData");
 
   const handleGenerateInvoice = async () => {
-    await fetchSpecificSerial(); // Wait for InvoiceId to be set
-    
-    if (!InvoiceId) {
-      setDialogTitle('Error');
-      setDialogMessage('Failed to generate Invoice ID. Please try again.');
-      setDialogOpen(true);
-      return;
-    }
-  
-    // Validate services and service_by selections
-    if (GBselectedServices.length === 0) {
-      setDialogTitle('Error');
-      setDialogMessage('Please select services!');
-      setDialogOpen(true);
-      return;
-    }
-  
-    if (service_by.length === 0) {
-      setDialogTitle('Error');
-      setDialogMessage('Please select service by!');
-      setDialogOpen(true);
-      return;
-    }
-  
-    // Validate mobile number
-    const mobileNoPattern = /^[0-9]{10}$/;
-    if (!mobileNoPattern.test(mobile_no)) {
-      setDialogTitle('Error');
-      setDialogMessage('Please enter a valid mobile number!');
-      setDialogOpen(true);
-      return;
-    }
-  
-    // Validate services table data
-    for (let i = 0; i < servicesTableData.length; i++) {
-      if (servicesTableData[i].inputFieldValue === '') {
-        setDialogTitle('Error');
-        setDialogMessage('Please enter quantity for selected services!');
-        setDialogOpen(true);
-        return;
-      }
-      if (servicesTableData[i].gst === '') {
-        setDialogTitle('Error');
-        setDialogMessage('Please select GST for all services!');
-        setDialogOpen(true);
-        return;
-      }
-    }
-  
-    // Validate product data
-    for (let i = 0; i < productData.length; i++) {
-      if (productData[i].quantity === '') {
-        setDialogTitle('Error');
-        setDialogMessage('Please enter quantity for selected products!');
-        setDialogOpen(true);
-        return;
-      }
-    }
-  
-    // If user does not exist, call handleSubmit to add the user
-    let submitResult = null;
-    if (!userExists) {
-      try {
-        submitResult = handleSubmit(); // Add user only if user doesn't exist
-      } catch (error) {
-        console.error('Error during user submission:', error);
-        setDialogTitle('Error');
-        setDialogMessage('An error occurred while adding user details. Please try again.');
-        setDialogOpen(true);
-        return;
-      }
-    }
-  
     try {
-      console.log("Invoice ID:", InvoiceId);
+      // Fetch the InvoiceId and proceed only if it's valid
+      const generatedInvoiceId = await fetchSpecificSerial();
+      if (!generatedInvoiceId) {
+        setDialogTitle('Error');
+        setDialogMessage('Failed to generate Invoice ID. Please try again.');
+        setDialogOpen(true);
+        return;
+      }
+  
+      // Set InvoiceId state explicitly for UI
+      setInvoiceId(generatedInvoiceId);
+  
+      // Validate services and other inputs
+      if (GBselectedServices.length === 0) {
+        setDialogTitle('Error');
+        setDialogMessage('Please select services!');
+        setDialogOpen(true);
+        return;
+      }
+  
+      if (service_by.length === 0) {
+        setDialogTitle('Error');
+        setDialogMessage('Please select service by!');
+        setDialogOpen(true);
+        return;
+      }
+  
+      const mobileNoPattern = /^[0-9]{10}$/;
+      if (!mobileNoPattern.test(mobile_no)) {
+        setDialogTitle('Error');
+        setDialogMessage('Please enter a valid mobile number!');
+        setDialogOpen(true);
+        return;
+      }
+  
+      // Validate services table and product data as before
+      for (let i = 0; i < servicesTableData.length; i++) {
+        if (servicesTableData[i].inputFieldValue === '') {
+          setDialogTitle('Error');
+          setDialogMessage('Please enter quantity for selected services!');
+          setDialogOpen(true);
+          return;
+        }
+        if (servicesTableData[i].gst === '') {
+          setDialogTitle('Error');
+          setDialogMessage('Please select GST for all services!');
+          setDialogOpen(true);
+          return;
+        }
+      }
+  
+      for (let i = 0; i < productData.length; i++) {
+        if (productData[i].quantity === '') {
+          setDialogTitle('Error');
+          setDialogMessage('Please enter quantity for selected products!');
+          setDialogOpen(true);
+          return;
+        }
+      }
+  
+      // Handle user addition if not exists
+      let submitResult = null;
+      if (!userExists) {
+        try {
+          submitResult = await handleSubmit();
+        } catch (error) {
+          console.error('Error during user submission:', error);
+          setDialogTitle('Error');
+          setDialogMessage('An error occurred while adding user details. Please try again.');
+          setDialogOpen(true);
+          return;
+        }
+      }
+  
+      // Proceed to navigate with the generated invoice
       await Promise.all([
-        submitResult, // Only call submitResult if user doesn't exist
-        navigate(`/${sname}/${branchName}/${InvoiceId}/invoice`, {
+        submitResult, // Only call if user doesn't exist
+        navigate(`/${sname}/${branchName}/${generatedInvoiceId}/invoice`, {
           state: {
             customer_name,
             email,
@@ -405,7 +409,7 @@ function GenerateInvoice() {
             isGST,
             gst_number,
             comments,
-            InvoiceId,
+            InvoiceId: generatedInvoiceId,
             productData,
             deductedPoints,
             selectMembership,
@@ -414,12 +418,14 @@ function GenerateInvoice() {
         }),
       ]);
     } catch (error) {
-      console.error('Error navigating:', error);
+      console.error('Error during invoice generation:', error);
       setDialogTitle('Error');
-      setDialogMessage('An error occurred while navigating. Please try again.');
+      setDialogMessage('An error occurred while generating the invoice. Please try again.');
       setDialogOpen(true);
     }
   };
+  
+  
   
   
 

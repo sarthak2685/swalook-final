@@ -14,6 +14,8 @@ import config from '../../config';
 import { CircularProgress } from '@mui/material';
 import { storage } from '../../utils/firebase';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { pdf, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { saveAs } from 'file-saver'; 
 
 function Invoice() {
 
@@ -432,7 +434,7 @@ const handlePriceBlur = (index, value) => {
 
 const [invoiceGenerated, setInvoiceGenerated] = useState(false); 
 
-  const handleGenerateInvoice = async (e) => {
+ const handleGenerateInvoice = async (e) => {
     e.preventDefault();
     if (invoiceGenerated) {
       setPopupMessage('Invoice has already been generated');
@@ -551,7 +553,6 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
     } finally {
       setLoading(false); // Set loading to false when API call finishes
     }
-    // handleSendInvoice();
 
   };
   
@@ -581,60 +582,60 @@ if (isGST) {
 }
 
 
-const handlePrint = async () => {
-  const capture = document.querySelector('.invoice_main');
+// const handlePrint = async () => {
+//   const capture = document.querySelector('.invoice_main');
   
-  html2canvas(capture).then(async (canvas) => {
-    const imgData = canvas.toDataURL('image/jpeg', 0.7);
+//   html2canvas(capture).then(async (canvas) => {
+//     const imgData = canvas.toDataURL('image/jpeg', 0.7);
     
-    const pdf = new jsPDF('l', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+//     const pdf = new jsPDF('l', 'mm', 'a4');
+//     const pdfWidth = pdf.internal.pageSize.getWidth();
+//     const pdfHeight = pdf.internal.pageSize.getHeight();
     
-    const padding = 10;
-    const margin = 10;
-    const availableWidth = pdfWidth - 2 * margin;
-    const availableHeight = pdfHeight - 2 * margin;
-    const imgWidth = availableWidth - 2 * padding;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+//     const padding = 10;
+//     const margin = 10;
+//     const availableWidth = pdfWidth - 2 * margin;
+//     const availableHeight = pdfHeight - 2 * margin;
+//     const imgWidth = availableWidth - 2 * padding;
+//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
-    const posX = margin + padding;
-    const posY = margin + padding;
+//     const posX = margin + padding;
+//     const posY = margin + padding;
     
-    pdf.addImage(imgData, 'JPEG', posX, posY, imgWidth, imgHeight);
-    pdf.compress = true;
-    pdf.save(`Invoice-${getInvoiceId}.pdf`);
+//     pdf.addImage(imgData, 'JPEG', posX, posY, imgWidth, imgHeight);
+//     pdf.compress = true;
+//     pdf.save(`Invoice-${getInvoiceId}.pdf`);
     
-    const pdfBlob = pdf.output('blob');
+//     const pdfBlob = pdf.output('blob');
     
-    // Initialize formData
-    const pdfRef = ref(storage, `invoices/Invoice-${getInvoiceId}.pdf`);
-    await uploadBytes(pdfRef, pdfBlob);
+//     // Initialize formData
+//     const pdfRef = ref(storage, `invoices/Invoice-${getInvoiceId}.pdf`);
+//     await uploadBytes(pdfRef, pdfBlob);
 
-    // Get download URL
-    const downloadURL = await getDownloadURL(pdfRef);
+//     // Get download URL
+//     const downloadURL = await getDownloadURL(pdfRef);
     
-    // Create WhatsApp link
-    const phoneNumber = `+91${mobile_no}`; // Replace with the customer's phone number
-    const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${atob(branchName)}.\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${atob(branchName)}\n\nClick on the link to download:: ${downloadURL}`;
-    const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+//     // Create WhatsApp link
+//     const phoneNumber = `+91${mobile_no}`; // Replace with the customer's phone number
+//     const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${atob(branchName)}.\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${atob(branchName)}\n\nClick on the link to download:: ${downloadURL}`;
+//     const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     
-    // Open WhatsApp link
-    window.open(whatsappLink, '_blank');
+//     // Open WhatsApp link
+//     window.open(whatsappLink, '_blank');
 
-    const token = localStorage.getItem('token');
-    const formData = new FormData();
-    formData.append('file', pdfBlob, `Invoice-${getInvoiceId}.pdf`);
-    formData.append('customer_name', customer_name);
-    formData.append('mobile_no', mobile_no);
-    formData.append('email', email);
-    formData.append('vendor_branch_name', bname);
-    formData.append('invoice', getInvoiceId);
+//     const token = localStorage.getItem('token');
+//     const formData = new FormData();
+//     formData.append('file', pdfBlob, `Invoice-${getInvoiceId}.pdf`);
+//     formData.append('customer_name', customer_name);
+//     formData.append('mobile_no', mobile_no);
+//     formData.append('email', email);
+//     formData.append('vendor_branch_name', bname);
+//     formData.append('invoice', getInvoiceId);
 
-    // Call the function to send invoice
-    await handleSendInvoice(formData);
-  });
-};
+//     // Call the function to send invoice
+//     await handleSendInvoice(formData);
+//   });
+// };
 
 const handleSendInvoice = async (formData) => {
   const token = localStorage.getItem('token');
@@ -651,6 +652,275 @@ const handleSendInvoice = async (formData) => {
     console.error('Error saving PDF:', error);
   }
 };
+
+
+
+const handlePrint = async () => {
+  const styles = StyleSheet.create({
+    invoiceContainer: { padding: 20, paddingHorizontal: 20 },
+    section: {
+      marginBottom: 20,
+      flexDirection: "row",
+      justifyContent: "space-between", // Align header and customer sections
+      
+      alignItems: "flex-start",
+    },
+    sectionColumn: { flex: 1, marginHorizontal: 10 , gap: 5, fontSize: 14},
+    invoiceHeader: { 
+      textAlign: "center", 
+      fontSize: 24, 
+      fontWeight: "bold", 
+      marginBottom: 15 // Add space after sname header
+    },
+    table: { width: "100%", marginTop: 20 },
+    tableHeader: {
+      flexDirection: "row",
+      backgroundColor: "#f0f0f0",
+      borderBottomWidth: 1,
+      borderBottomColor: "#ccc",
+      fontSize: 10,
+      fontWeight: "bold",
+      padding: 5,
+    },
+    tableRow: {
+      flexDirection: "row",
+      borderBottomWidth: 1,
+      borderBottomColor: "#eee",
+      fontSize: 10,
+      paddingVertical: 8,
+    },
+    tableCell: { flex: 1, textAlign: "center", padding: 5 },
+    totalRow: {
+      flexDirection: "row",
+      backgroundColor: "#eaeaea",
+      borderTopWidth: 1,
+      borderTopColor: "#ccc",
+      fontWeight: "bold",
+      paddingVertical: 10,
+      fontSize: 9, // Smaller font size for the total row
+    },
+    footer: {
+      marginTop: 20,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      fontSize: 10, // Smaller text size for footer
+    },
+    footerText: { fontWeight: "bold" },
+    fieldName: { fontWeight: "600" }, // Semibold for field names
+  });
+
+
+  // Example Data - Replace with actual dynamic data
+  const invoiceData = {
+    sname,
+    customer_name,
+    address,
+    email,
+    mobile_no,
+    payment_mode,
+    getInvoiceId,
+    getCurrentDate,
+    isGST,
+    gst_number,
+    services,
+    membership,
+    membershipPrice,
+    membershipTax,
+    cgsts,
+    sgsts,
+    membershipTotal,
+    total_prise,
+    total_quantity,
+    total_discount,
+    total_tax,
+    total_cgst,
+    total_sgst,
+    grand_total,
+    grandTotalInWords,
+    final_price,
+    comments,
+  };
+
+  const InvoiceDocument = () => (
+<Document>
+<Page style={styles.invoiceContainer}>
+<Text style={styles.invoiceHeader}>{sname}</Text>
+
+      {/* Header and Customer Section */}
+      <View style={styles.section}>
+      <View style={styles.sectionColumn}>
+            <Text style={styles.fieldName}>Invoice To:</Text>
+            <Text>{customer_name}</Text>
+            <Text>{address}</Text>
+            <Text>{email}</Text>
+            <Text>{mobile_no}</Text>
+            <Text>Payment Mode: {payment_mode}</Text>
+          </View>
+          <View style={styles.sectionColumn}>
+            <Text>Date of Invoice: {getCurrentDate()}</Text>
+            <Text>Invoice Id: {getInvoiceId}</Text>
+            {isGST && <Text>GST Number: {gst_number}</Text>}
+          </View>
+          
+      </View>
+
+
+        {/* Table */}
+        <View style={styles.table}>
+          {/* Table Header */}
+          <View style={[styles.tableRow, styles.tableHeader]}>
+            <Text style={[styles.tableCell, { width: '10%' }]}>S. No.</Text>
+            <Text style={[styles.tableCell, { width: '30%' }]}>DESCRIPTION</Text>
+            <Text style={[styles.tableCell, { width: '15%' }]}>PRICE</Text>
+            <Text style={[styles.tableCell, { width: '10%' }]}>QUANTITY</Text>
+            <Text style={[styles.tableCell, { width: '10%' }]}>DISCOUNT</Text>
+            {isGST && (
+              <>
+                <Text style={[styles.tableCell, { width: '10%' }]}>TAX AMT</Text>
+                <Text style={[styles.tableCell, { width: '10%' }]}>CGST</Text>
+                <Text style={[styles.tableCell, { width: '10%' }]}>SGST</Text>
+              </>
+            )}
+            <Text style={[styles.tableCell, { width: '15%' }]}>TOTAL AMT</Text>
+          </View>
+
+          {/* Table Rows */}
+          {services.map((service, index) => (
+          <View style={styles.tableRow} key={index}>
+            <Text style={[styles.tableCell, { width: "10%" }]}>{index + 1}</Text>
+            <Text style={[styles.tableCell, { width: "30%" }]}>{service.value}</Text>
+            <Text style={[styles.tableCell, { width: "15%" }]}>{service.price}</Text>
+            <Text style={[styles.tableCell, { width: "10%" }]}>
+              {service.inputFieldValue || "N/A"}
+            </Text>
+            <Text style={[styles.tableCell, { width: "10%" }]}>{service.discount || 0}</Text>
+            {isGST && (
+              <>
+                <Text style={[styles.tableCell, { width: "10%" }]}>{service.tax}</Text>
+                <Text style={[styles.tableCell, { width: "10%" }]}>{service.cgst}</Text>
+                <Text style={[styles.tableCell, { width: "10%" }]}>{service.sgst}</Text>
+              </>
+            )}
+            <Text style={[styles.tableCell, { width: "15%" }]}>{totalAmts[index]}</Text>
+          </View>
+        ))}
+
+          {/* Membership Row */}
+          {membership && membership !== 'None' && (
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, { width: '10%' }]}>{services.length + 1}</Text>
+              <Text style={[styles.tableCell, { width: '30%' }]}>{membership}</Text>
+              <Text style={[styles.tableCell, { width: '15%' }]}>{membershipPrice}</Text>
+              <Text style={[styles.tableCell, { width: '10%' }]}>1</Text>
+              <Text style={[styles.tableCell, { width: '10%' }]}>0</Text>
+              {isGST && (
+                <>
+                  <Text style={[styles.tableCell, { width: '10%' }]}>{membershipTax}</Text>
+                  <Text style={[styles.tableCell, { width: '10%' }]}>{cgsts}</Text>
+                  <Text style={[styles.tableCell, { width: '10%' }]}>{sgsts}</Text>
+                </>
+              )}
+              {isGST ? (
+               <Text style={[styles.tableCell, { width: '15%' }]}>{membershipTotal}</Text>
+
+              ) : (
+                <Text style={[styles.tableCell, { width: '15%' }]}>{membershipTotal-membershipTax}</Text>
+              )}
+              <Text style={[styles.tableCell, { width: '15%' }]}>{membershipTotal}</Text>
+            </View>
+          )}
+
+          {/* Product Rows */}
+          {productDetails.map((product, index) => (
+            <View style={styles.tableRow} key={index}>
+              <Text style={[styles.tableCell, { width: '10%' }]}>{services.length + 1 + index}</Text>
+              <Text style={[styles.tableCell, { width: '30%' }]}>{product.name}</Text>
+              <Text style={[styles.tableCell, { width: '15%' }]}>{product.price}</Text>
+              <Text style={[styles.tableCell, { width: '10%' }]}>{product.quantity}</Text>
+              <Text style={[styles.tableCell, { width: '10%' }]}>0</Text>
+              {isGST && (
+                <>
+                  <Text style={[styles.tableCell, { width: '10%' }]}>{product.tax}</Text>
+                  <Text style={[styles.tableCell, { width: '10%' }]}>{product.cgst}</Text>
+                  <Text style={[styles.tableCell, { width: '10%' }]}>{product.sgst}</Text>
+                </>
+              )}
+              {isGST ? (
+                <Text style={[styles.tableCell, { width: '15%' }]}>{product.total - product.cgst-product.sgst}</Text>
+              ) : (
+                <Text style={[styles.tableCell, { width: '15%' }]}>{product.total-product.tax-product.cgst-product.sgst}</Text>
+              )}
+             
+            </View>
+          ))}
+        </View>
+        <View style={[styles.tableRow, styles.totalRow]}>
+        <Text style={[styles.tableCell, { width: "40%" }]}></Text>
+          <Text style={[styles.tableCell, { width: "40%" }]}>TOTAL</Text>
+          <Text style={[styles.tableCell, { width: "40%" }]}>{total_prise}</Text>
+          <Text style={[styles.tableCell, { width: "15%" }]}>
+            {membership === "None" ? total_quantity - 1 : total_quantity}
+          </Text>
+          <Text style={[styles.tableCell, { width: "10%" }]}>{total_discount}</Text>
+          {isGST && (
+            <>
+              <Text style={[styles.tableCell, { width: "10%" }]}>{total_tax}</Text>
+              <Text style={[styles.tableCell, { width: "10%" }]}>{total_cgst}</Text>
+              <Text style={[styles.tableCell, { width: "10%" }]}>{total_sgst}</Text>
+            </>
+          )}
+          <Text style={[styles.tableCell, { width: "15%" }]}>{grand_total}</Text>
+        </View>
+          { comments ? (
+          <Text>Comments: {comments}</Text>
+          ) : null}
+
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text>Amount in Words: {grandTotalInWords} Rupees Only</Text>
+          <Text>FINAL VALUE: Rs {final_price}</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+  try {
+    const blob = await pdf(<InvoiceDocument />).toBlob();
+
+    if (blob) {
+      // If the blob is created successfully, download it
+      console.log('PDF Blob:', blob);
+      saveAs(blob, `Invoice-${invoiceData.getInvoiceId}.pdf`);
+      const pdfRef = ref(storage, `invoices/Invoice-${invoiceData.getInvoiceId}.pdf`);
+      await uploadBytes(pdfRef, blob);
+    
+      // Get download URL from Firebase Storage
+      const downloadURL = await getDownloadURL(pdfRef);
+    
+      // Create WhatsApp link
+      const phoneNumber = `+91${mobile_no}`;
+      const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${atob(branchName)}.\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${atob(branchName)}\n\nClick on the link to download:: ${downloadURL}`;
+      const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    
+      // Open WhatsApp link
+      window.open(whatsappLink, '_blank');
+    } else {
+      console.error('Failed to create PDF blob');
+    }
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+  }
+
+  // const blob = await pdf(<InvoiceDocument />).toBlob();
+
+  // // Save PDF locally
+  // saveAs(blob, `Invoice-${invoiceData.getInvoiceId}.pdf`);
+
+  // // Initialize formData for uploading the PDF
+
+};
+
+
 console.log("hero hu ",typeof membership, membership, membershipPrice);
   return (
     

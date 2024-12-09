@@ -44,7 +44,7 @@ const ExpenseSetting = () => {
 
     const handleSaveCategories = async () => {
         const payload = {
-            category: categories
+            vendor_expense_type: categories
                 .filter((category) => category.value.trim() !== "")
                 .map((category) => category.value),
         };
