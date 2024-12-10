@@ -148,12 +148,15 @@ function GenerateInvoice() {
       }
   
       const data = await response.json();
+      console.log("hero",data)
       const staffArray = Array.isArray(data.table_data) ? data.table_data : [];
+      console.log("h",staffArray)
   
       // Format staff data
       const formattedOptions = staffArray.map((staff) => ({
-        label: `${staff.staff_name} (${staff.staff_role})`,
+        label: `${staff.staff_name})`,
       }));
+      console.log("ok",formattedOptions)
   
       setStaffData(formattedOptions);
       setStaffApiCalled(true); // Mark API as called

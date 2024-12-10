@@ -174,18 +174,6 @@ const AdminDashboard = () => {
     },
   ];
 
- 
-
-  const staffData = [
-    { name: "Deb", revenue: 80000 },
-    { name: "Ryan", revenue: 70000 },
-    { name: "Ram", revenue: 50000 },
-    { name: "Rajesh", revenue: 40000 },
-    { name: "Prem", revenue: 30000 },
-  ];
-
-
-
   const currentDate = new Date(selectedDate1);
   const currentWeek = Math.ceil(
     (currentDate.getDate() - currentDate.getDay() + 1) / 7
@@ -245,9 +233,7 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${
-            config.apiUrl
-          }/api/swalook/business-analysis/month-customer/?month=${currentMonth}&year=${currentYear}`,
+          `${config.apiUrl}/api/swalook/business-analysis/month-customer/?month=${currentMonth}&year=${currentYear}`,
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -278,13 +264,18 @@ const AdminDashboard = () => {
       }
     };
 
-    // Call the async fetch function
     fetchData();
-  }, [token, config.apiUrl]); // Dependency array includes token and apiUrl
+  }, [token, config.apiUrl]);
 
   const [todayRevenue, setTodayRevenue] = useState(0);
   const [yesterdayRevenue, setYesterdayRevenue] = useState(0);
   const [appointmentsToday, setAppointmentsToday] = useState(0);
+
+  const [staffperiod, setStaffPeriod] = useState("Week");
+  const [staffData, setStaffData] = useState([]);
+  const [dailyData, setDailyData] = useState([]);
+  const [monthlyData, setMonthlyData] = useState([]);
+  const [yearlyData, setYearlyData] = useState([]);
 
   useEffect(() => {
     const fetchHeaderData = async () => {
@@ -306,6 +297,12 @@ const AdminDashboard = () => {
 
         const data = await response.json();
 
+        // Set state for staff data
+        setDailyData(data.staff_data || []);
+        setMonthlyData(data.staff_data_1 || []);
+        setYearlyData(data.staff_data_2 || []);
+        setStaffData(data.staff_data || []);
+
         // Set state for mode of payment
         setModeOfPaymentData(data.mode_of_payment || []);
 
@@ -321,25 +318,50 @@ const AdminDashboard = () => {
     fetchHeaderData();
   }, []);
 
+  useEffect(() => {
+    if (staffperiod === "Week") {
+      setStaffData(dailyData);
+    } else if (staffperiod === "Month") {
+      setStaffData(monthlyData);
+    } else if (staffperiod === "Year") {
+      setStaffData(yearlyData);
+    }
+  }, [staffperiod, dailyData, monthlyData, yearlyData]);
+
   const [modeOfPaymentData, setModeOfPaymentData] = useState([]);
 
   const donutChartData = useMemo(() => {
-    // Filter data for the selected month
     const filteredData = modeOfPaymentData.filter(
       (item) => Number(item.month) === selectedMonth
     );
 
-    // Generate series and labels dynamically
     const series = filteredData.map((item) => item.total_revenue);
     const labels = filteredData.map((item) => item.mode_of_payment);
 
     return {
-      series: series.length > 0 ? series : [0], // Default to 0 if no data
+      series: series.length > 0 ? series : [1], 
       options: {
         chart: {
           type: "donut",
         },
         labels: labels.length > 0 ? labels : ["No Data"],
+        colors: series.length > 0
+          ? [
+              "#328cd2", 
+              "#01e296", 
+              "#ffb01a", 
+              ...Array(series.length > 3 ? series.length - 3 : 0)
+                .fill()
+                .map(() => `#${Math.floor(Math.random() * 16777215).toString(16)}`),
+            ]
+          : ["#d1d5db"],
+        plotOptions: {
+          pie: {
+            donut: {
+              size: "70%", 
+            },
+          },
+        },
         responsive: [
           {
             breakpoint: 480,
@@ -357,15 +379,10 @@ const AdminDashboard = () => {
     };
   }, [modeOfPaymentData, selectedMonth]);
 
-
-
   return (
-    <div className="flex flex-col min-h-screen">
+    <>
       <Header />
-
-      <div className="flex flex-grow">
         <VertNav />
-
         <div className="bg-gray-100 flex-grow mt-16 ml-72 p-10">
           <div className="bg-white shadow-md p-4 rounded-lg mb-10">
             <BiBarChartSquare className="text-4xl text-gray-500 bg-[#FFCC9129] mb-4 mr-10" />
@@ -494,8 +511,9 @@ const AdminDashboard = () => {
               </div>
             </div>
           </div>
-          {/* Row 3: */}
-          <div className="grid grid-cols-3 gap-6 mt-6">
+
+          {/* Row 3: Sales by Staff, Top 5 Customers, Top 5 Services */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {/* Sales by Staff */}
             <div className="bg-white shadow-md p-6 rounded-lg">
               <div className="flex justify-between items-center mb-4">
@@ -503,8 +521,8 @@ const AdminDashboard = () => {
                   Sales by Staff
                 </h3>
                 <select
-                  value={period}
-                  onChange={(e) => setPeriod(e.target.value)}
+                  value={staffperiod}
+                  onChange={(e) => setStaffPeriod(e.target.value)}
                   className="border border-gray-300 text-gray-700 rounded-lg p-1 text-sm"
                 >
                   <option value="Week">Weekly</option>
@@ -513,24 +531,52 @@ const AdminDashboard = () => {
                 </select>
               </div>
               <div className="space-y-4">
-                {staffData.map((staff, index) => (
-                  <div key={index}>
-                    <div className="flex justify-between text-sm text-gray-500">
-                      <span>{staff.name}</span>
-                      <span>Rs.{(staff.revenue / 1000).toFixed(1)}k</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-lg mt-1">
-                      <div
-                        className="h-full bg-[#42a0fc] border rounded-lg"
-                        style={{
-                          width: `${(staff.revenue / 100000) * 100}%`,
-                          borderColor: "#328cd2",
-                          borderWidth: "3px",
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
+                {staffData.length > 0 ? (
+                  staffData
+                    .sort((a, b) => b.total_revenue - a.total_revenue)
+                    .slice(0, 5)
+                    .map((staff, index) => {
+                      let revenueThreshold = 0;
+                      if (staffperiod === "Year") {
+                        revenueThreshold = 500000;
+                      } else if (staffperiod === "Month") {
+                        revenueThreshold = 50000;
+                      } else if (staffperiod === "Week") {
+                        revenueThreshold = 25000;
+                      }
+
+                      const progressBarWidth = Math.min(
+                        (staff.total_revenue / revenueThreshold) * 100,
+                        100
+                      );
+
+                      return (
+                        <div key={index}>
+                          <div className="flex justify-between text-sm text-gray-500">
+                            <span>{staff.service_by}</span>
+                            <span className="text-gray-500 text-sm mr-4">
+                              Invoices: {staff.total_invoices}
+                            </span>
+                            <span>₹{staff.total_revenue}</span>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded-lg mt-1">
+                            <div
+                              className="h-full bg-[#42a0fc] border rounded-lg"
+                              style={{
+                                width: `${progressBarWidth}%`,
+                                borderColor: "#328cd2",
+                                borderWidth: "3px",
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      );
+                    })
+                ) : (
+                  <p className="text-gray-500">
+                    No data available for the selected period.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -597,8 +643,8 @@ const AdminDashboard = () => {
             )}
           </div>
         </div>
-      </div>
-    </div>
+      
+    </>
   );
 };
 
