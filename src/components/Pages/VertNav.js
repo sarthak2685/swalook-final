@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import '../Styles/VertNav.css';
 import {
   Storefront as StorefrontIcon,
   ShowChart as ShowChartIcon,
@@ -17,22 +16,21 @@ import {
 import Logo from '../../assets/header_crm_logo.webp';
 
 const NavItem = ({ to, icon: Icon, label, disabled, isActive, onClick }) => {
-  const disabledStyle = disabled ? { pointerEvents: 'none', opacity: 0.5 } : {};
+  const disabledStyle = disabled ? 'pointer-events-none opacity-50' : '';
 
   return (
-    <div className="icon-container" style={disabledStyle} title={disabled ? 'Not permitted' : ''}>
+    <div className={`icon-container ${disabledStyle}`} title={disabled ? 'Not permitted' : ''}>
       <Link 
         to={to} 
-        className={`nav-link ${isActive ? 'active' : ''}`} 
+        className={`nav-link ${
+          isActive 
+            ? 'bg-blue-500 text-white shadow-md' 
+            : 'text-black hover:bg-blue-500 hover:text-white'
+        } flex items-center p-4 w-58 h-14 rounded-md transition-all ease-in-out`} 
         onClick={onClick}
       >
-        <Icon 
-          style={{ 
-            fontSize: 27, 
-            margin: '5px' 
-          }} 
-        />
-        <span className="icon-text">{label}</span>
+        <Icon style={{ fontSize: 27, margin: '5px' }} />
+        <span className="icon-text ml-2 text-sm">{label}</span>
       </Link>
     </div>
   );
@@ -41,9 +39,9 @@ const NavItem = ({ to, icon: Icon, label, disabled, isActive, onClick }) => {
 const SupportButton = ({ sname, branchName }) => {
   return (
     <Link to={`/${sname}/${branchName}/help`} style={{ textDecoration: 'none' }}>
-      <button className="nav-button" style={{ background: '#5E63661A', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '46px', borderRadius: '16px', marginRight: '10px', paddingBottom: '10px' }}>
+      <button className="nav-button bg-opacity-10 rounded-lg flex items-center justify-center h-12 md:mr-28 py-1 px-2">
         <HeadphonesIcon style={{ marginRight: '10px' }} />
-        <span style={{ color: 'black', fontFamily: 'Inter', fontSize: '14px' }}>Help</span>
+        <span className="text-black font-inter text-sm">Help</span>
       </button>
     </Link>
   );
@@ -53,14 +51,14 @@ const SettingsButton = ({ userType, sname, branchName }) => {
   return (
     <>
       {(userType === 'staff' || userType === 'vendor') ? (
-        <button className="nav-button" style={{ pointerEvents: 'none', opacity: 0.5, border: 'none', cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '46px', borderRadius: '16px', marginRight: '10px', padding: '0 10px' }}>
-          <span style={{ color: 'black', fontFamily: 'Inter', fontSize: '14px' }}>Settings</span>
+        <button className="nav-button pointer-events-none opacity-50 bg-transparent rounded-lg flex items-center justify-center mr-28 h-12 px-2">
+          <span className="text-black font-inter text-sm">Settings</span>
         </button>
       ) : (
         <Link to={`/${sname}/${branchName}/settings`} style={{ textDecoration: 'none' }}>
-          <button className="nav-button" style={{ backgroundColor: '#FFCC9133', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '46px', borderRadius: '16px', marginRight: '10px', padding: '0 10px' }}>
+          <button className="nav-button flex items-center justify-center h-12 rounded-lg md:mr-28 px-2">
             <SettingsSharpIcon style={{ marginRight: '10px' }} />
-            <span style={{ color: 'black', fontFamily: 'Inter', fontSize: '14px' }}>Settings</span>
+            <span className="text-black font-inter text-sm">Settings</span>
           </button>
         </Link>
       )}
@@ -68,7 +66,7 @@ const SettingsButton = ({ userType, sname, branchName }) => {
   );
 };
 
-const VertNav = () => {
+const VertNav = ({ sidebarOpen }) => {
   const [activeLink, setActiveLink] = useState('');
   const navigate = useNavigate();
   const branchName = localStorage.getItem('branch_name');
@@ -81,18 +79,13 @@ const VertNav = () => {
   };
 
   return (
-    <div className='vert_nav_main_c'>
+    <div className={` ${sidebarOpen ? 'open' : ''} h-[85rem] top-0 left-0 flex flex-col justify-start bg-white absolute p-5 z-50 shadow-lg gap-0 transition-all duration-300 lg:block md:w-[298px] lg:w-[300px]  ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <img
         src={Logo}
         alt="Swalook Logo"
-        className="swalook-logo"
-        style={{
-          width: '101px',
-          height: '90px',
-          marginBottom: '20px',
-        }}
+        className="w-40 h-40 mb-5"
       />
-      <div className="nav-items">
+      <div className="nav-items flex flex-col gap-6 mt-2 mb-5 overflow-y-auto mx-8 ">
         <NavItem 
           to={`/${sname}/${branchName}/dashboard`} 
           icon={GridViewRoundedIcon} 
@@ -163,10 +156,15 @@ const VertNav = () => {
           onClick={() => handleLinkClick('expense', `/${sname}/${branchName}/expense`)}
         />
       </div>
-      <SupportButton sname={sname} branchName={branchName} />
-      <SettingsButton userType={userType} sname={sname} branchName={branchName} />
+
+      {/* Buttons placed outside the nav-items div to avoid repetition */}
+      <div className="support-settings-buttons flex flex-col items-center mt-4">
+        <SupportButton sname={sname} branchName={branchName} />
+        <SettingsButton userType={userType} sname={sname} branchName={branchName} />
+      </div>
     </div>
   );
 };
 
 export default VertNav;
+

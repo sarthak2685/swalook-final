@@ -1,4 +1,3 @@
-
 /* Base container styles */
 .appointment-dashboard {
   display: flex;
@@ -6,14 +5,15 @@
   align-items: center;
   width: 100%;
   padding-top: 6rem;
-  margin: 0 0 0 125px; /* Adjust this value based on your header height */
-  overflow: auto;
+  margin: 25px ;
+}
 
-}
-.filters-wrapper{
+.filters-wrapper {
   width: 100%;
-  height: 50rem;
+  height: auto;
+  overflow-x: hidden;
 }
+
 .schedule-section {
   display: flex;
   flex-direction: column; /* Stack items vertically */
@@ -21,6 +21,7 @@
   align-items: flex-start;
   width: 100%;
 }
+
 .forms-sections labels {
   font-size: 18px;
   color: #333;
@@ -28,14 +29,16 @@
   font-weight: bold;
   margin-top: 1rem;
 }
+
 .appoint-button-containers {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .appointform-groups {
   display: flex;
-  gap: 10px; 
+  gap: 10px;
 }
 
 /* Main content container */
@@ -47,14 +50,16 @@
   padding: 20px;
   margin-bottom: 20px;
 }
+
 .user-info-appn {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .edit-details-btn {
   padding: 10px 20px;
-  font-size:  1rem;
+  font-size: 1rem;
   color: #ffffff;
   background-color: #007bff;
   border: none;
@@ -64,11 +69,20 @@
 }
 
 /* Responsive max-width settings */
-@media (min-width: 320px) {
+@media (max-width: 320px) {
   .headers-container, .new-appointment-wrapper {
     max-width: 90%; /* For very small screens */
   }
+ 
+  .appointform-groups {
+    display: block;
+    gap: 10px;
+  }
+  .appointment-dashboard {
+    margin: 0;
+  }
 }
+
 @media (min-width: 768px) and (max-width: 1024px) {
   .appointform-groups {
     display: block;
@@ -77,42 +91,48 @@
   .schedule_time-dropdown, .schedule_date-input {
     min-width: 100px; /* Slightly larger for mid-sized screens */
   }
+  
  
 }
-@media (min-width: 480px) {
+
+@media (min-width: 300px) and (max-width: 750px) {
   .headers-container, .new-appointment-wrapper {
     max-width: 95%; /* Slightly larger on small screens */
   }
-  /* .appointment-dashboard{
-    margin-top: 5rem;
-
-  } */
+  .appointform-groups {
+    display: block;
+    gap: 10px;
+  }
+  .appointment-dashboard {
+    margin: 0;
+  }
 }
+
 
 @media (min-width: 768px) {
   .headers-container, .new-appointment-wrapper {
     max-width: 750px; /* For tablets and small laptops */
   }
-  .customer-details{
+  .customer-details {
     gap: 5px;
     display: flex;
     flex-wrap: wrap;
     margin-top: 2rem;
   }
-  /* .appointment-dashboard{
-    margin: 0 0 0 0px;
-  } */
- 
+  .appointment-dashboard {
+    margin: 0 0 0 150px;
+  }
+  
 }
 
 @media (min-width: 1024px) {
   .headers-container, .new-appointment-wrapper {
-    max-width: 800px; /* For larger laptops */
+    max-width: 950px; /* For larger laptops */
   }
-  .appointment-dashboard{
+  .appointment-dashboard {
     margin: 0 0 0 155px;
   }
-  .customer-details{
+  .customer-details {
     gap: 50px;
     display: flex;
     flex-wrap: wrap;
@@ -123,13 +143,8 @@
 @media (min-width: 1280px) {
   .headers-container, .new-appointment-wrapper {
     max-width: 1000px; /* For desktops */
-    
   }
-  /* .appointment-dashboard{
-    padding-top: 6rem;
-
-  } */
-  .customer-details{
+  .customer-details {
     gap: 100px;
     display: flex;
     flex-wrap: wrap;
@@ -141,11 +156,7 @@
   .headers-container, .new-appointment-wrapper {
     max-width: 1420px; /* For large desktops */
   }
-  /* .appointment-dashboard{
-    padding-top: 7rem;
-
-  } */
-  .customer-details{
+  .customer-details {
     gap: 100px;
     display: flex;
     flex-wrap: wrap;
@@ -159,26 +170,29 @@
   justify-content: space-between;
   align-items: center;
 }
+
 .stat-card span {
   color: grey; /* Change the color to grey */
   font-weight: 500;
-  
 }
 
 .stat-card p {
-text-align: left;  
-font-weight: bold;
+  text-align: left;
+  font-weight: bold;
 }
+
 .custom-multiselect {
   border: none; /* Remove border */
   outline: none; /* Remove outline */
   width: 30%;
   margin-top: 2rem;
-  padding: 0px
+  padding: 0px;
 }
 
-.appnt-heading{
+.appnt-heading {
   text-align: center;
+  font-size: 20px;
+  font: bold;
 }
 
 .edit-details-btn {
@@ -187,10 +201,11 @@ font-weight: bold;
   background: none;
   border: none;
   cursor: pointer;
-  font-size:  1rem;
+  font-size: 1rem;
   padding: 0.5rem;
   text-align: center;
 }
+
 .edit-details-btn:hover {
   text-decoration: underline;
 }
@@ -209,18 +224,21 @@ font-weight: bold;
   text-align: center;
   font-size: 1rem;
 }
+
 .stat-card p {
   font-size: 1rem;
   color: #888888;
   margin-bottom: 5px;
 }
+
 .stat-card h3 {
-  font-size:  1.25rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: #333;
   margin: 0.5rem 0;
   text-align: left;
 }
+
 .stat-card span {
   font-size: 0.9rem;
   color: #007bff; /* Green color for percentage */
@@ -243,15 +261,16 @@ font-weight: bold;
 
 .customer-details {
   display: flex;
-  /* gap: 100px; */
   flex-wrap: wrap;
   margin-top: 2rem;
 }
-#search_input{
+
+#search_input {
   border: none !important;
   font-weight: bold;
 }
-#inputss{
+
+#inputss {
   margin-top: 2rem;
   font-weight: bold;
 }
@@ -263,13 +282,14 @@ font-weight: bold;
   flex: 1;
   min-width: 200px;
   padding: 15px;
-  font-size: 18px; 
+  font-size: 18px;
   border: 1px solid #ddd;
   border-radius: 5px;
   margin-top: 2rem;
   color: #CCCCCF;
   font-weight: bold;
 }
+
 .custom-select {
   width: 30%; /* Set width to 30% */
   padding: 8px; /* Optional: add some padding for better appearance */
@@ -287,12 +307,12 @@ font-weight: bold;
   margin-top: 1rem;
 }
 
-.submits-buttons {
-  width: 35%;
+#submits-buttons {
+  width: auto;
   padding: 12px;
   background-color: #3a6eff;
   color: #fff;
-  font-size: 18px; 
+  font-size: 18px;
   font-weight: bold;
   border: none;
   border-radius: 8px;
@@ -304,7 +324,7 @@ font-weight: bold;
   margin-left: 0;
 }
 
-.submits-buttons:hover {
+#submits-buttons:hover {
   background-color: #2f55cc;
 }
 
@@ -322,9 +342,10 @@ font-weight: bold;
   .new-appointment-wrapper {
     padding: 15px;
   }
+ 
 }
-#close-invoice-btns
-{
+
+#close-invoice-btns {
   position: absolute !important;
   top: 10px !important;
   right: 10px !important;
