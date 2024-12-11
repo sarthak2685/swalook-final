@@ -447,9 +447,10 @@ function Appointment() {
 
   return (
     <>
+     <Header />
+     <VertNav />
       <div className="filters-wrapper">
-        <Header />
-        <VertNav />
+       
         <div className="appointment-dashboard">
           {userExists && (
             <header className="headers-container">
@@ -543,7 +544,7 @@ function Appointment() {
           )}
 
           <div className="new-appointment-wrapper">
-            <h2 className="appnt-heading">Appointment</h2>
+            <h2 className="appnt-heading font-bold">Appointment</h2>
             <form
               onSubmit={handleAddAppointment}
               className="new-appointment-form"
@@ -582,7 +583,7 @@ function Appointment() {
                 </div>
               </div>
 
-              <div className="forms-groups-appn" onClick={handleServiceClick}>
+              <div className="forms-groups-appn " onClick={handleServiceClick}>
                 <labels>Select Services</labels>
                 <Multiselect
                   options={serviceOptions}
@@ -591,16 +592,16 @@ function Appointment() {
                   onRemove={handleSelect}
                   displayValue="value"
                   placeholder="Select Service"
-                  className="custom-multiselect"
+                  className="custom-multiselect "
                 />
               </div>
 
-              <div className="forms-groups-appn">
+              <div className="forms-groups-appn ">
                 <labels>To be Served by:</labels>
                 <select
                   onClick={handleDropdownClick} // Trigger API call on click
                   onChange={(e) => setServiceBy([{ labels: e.target.value }])}
-                  className="custom-select"
+                  className="custom-select "
                 >
                   <option value="" disabled selected>
                     Select Served By
@@ -683,9 +684,9 @@ function Appointment() {
               </div>
 
               <div className="appoint-button-containers">
-                <button
+                <buttons
                   type="submit"
-                  className="submits-buttons"
+                  id="submits-buttons"
                   disabled={bookAppointment}
                 >
                   {bookAppointment ? (
@@ -693,7 +694,7 @@ function Appointment() {
                   ) : (
                     "Create Appointment"
                   )}
-                </button>
+                </buttons>
               </div>
             </form>
           </div>
