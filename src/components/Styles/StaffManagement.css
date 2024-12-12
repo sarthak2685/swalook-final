@@ -2,7 +2,6 @@
   padding: 16px;
   width: 100%;
   margin-bottom: 600px;
-  margin-top: 160px;
   margin-left: 180px;
 }
 
@@ -55,7 +54,7 @@
   text-align: center; /* Center align for button container */
 }
 
-.attendance-button {
+#attendance-button {
   margin-top: 10px;
   background-color: #007bff; 
   color: white;
@@ -65,10 +64,11 @@
   cursor: pointer;
   transition: background-color 0.3s;
   display: inline-block;
-  margin-right: 45px;
+  width: 100%;
+  padding: 0.4rem;
 }
 
-.attendance-button:hover {
+#attendance-button:hover {
   background-color: #5570F1;
 }
 
@@ -79,11 +79,9 @@
     padding: 8px;
   }
 
-  .staff-title {
-    font-size: 1.25rem;
-  }
+ 
 
-  .attendance-button {
+  #attendance-button {
     padding: 2px 5px;
     font-size: 11px;
   }
@@ -129,6 +127,7 @@
 /* Additional styles for the update class and table responsiveness */
 .update {
   display: flex;
+  width: 100%;
 }
 
 .table_responsive {
@@ -143,7 +142,6 @@
   }
 
   .staff-title {
-      font-size: 1.4rem;
       margin-left: 50px;
   }
 
@@ -152,9 +150,19 @@
       margin-left: 50px;
   }
 
-  .attendance-button {
+  #attendance-button {
       font-size: 11px;
       padding: 8px 12px;
+  }
+  .update {
+    display: flex;
+  }
+}
+@media (min-width: 1150px)
+{
+  .update{
+    display: flex;
+    width: auto;
   }
 }
 
@@ -168,7 +176,6 @@
   }
 
   .staff-title {
-      font-size: 1.25rem;
       margin-left: 20px;
   }
 
@@ -183,7 +190,7 @@
       padding: 8px;
   }
 
-  .attendance-button {
+  #attendance-button {
       padding: 6px 10px;
       font-size: 10px;
   }
@@ -191,13 +198,14 @@
 
 /* Mobile view adjustments (768px and below) */
 @media (max-width: 768px) {
+
+ 
   .staff-management-container {
       margin: 0 auto;
       padding: 5px;
   }
 
   .staff-title {
-      font-size: 1.1rem;
       margin-left: 10px;
   }
 
@@ -212,7 +220,7 @@
       padding: 6px;
   }
 
-  .attendance-button {
+  #attendance-button {
       font-size: 10px;
       padding: 4px 8px;
   }

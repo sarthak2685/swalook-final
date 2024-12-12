@@ -85,9 +85,10 @@ const ExpensesManagement = () => {
     };
 
     return (
+        <>
+         <VertNav />
+         <Header />
         <div className="expenses-container">
-            <VertNav />
-            <Header />
             <div className="mains-contents">
                 <div className="expenses-management">
                     <div className="expenses-header">
@@ -187,6 +188,7 @@ const ExpensesManagement = () => {
             </div>
             {showModal && <ExpenseModal onClose={() => setShowModal(false)} />}
         </div>
+        </>
     );
 };
 

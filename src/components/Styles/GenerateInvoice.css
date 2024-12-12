@@ -6,7 +6,7 @@
   width: 100% !important;
   padding-top: 20px;
   margin: 0 0 0 10rem;
-  overflow: auto;
+  overflow-x: hidden;
 }
  /* Base container styles */
 
@@ -64,7 +64,7 @@
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-bottom: 20px;
-  width: auto !important;;
+  display: block;
 }
 
 .user-info .user-stats {
@@ -131,6 +131,7 @@
 #form-titles{
   color: #333;
   text-align: left;
+  font: 800;
 }
 
 .form-section {
@@ -231,7 +232,7 @@ margin-top: 3rem;
 /* Responsive settings */
 @media (max-width: 1024px) {
   .user-info, .invoice-section {
-    width: auto; /* Adjust container width */
+    width: 48rem; /* Adjust container width */
   }
   .user-info .user-stats {
      /* Distribute items evenly across the container */
@@ -239,7 +240,6 @@ margin-top: 3rem;
   }
 
   .form-row {
-    /* flex-direction: column; */
     gap: 15px; /* Adjust gap */
   }
 
@@ -272,6 +272,15 @@ margin-top: 3rem;
   }
   .gb_dash_main {
    width: min-content;
+   margin: 0;
+  }
+}
+@media screen and (max-width: 768px) {
+  .user-info {
+    display: none;
+  }
+  .user-info, .invoice-section {
+    width: 100%; /* Adjust container width */
   }
 }
  

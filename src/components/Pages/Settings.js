@@ -56,9 +56,11 @@ function Settings() {
   };
 
   return (
+    <>
+     <Header />
+     <VertNav />
     <div className='settings_container'>
-      <Header />
-      <VertNav />
+     
       <div className="content_container">
         <Link to={`/${sname}/${branchName}/settings/personalInformation`} className="settings_box">
           <img src={PI} alt="Personal Information" />
@@ -87,6 +89,7 @@ function Settings() {
         </Link>
       </div>
     </div>
+    </>
   );
 }
 

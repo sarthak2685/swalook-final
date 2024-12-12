@@ -18,7 +18,7 @@ body {
     margin-bottom: 200px;
 }
 
-.inventory_details_header {
+#inventory_details_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -26,12 +26,14 @@ body {
     max-width: 1500px; /* Increased max width */
 }
 
-.inventory_details_header h1 {
+#inventory_details_header h1 {
     white-space: nowrap;
     margin-right: 20px;
+    font: bold;
+    margin-left: 1rem;
 }
 
-.add_inventory_button {
+#add_inventory_button {
     background-color: transparent;
     color: white;
     padding: 8px 16px;
@@ -43,7 +45,7 @@ body {
     margin-left: 40px;
 }
 
-.add_inventory_button:hover {
+#add_inventory_button:hover {
     background-color: #4560d1;
     color: white;
 }
@@ -108,163 +110,24 @@ body {
 }
 
 
-/* Responsive adjustments for tablet view (1024px and below) */
-
-/* Responsive styles for tablet and small desktop view */
-@media (max-width: 1400px) and (min-width: 900px) {
+/* Responsive adjustments for mobile view 624px
+ */
+@media only screen and (max-width: 760px) {
     .admin_inventory_container {
-        width: 95%; /* Set to 95% for better fit on medium screens */
-        margin: 0 auto; /* Center the container */
-        padding: 20px;
-        margin-left: 180px;
-        margin-bottom: 200px;
-        margin-top: 180px;
-    }
-
-    .inventory_details_header {
-        display: flex; /* Use flexbox */
-        flex-direction: row; /* Place items side by side */
-        align-items: center; /* Align items vertically */
-        justify-content: space-between; /* Space out the title and button */
-        margin-bottom: 15px;
-    }
-
-    .inventory_details_header h1 {
-        margin-left: 150px;
-        font-size: 1.5rem;
-    }   
-
-    .add_inventory_button {
-        width: 100px;
-        font-size: 14px;
-        padding: 12px;
-        color:white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        background-color:#5570F1 ;
-        margin-right: 140px;
-    }
-
-    .add_inventory_button:hover {
-        background-color: #4560d1;
-    }
-
-    .horizontal_line {
-        width: 1000px; /* Full width */
-        margin: 20px 0; /* Top and bottom spacing */
-        border: 0;
-        height: 2px;
-        color: #292D32;
-        background-color: #091a44;
-    }
-
-    .admin_inventory_table_container {
-        width: 100%; /* Full width for the table container */
-        margin-top: 20px;
-    }
-
-    .admin_inventory_table {
-        width: 1200px;
-        border-collapse: collapse;
-        margin-top: 20px;
-        background-color: white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-right: auto; /* Center the table */
-        border: 1px solid #e0e0e0; /* Light border for the table */
-    }
-
-    .admin_inventory_table th,
-    .admin_inventory_table td {
-        padding: 10px;
-        text-align: center;
-        border: none; /* Remove lines between cells */
-
-    }
-
-    .admin_inventory_table th {
-        background-color: #ffffff; /* Updated color */
-        color: #B5B7C0; /* Font color for headings */
-        font-family: 'Poppins', sans-serif; /* Updated font family */
-        font-size: 14px; /* Updated font size */
-        font-weight: 500; /* Updated font weight */
-        line-height: 21px; /* Updated line height */
-        letter-spacing: -0.01em; /* Updated letter spacing */
-    }
-    
-    .admin_inventory_table td {
-        background: #ffffff; /* Updated background color for data cells */
-        color: #292D32; /* Font color for data */
-        font-family: 'Poppins', sans-serif; /* Updated font family */
-        font-size: 14px; /* Updated font size */
-        font-weight: 500; /* Updated font weight */
-        line-height: 21px; /* Updated line height */
-        letter-spacing: -0.01em; /* Updated letter spacing */
-    }
-
-    /* Adjustments for better readability on smaller screens */
-    .admin_inventory_table th,
-    .admin_inventory_table td {
-        padding: 8px;
-        font-size: 12px;
-    }
-}
-
-/* Adjustments for screens less than 1150px */
-@media (max-width: 1100px) {
-    .admin_inventory_container {
-        width: 100%;
-        margin: 0 auto;
-        padding: 10px;
-        margin-left: 120px;
-        margin-bottom: 200px;
-        margin-top: 180px;
-    }
-
-    .inventory_details_header {
-        display: flex; /* Use flexbox */
-        flex-direction: row; /* Place items side by side */
+        display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: space-between; /* Space out the title and button */
-    }
-
-    .inventory_details_header h1 {
-        padding-top: 40px;
-        margin-left: 280px;
-        font-size: 1.4rem;
-    }
-
-    .add_inventory_button {
-        width:100px;
-        font-size: 12px;
-        padding: 2px 6px;
-        margin-left: auto; /* Align to the right */
-        align-self: flex-start;
-        margin-right: 180px;
-    }
-
-    .horizontal_line {
-        width:700px;
-        margin: 20px 0;
-        margin-left: 40px;
-        color: #292D32;
-    }
-
-    .admin_inventory_table_container {
-        width: 80%;
-    }
-
-    .admin_inventory_table {
-        width: 800px;
-        font-size: 12px;
-    }
-
-    .admin_inventory_table th,
-    .admin_inventory_table td {
-        padding: 8px;
-        font-size: 12px;
+        padding: 20px;
+        margin-top: 100px;
+        margin-left: 0;
+        margin-bottom: 200px;
     }
 }
+
+/* more that 1024 px */
+
+@media only screen and (min-width: 1025px) {
+    
+}
+
+

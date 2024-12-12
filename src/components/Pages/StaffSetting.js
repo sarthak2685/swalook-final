@@ -133,11 +133,11 @@ const StaffSetting = () => {
 
   return (
     <>
+    <Header />
+    <VertNav />
       <Helmet>
         <title>Staff Settings</title>
-      </Helmet>
-      <Header />
-      <VertNav />
+      </Helmet>  
       <div className="staff-setting-container">
         <h2 className="heading-settings">Staff Settings</h2>
         <div className="table-section">

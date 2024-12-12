@@ -6,7 +6,7 @@
 
 .settings_container {
   background-color:white;
-  margin-top: 400px;
+  margin-top: 1rem;
   width: 100vw;
   height: 100vh;
   font-family: 'Montserrat', sans-serif;
@@ -30,12 +30,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 90%;
+  width: 100%;
   max-width: 400px;
   padding: 20px;
-  height: 45vh;
   border: 1px solid #ccc;
-  border-radius: 15px; /* Added border radius */
+  border-radius: 15px; 
   margin: 10px;
   background-color: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -56,4 +55,16 @@ body {
 /* Optional hover effect */
 .settings_box:hover {
   transform: translateY(-5px); /* Slight lift on hover */
+}
+
+@media (max-width: 580px) {
+  .settings_container {
+    background-color:white;
+    margin-top: 1rem;
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+    margin-right: 1rem;
+    margin-left: 6rem;
+  }
 }
