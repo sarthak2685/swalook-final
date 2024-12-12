@@ -103,21 +103,19 @@ function CustomerL() {
     };
 
     return (
+        <>
+        <Header />
+        <VertNav />
         <div className='cl_container'>
             <Helmet>
                 <title>Customer Loyalty</title>
             </Helmet>
-            <Header />
             <div className='cl_main'>
-                <div className='update'>
-                    <div className='gb_h9'>
-                        <div className='gb_ver_nav1'>
-                            <VertNav />
-                        </div>
-                    </div>
+                <div className='updates'>
+                    
                     <div className='cl_tableContainer'>               
                         <div className='cl_headerContainer'>
-                            <h2 className='cl_heading'>Customer Details</h2>
+                            <h2 className='cl_heading font-bold text-2xl'>Customer Details</h2>
                         </div>
                         <div className='cl_headerActions'>
                             <div className='cl_searchContainer'>
@@ -129,10 +127,10 @@ function CustomerL() {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
-                            <button className='cl_card cl_add' onClick={handleAddCustomerClick}>
+                            <buttons className='cl_card cl_add' onClick={handleAddCustomerClick}>
                                 <PersonAddIcon style={{ fontSize: "24px", marginRight: "8px" }} />
                                 Add Customer
-                            </button>
+                            </buttons>
                         </div>
 
                         <div className='cl_table_wrapper'>
@@ -195,6 +193,7 @@ function CustomerL() {
                 )}
             </div>
         </div>
+        </>
     );
 }
 

@@ -175,14 +175,13 @@ const AdminManagement = () => {
   return (
     <>
     <Header />
-    <div className="update">
-          <VertNav />
+    <VertNav />
     <div className="staff-mgmt-container">
         
         <Toaster />
         
       <div className='add-staff'>
-      <h1 className="staff-mgmt-title">Staff Management</h1>
+      <h1 className="staff-mgmt-title text-3xl">Staff Management</h1>
 
         <button className="staff-mgmt-add-button" onClick={() => setShowAddStaffModal(true)}>
           Add Staff
@@ -292,7 +291,6 @@ const AdminManagement = () => {
           </div>
         </div>
       )}
-    </div>
     </div>
     </>
   );

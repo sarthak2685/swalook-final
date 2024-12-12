@@ -4,8 +4,7 @@
     flex-direction: column;
     height: 100vh;
     background-color: white;
-    margin-top: 200px;
-    width: 1400px;
+    margin-top: 2rem;
     margin-right: 50px;
     margin-left: 350px;
 }
@@ -48,8 +47,8 @@
     padding: 10px 10px 10px 40px;
     border-radius: 4px;
     border: 1px solid #ccc;
-    width: 400px;
     margin-right: 20px;
+    width: 100%;
 }
 
 /* Button styling for adding customers */
@@ -63,8 +62,6 @@
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.3s;
-    margin-bottom: 20px;
-    width: 210px;
 }
 
 /* Hover effect for button */
@@ -79,7 +76,7 @@
 
 /* Table styling */
 .cl_table {
-    width: 1600px;
+    width: 100%;
     border-collapse: separate; /* Prevent borders from collapsing */
     margin-top: 20px;
     background-color: white;
@@ -88,6 +85,10 @@
     overflow: hidden;
     margin-right: auto; /* Center the table */
     border: 1px solid #e0e0e0; /* Light border for the table */
+}
+
+.updates{
+    width: 100%;
 }
 
 /* Table header and cell styling */
@@ -127,69 +128,16 @@
     height: 1px;
     background-color: #ddd;
 }
-
-/* Responsive adjustments for tablet view (1024px and below) */
-@media (max-width: 1400px) and (min-width: 900px) {
-    .cl_container {
-        width: 100%;
-        margin-left: 350px;
-        margin-right: 10px;
-        max-width:1200px;
-    }
-
-    .cl_searchBar {
-        width: 80%; /* Reduce search bar width */
-    }
-
-    .cl_add {
-        width: 180px; /* Slightly reduce button width */
-        font-size: 13px;
-    }
-
-    .cl_table {
-        width: 1200px; /* Reduce table width for smaller screens */
-    }
+ @media (max-width: 768px) {
+    
+        .cl_container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: white;
+            margin-top: 2rem;
+            margin-right: 50px;
+            margin-left: 50px;
+        }
 }
 
-
-/* Adjustments for screens less than 920px */
-@media (max-width: 1150px) {
-    .cl_container {
-        width: 100%;
-        margin: 0 auto;
-        padding: 10px;
-        margin-left:350px;
-        overflow-x: auto;
-        margin-top: 120px;
-    }
-
-    .cl_searchBar {
-        width: 80%; /* Full width search bar */
-    }
-
-    .cl_add {
-        width: 20%; /* Full width button */
-        font-size: 12px; /* Smaller font */
-        padding: 8px 16px;
-    }
-
-    .cl_table_wrapper {
-        overflow-x: auto;
-        width: 100%;
-    }
-
-    .cl_table {
-        width: 800px; /* Reduced table width for screens less than 920px */
-        font-size: 12px; /* Adjusted font size */
-    }
-
-    .cl_table th,
-    .cl_table td {
-        padding: 8px; /* Smaller padding for better fit */
-        font-size: 12px;
-    }
-
-    .cl_divider {
-        margin: 15px 0;
-    }
-}

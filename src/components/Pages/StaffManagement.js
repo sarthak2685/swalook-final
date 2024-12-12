@@ -112,7 +112,7 @@ const StaffManagement = () => {
         <VertNav />
         <div className="staff-management-container">
           <Toaster />
-          <h1 className="staff-title">Staff Attendance:</h1>
+          <h1 className="staff-title text-3xl">Staff Attendance:</h1>
           <div className="table_responsive">
             <table className="staff-table">
               <thead>
@@ -134,15 +134,15 @@ const StaffManagement = () => {
                     <td>{`${staff.attendance.present}/${staff.attendance.total}`}</td>
                     <td>{staff.joiningDate}</td>
                     <td className='button-container'>
-                      <button
-                        className="attendance-button"
+                      <buttons
+                        id="attendance-button"
                         onClick={() => {
                           setShowAttendance(true);
                           setCurrentStaffId(staff.id);
                         }}
                       >
                         Mark
-                      </button>
+                      </buttons>
                     </td>
                   </tr>
                 ))}

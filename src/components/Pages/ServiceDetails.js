@@ -59,19 +59,18 @@ function ServiceDetails() {
     };
 
     return (
+        <>
+         <Header />
+         <VertNav />
         <div className='admin_service_container'>
             <Helmet>
                 <title>Services</title>
-            </Helmet>
-            <div className='c_header'>
-                <Header />
-                <VertNav />
-            </div>
+            </Helmet>               
             <div className="service_details_header">
-                <h1>Service Details</h1>
-                <div>
-                    <button className="add_service_button" onClick={AddtogglePopup}>Add</button>
-                    <button className="delete_service_button" onClick={DeletetogglePopup}>Delete</button>
+                <h1 className='text-3xl font-bold '>Service Details</h1>
+                <div className='flex flex-row gap-8 md:gap-5 sm:ml-[30rem]'>
+                    <buttons className="add_service_button" onClick={AddtogglePopup}>Add</buttons>
+                    <buttons className="delete_service_button" onClick={DeletetogglePopup}>Delete</buttons>
                 </div>
             </div>
             <div className="admin_service_table_container">
@@ -109,6 +108,7 @@ function ServiceDetails() {
             {isDeletePopupOpen && <DeleteServicePopup onClose={DeletetogglePopup} />}
             {isEditPopupOpen && <EditServicePopup serviceData={editServiceData} onClose={EdittogglePopup} />}
         </div>
+        </>
     );
 }
 

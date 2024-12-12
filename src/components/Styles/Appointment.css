@@ -50,6 +50,9 @@
   padding: 20px;
   margin-bottom: 20px;
 }
+.headers-container{
+  display: block;
+}
 
 .user-info-appn {
   display: flex;
@@ -96,9 +99,10 @@
 }
 
 @media (min-width: 300px) and (max-width: 750px) {
-  .headers-container, .new-appointment-wrapper {
+  .new-appointment-wrapper {
     max-width: 95%; /* Slightly larger on small screens */
   }
+ 
   .appointform-groups {
     display: block;
     gap: 10px;
@@ -336,6 +340,9 @@
 
   .customer-details {
     flex-direction: column;
+  }
+  .headers-container{
+    display: none;
   }
 
   .headers-container,

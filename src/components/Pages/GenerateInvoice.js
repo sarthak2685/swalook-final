@@ -805,12 +805,12 @@ function GenerateInvoice() {
   return (
     <>
       <Header />
-      <div className='gb_h1'>
-        <div className='gb_ver_nav'>
+      <div className='gb_h1 overflow-x-hidden'>
+        <div className='gb_ver_nav overflow-x-hidden'>
           <VertNav />
         </div>
       </div>
-      <div className='gb_dash_main'>
+      <div className='gb_dash_main overflow-x-hidden'>
         <Helmet>
           <title>Generate Invoice</title>
         </Helmet>
@@ -902,7 +902,7 @@ function GenerateInvoice() {
 
             {/* Invoice Form Section */}
             <div className='invoice-section'>
-              <h2 className='section-titles'>Invoice</h2>
+              <h2 className='section-titles font-bold'>Invoice</h2>
               <div className='form-container'>
                 {/* Customer Details */}
                 <div className='form-section'>
@@ -913,14 +913,14 @@ function GenerateInvoice() {
                     </div>
                     <div className='form-groups'>
                     <input
-    type="text"
-    id="name"
-    placeholder="Full Name"
-    value={customer_name}
-    readOnly={userExists} // Read-only for existing user
-    required
-    onChange={(e) => !userExists && setCustomer_Name(e.target.value)} // Editable only for new user
-  />
+                    type="text"
+                    id="name"
+                    placeholder="Full Name"
+                    value={customer_name}
+                    readOnly={userExists} // Read-only for existing user
+                    required
+                    onChange={(e) => !userExists && setCustomer_Name(e.target.value)} // Editable only for new user
+                  />
                     </div>
 
                     <div className='form-groups'>

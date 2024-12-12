@@ -101,18 +101,18 @@ function Inventory() {
     }, []);
 
     return (
+        <>
+         <Header />
+         <VertNav />
         <div className='admin_inventory_container'>
             <Helmet>
                 <title>Inventory</title>
             </Helmet>
-            <div className='c_header'>
-                <Header />
-            </div>
-            <VertNav />
-            <div className="inventory_details_header">
-                <h1>Inventory Details</h1>
+               
+            <div id="inventory_details_header">
+                <h1 className='font-bold text-2xl'>Inventory Details</h1>
                 <div>
-                    <button className="add_inventory_button" onClick={AddtogglePopup}>Add</button>
+                    <button id="add_inventory_button" onClick={AddtogglePopup}>Add</button>
                 </div>
             </div>
            
@@ -166,6 +166,7 @@ function Inventory() {
                 />
             )}
         </div>
+        </>
     );
 }
 
