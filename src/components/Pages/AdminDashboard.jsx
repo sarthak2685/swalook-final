@@ -19,6 +19,8 @@ const AdminDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("Weekly");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const token = localStorage.getItem("token");
+  const bid = localStorage.getItem("branch_id");
+
 
   const fetchChartData = async () => {
     if (!selectedDate) return;
@@ -34,13 +36,13 @@ const AdminDashboard = () => {
 
     switch (selectedPeriod) {
       case "Weekly":
-        apiData = `${config.apiUrl}/api/swalook/business-analysis/week/?week=${currentWeek}&month=${currentMonth}&year=${currentYear}`;
+        apiData = `${config.apiUrl}/api/swalook/business-analysis/week/?branch_name=${bid}&week=${currentWeek}&month=${currentMonth}&year=${currentYear}`;
         break;
       case "Monthly":
-        apiData = `${config.apiUrl}/api/swalook/business-analysis/month/?month=${currentMonth}&year=${currentYear}`;
+        apiData = `${config.apiUrl}/api/swalook/business-analysis/month/?branch_name=${bid}&month=${currentMonth}&year=${currentYear}`;
         break;
       case "YTD":
-        apiData = `${config.apiUrl}/api/swalook/business-analysis/year/?year=${currentYear}`;
+        apiData = `${config.apiUrl}/api/swalook/business-analysis/year/?branch_name=${bid}&year=${currentYear}`;
         break;
       default:
         console.error("Invalid period selected");
@@ -188,7 +190,7 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${config.apiUrl}/api/swalook/business-analysis/service/?week=${currentWeek}&month=${currentMonth}&year=${currentYear}`,
+          `${config.apiUrl}/api/swalook/business-analysis/service/?branch_name=${bid}&week=${currentWeek}&month=${currentMonth}&year=${currentYear}`,
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -233,7 +235,7 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${config.apiUrl}/api/swalook/business-analysis/month-customer/?month=${currentMonth}&year=${currentYear}`,
+          `${config.apiUrl}/api/swalook/business-analysis/month-customer/?branch_name=${bid}&month=${currentMonth}&year=${currentYear}`,
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -281,7 +283,7 @@ const AdminDashboard = () => {
     const fetchHeaderData = async () => {
       try {
         const response = await fetch(
-          `${config.apiUrl}/api/swalook/staff-header-mode-of-payment/`,
+          `${config.apiUrl}/api/swalook/staff-header-mode-of-payment/?branch_name=${bid}`,
           {
             method: "GET",
             headers: {
@@ -334,22 +336,23 @@ const AdminDashboard = () => {
     const filteredData = modeOfPaymentData.filter(
       (item) => Number(item.month) === selectedMonth
     );
-
+  
     const series = filteredData.map((item) => item.total_revenue);
     const labels = filteredData.map((item) => item.mode_of_payment);
-
+  
     return {
-      series: series.length > 0 ? series : [1], 
+      series: series.length > 0 ? series : [1],
       options: {
         chart: {
           type: "donut",
+          width: "100%", 
         },
         labels: labels.length > 0 ? labels : ["No Data"],
         colors: series.length > 0
           ? [
-              "#328cd2", 
-              "#01e296", 
-              "#ffb01a", 
+              "#328cd2",
+              "#01e296",
+              "#ffb01a",
               ...Array(series.length > 3 ? series.length - 3 : 0)
                 .fill()
                 .map(() => `#${Math.floor(Math.random() * 16777215).toString(16)}`),
@@ -358,19 +361,35 @@ const AdminDashboard = () => {
         plotOptions: {
           pie: {
             donut: {
-              size: "70%", 
+              size: "70%",
             },
           },
         },
+        
+        legend: {
+          position: "top", 
+          fontSize: "14px",
+        },
         responsive: [
           {
-            breakpoint: 480,
+            breakpoint: 1024, 
             options: {
               chart: {
-                width: 200,
+                width: "80%",
               },
               legend: {
-                position: "bottom",
+                position: "right",
+              },
+            },
+          },
+          {
+            breakpoint: 768, 
+            options: {
+              chart: {
+                width: "100%", 
+              },
+              legend: {
+                position: "top", 
               },
             },
           },
@@ -378,12 +397,13 @@ const AdminDashboard = () => {
       },
     };
   }, [modeOfPaymentData, selectedMonth]);
+  
 
   return (
     <>
       <Header />
         <VertNav />
-        <div className="bg-gray-100 flex-grow mt-16 ml-72 p-10">
+        <div className="bg-gray-100 flex-grow  md:ml-72 p-10">
           <div className="bg-white shadow-md p-4 rounded-lg mb-10">
             <BiBarChartSquare className="text-4xl text-gray-500 bg-[#FFCC9129] mb-4 mr-10" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -502,7 +522,7 @@ const AdminDashboard = () => {
                   </select>
                 </div>
               </div>
-              <div className="rounded-lg">
+              <div className="rounded-lg ">
                 <ApexCharts
                   options={donutChartData.options}
                   series={donutChartData.series}

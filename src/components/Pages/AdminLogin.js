@@ -135,7 +135,7 @@ function AdminLogin() {
                   Forgot your password?{' '}
                   <a onClick={handleResetPasswordClick}>Reset it</a>
                 </p>
-                <button type='submit'>Login</button>
+                <button  type='submit'>Login</button>
               </form>
             </div>
           </div>

@@ -78,7 +78,7 @@ input[type="password"] {
   color: #888;
 }
 
-button {
+#btn {
   width: 200px;
   height: 45px;
   background-color: #5570F1;
@@ -88,7 +88,7 @@ button {
   cursor: pointer;
   margin-top: 20px;
   margin-left:90px;
-}
+} 
 
 .forgot-password {
   margin-top: 10px;

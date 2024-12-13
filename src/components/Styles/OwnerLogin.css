@@ -76,7 +76,7 @@ input[type="password"] {
   padding-left: 40px; /* Leave space for the icon */
 }
 
-button {
+#btn {
   margin-top: 20px;
   width: 275px; /* Fixed width */
   height: 40px; /* Fixed height */
@@ -134,7 +134,7 @@ button {
     padding-left: 16px; /* Adjust padding for smaller screens */
   }
 
-  button {
+  #btn {
     width: 100%; /* Full width for smaller screens */
   }
 }
