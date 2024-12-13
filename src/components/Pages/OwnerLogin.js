@@ -95,7 +95,7 @@ function OwnerLogin() {
               </div>
             </div>
             <p className="forgot-password">Forgot your password? <a href="#">Reset it</a></p>
-            <button type="submit">
+            <button id='btn' type="submit">
               {loading ? <CircularProgress size={20} color="inherit" /> : 'Login'}
             </button>
           </form>
