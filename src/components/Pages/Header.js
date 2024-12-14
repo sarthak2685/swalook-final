@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa"; // React Icon for Account Circle
-import { FiMenu } from "react-icons/fi"; // React Icon for Menu
-import { IoMdArrowDropdown } from "react-icons/io"; // React Icon for ExpandMore (dropdown)
+import { FaUserCircle } from "react-icons/fa";
+import { FiMenu } from "react-icons/fi";
+import { IoMdArrowDropdown } from "react-icons/io";
 import Cookies from "js-cookie";
 import axios from "axios";
-import VertNav from "./VertNav"; // Assuming VertNav is in the same directory
+import VertNav from "./VertNav"; 
 import config from "../../config";
 
 function Header() {
@@ -24,7 +24,6 @@ function Header() {
   const sname = localStorage.getItem("s-name");
   const branchName = localStorage.getItem("branch_name");
 
-  // Fetch branches data from API
   useEffect(() => {
     const fetchBranches = async () => {
       setLoading(true);
@@ -50,6 +49,31 @@ function Header() {
 
     fetchBranches();
   }, []);
+
+
+
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setSidebarOpen(true); 
+      } else {
+        setSidebarOpen(false); 
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []); 
+
+
+
+
 
   const toggleBranchDropdown = () => {
     setShowBranchDropdown((prev) => !prev);
@@ -81,14 +105,24 @@ function Header() {
     navigate("/");
   };
 
-  const toggleSidebar = () => setSidebarOpen((prevState) => !prevState);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen((prev) => !prev);
+  }, []);
+  
 
   const handleBranchChange = (branch) => {
     setSelectedBranch(branch.branch_name);
-    // Save branch name and ID in local storage
+
     localStorage.setItem("branch_name", branch.branch_name);
     localStorage.setItem("branch_id", branch.id);
+  
+    setShowBranchDropdown(false);
+
+      window.location.reload();
   };
+  
+  
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -119,7 +153,7 @@ function Header() {
               className="cursor-pointer p-2 bg-gray-100 rounded-md flex items-center gap-2"
               onClick={toggleBranchDropdown}
             >
-              <span>{selectedBranch || "Select Branch"}</span>
+              <span>{selectedBranch || branchName}</span>
               <IoMdArrowDropdown />
             </div>
             {showBranchDropdown && (
@@ -191,7 +225,7 @@ function Header() {
         </div>
       </nav>
 
-      {sidebarOpen && <VertNav sidebarOpen={sidebarOpen} />}
+      {sidebarOpen && <VertNav sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Storefront as StorefrontIcon,
@@ -79,17 +79,44 @@ const SettingsButton = ({ userType, sname, branchName }) => {
   );
 };
 
-const VertNav = ({ sidebarOpen }) => {
+const VertNav = ({ sidebarOpen, toggleSidebar }) => {
   const [activeLink, setActiveLink] = useState("");
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
+
   const branchName = localStorage.getItem("branch_name");
+  const branchId = localStorage.getItem("branch_id");
   const sname = localStorage.getItem("s-name");
   const userType = localStorage.getItem("type");
 
-  const handleLinkClick = (link, to) => {
-    setActiveLink(link);
-    navigate(to);
-  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); 
+    };
+
+    handleResize(); 
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const handleLinkClick = useCallback(
+    (link, to) => {
+      setActiveLink(link);
+      navigate(to);
+
+      if (isMobile && typeof toggleSidebar === "function") {
+        toggleSidebar();
+      }
+    },
+    [navigate, toggleSidebar, isMobile]
+  );
+
+
+  
 
   return (
     <div
