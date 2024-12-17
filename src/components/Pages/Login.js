@@ -44,47 +44,60 @@ function Login() {
   //   }
   // }, [navigate]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`https://api.crm.swalook.in/api/swalook/verify/${decodedSname}/${decodedAdminUrl}/`);
-        if (response.data.status === true) {
-          setIsValid(true);
-        } else {
-          setIsValid(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchbody = async () => {
+  //     try {
+  //       const response = await axios.get(`https://api.crm.swalook.in/api/swalook/verify/${decodedSname}/${decodedAdminUrl}/`);
+  //       if (response.body.status === true) {
+  //         setIsValid(true);
+  //       } else {
+  //         setIsValid(false);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-    fetchData();
-  }, [decodedSname, decodedAdminUrl]);
+  //   fetchbody();
+  // }, [decodedSname, decodedAdminUrl]);
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
 
    
 
-    axios.post('https://api.crm.swalook.in/api/swalook/staff/login/', {
+    axios.post('https://4qskkbuiu6n3coyj7jfvol22zm0snpll.lambda-url.us-east-1.on.aws/', {
       mobileno: mobileno,
       password: password,
     })
     .then((res) => {
-      if (res.data.text === 'login successful!') {
-        Cookies.set('loggedIn', 'true', { expires: 10 });
-        Cookies.set('type', res.data.type, { expires: 10 });
-        Cookies.set('branch_n', res.data.branch_name, { expires: 10 });
-        Cookies.set('salon-name',res.data.salon_name, { expires: 10 });
-        navigate(`/${decodedSname}/${burl}/dashboard`);
-        const token = res.data.token;
-        const number = btoa(res.data.user);
-        localStorage.setItem('token', token);
-        localStorage.setItem('number', number);
-        localStorage.setItem('type', res.data.type);
+      try {
+        const cleanText = res.body.text.replace(/^\"|\"$/g, ''); 
+        const cleanType = res.body.type.replace(/^\"|\"$/g, '');
+        const cleanBranchName = res.body.branch_name.replace(/^\"|\"$/g, '');
+        const cleanSalonName = res.body.salon_name.replace(/^\"|\"$/g, '');
+        const cleanToken = res.body.token.replace(/^\"|\"$/g, '');
+    
+        if (cleanText === 'login done!') {
+          Cookies.set('loggedIn', 'true', { expires: 10 });
+          Cookies.set('type', cleanType, { expires: 10 });
+          Cookies.set('branch_n', cleanBranchName, { expires: 10 });
+          Cookies.set('salon-name', cleanSalonName, { expires: 10 });
+    
+          navigate(`/${decodedSname}/${burl}/dashboard`);
+    
+          localStorage.setItem('token', cleanToken);
+          const number = btoa(res.body.user); 
+          localStorage.setItem('number', number);
+          localStorage.setItem('type', cleanType);
+        }
+    
+        console.log(res.body);
+      } catch (error) {
+        console.error('Error processing response:', error);
       }
-      console.log(res.data);
     })
+  
     .catch((err) => {
       console.log(err);
       setErrorMessage('Invalid login credentials. Please check your credentials and try again.');

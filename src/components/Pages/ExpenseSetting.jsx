@@ -57,7 +57,7 @@ const ExpenseSetting = () => {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Token ${token}`,
-                }, 
+                },
                 body: JSON.stringify(payload),
             });
 
@@ -72,54 +72,58 @@ const ExpenseSetting = () => {
     };
 
     return (
-        <div className="dashboard-container">
+        <>
             <Header />
-            <div className="dashboard-layout">
-                <VertNav />
-                <div className="dashboard-content">
-                    <header className="page-header">
-                        <h1>Expense Category Settings</h1>
-                    </header>
-                    <div className="content-section">
-                        <div className="left-image">
-                            <img src={ES} alt="Expense Category Illustration" />
-                            <p>Expense Category Settings</p>
-                        </div>
-                        <div className="right-content">
-                            <h2>Expense Category Settings</h2>
-                            {categories.map((category) => (
-                                <div key={category.id} className="category-item">
-                                    <input
-                                        type="text"
-                                        list={`category-options-${category.id}`}
-                                        placeholder="Select or Add Category"
-                                        value={category.value}
-                                        onChange={(e) => handleCategoryChange(category.id, e.target.value)}
-                                        className="category-input"
-                                    />
-                                    <datalist id={`category-options-${category.id}`}>
-                                        {predefinedCategories.map((predefinedCategory, idx) => (
-                                            <option key={idx} value={predefinedCategory}>
-                                                {predefinedCategory}
-                                            </option>
-                                        ))}
-                                    </datalist>
+            <VertNav />
+
+            <div className="dashboard-container">
+                <div className="dashboard-layout">
+                    <div className="dashboard-content">
+                        <header className="page-header">
+                            <h1 className="font-bold text-2xl ml-4 md:ml-80">Expense Category Settings</h1>
+                        </header>
+                        <div className="content-section">
+                            <div className="left-image">
+                                <img src={ES} alt="Expense Category Illustration" />
+                                <p>Expense Category Settings</p>
+                            </div>
+                            <div className="right-content">
+                                <h2>Expense Category Settings</h2>
+                                {categories.map((category) => (
+                                    <div key={category.id} className="category-item">
+                                        <input
+                                            type="text"
+                                            list={`category-options-${category.id}`}
+                                            placeholder="Select or Add Category"
+                                            value={category.value}
+                                            onChange={(e) => handleCategoryChange(category.id, e.target.value)}
+                                            className="category-input"
+                                        />
+                                        <datalist id={`category-options-${category.id}`}>
+                                            {predefinedCategories.map((predefinedCategory, idx) => (
+                                                <option key={idx} value={predefinedCategory}>
+                                                    {predefinedCategory}
+                                                </option>
+                                            ))}
+                                        </datalist>
+                                    </div>
+                                ))}
+                                <div id="categories">
+                                    <div className="new-category">
+                                        <button onClick={handleAddCategory}>+ New Category</button>
+                                    </div>
+                                    <div className="new-category">
+                                        <button onClick={handleSaveCategories}>Save Categories</button>
+                                    </div>
                                 </div>
-                            ))}
-                            <div id="categories">
-                            <div className="new-category">
-                                <button onClick={handleAddCategory}>+ New Category</button>
-                            </div>
-                            <div className="new-category">
-                                <button onClick={handleSaveCategories}>Save Categories</button>
-                            </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
+
 };
 
 export default ExpenseSetting;

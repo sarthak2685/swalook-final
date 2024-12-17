@@ -156,7 +156,6 @@
     .content-section {
         flex-direction: column; /* Stack sections vertically */
         align-items: center;
-        margin-top: 6rem; /* Adjust top margin */
     }
 
     .left-image,
@@ -179,8 +178,15 @@
         max-width: 100%; /* Use full width on small screens */
     }
 
+    
     .content-section {
-        margin-top: 4rem; /* Adjust top margin */
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        padding: 0 20px;
+        margin-left: 8rem;
+        margin-right: 8rem;
     }
 }
 

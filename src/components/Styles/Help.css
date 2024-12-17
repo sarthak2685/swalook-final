@@ -71,6 +71,7 @@
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease;
+    width: 40%;
   }
   
   .contact-form button:hover {
@@ -98,6 +99,15 @@
   @media (max-width: 768px) {
     .contact-form .form-row {
       flex-direction: column;
+    }
+    .help-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color:white;
+      padding: 20px;
+      margin-top: 200px;
+      margin-left:0;
     }
   }
   

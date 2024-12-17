@@ -69,9 +69,10 @@ function PersonalInformation() {
   };
 
   return (
+    <>
+    <Header />
+    <VertNav />
     <div className='personal_information_container'>
-      <Header />
-      <VertNav />
       <div className='pi_main'>
         <div className="pi_horizontal_container">
           <div className="pi_horizontal_item">
@@ -115,6 +116,7 @@ function PersonalInformation() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
