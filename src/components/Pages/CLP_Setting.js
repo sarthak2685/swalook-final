@@ -222,12 +222,13 @@ function CLP_Setting() {
   };
 
   return (
+    <>
+     <Header />
+     <VertNav/>
     <div className='clp_setting_container'>
       <Helmet>
         <title>CLP Settings</title>
       </Helmet>
-      <Header />
-      <VertNav/>
       <div className='clp_main'>
         <div className='clp_settings_content'>
           <h1 className='clp_settings_heading'>Customer Loyalty Programme Settings</h1>
@@ -368,6 +369,7 @@ function CLP_Setting() {
         <button onClick={() => setEdit(null)}>Cancel</button>
       </Modal>
     </div>
+    </>
   );
 }
 

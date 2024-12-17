@@ -2,12 +2,11 @@
 .staff-setting-container {
   padding: 40px;
   border-radius: 10px;
-  width: 1200px;
   margin: 70px auto;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   font-family: 'Arial', sans-serif;
   background-color: transparent;
-  margin-left: 550px;
+  margin-left: 24rem;
 }
 
 .heading-settings {
@@ -92,11 +91,7 @@ h3 {
 
 /* Responsive adjustments for screens up to 1400px */
 @media (max-width: 1400px) {
-  .staff-setting-container {
-    width: 60%;
-    margin-left: 500px;
-    padding: 30px;
-  }
+  
 
   .heading-settings {
     font-size: 24px;
@@ -105,11 +100,7 @@ h3 {
 
 /* Tablet view (1024px and below) */
 @media (max-width: 1024px) {
-  .staff-setting-container {
-    width: 95%;
-    margin-left: 200px;
-    padding: 20px;
-  }
+ 
 
   .heading-settings {
     font-size: 22px;

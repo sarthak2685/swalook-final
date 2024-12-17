@@ -921,7 +921,6 @@ const handlePrint = async () => {
 };
 
 
-console.log("hero hu ",typeof membership, membership, membershipPrice);
   return (
     
     <div className='invoice_container'>
@@ -937,7 +936,7 @@ console.log("hero hu ",typeof membership, membership, membershipPrice);
           <div className='invoice_name'>{sname}</div>
         </div>
         <div className='invoice_content'>
-          <div className='invoice_left'>
+          <div id='invoice_left'>
             <h3><b>Invoice To:</b></h3>
             <p>{customer_name}</p>
             <p>{address}</p>
@@ -945,7 +944,7 @@ console.log("hero hu ",typeof membership, membership, membershipPrice);
             <p>{mobile_no}</p>
             <p><b>Payment Mode:</b> {payment_mode}</p>
           </div>
-          <div className='invoice_right'>
+          <div id='invoice_right'>
             <div className='invoice-invoice_id'>
             <p><b>Invoice Id:</b></p>
               <p>{getInvoiceId}</p>
@@ -1100,12 +1099,12 @@ console.log("hero hu ",typeof membership, membership, membershipPrice);
   </div>
 ) : null}
 
-        <div className='invoice_footer'>
-          <div className='invoice_footer_left'>
+        <div id='invoice_footer'>
+          <div id='invoice_footer_left'>
             <h4>Amount in Words:</h4>
             <p>{grandTotalInWords} Rupees Only</p>
           </div>
-          <div className='invoice_footer_right'>
+          <div id='invoice_footer_right'>
             <h4>FINAL VALUE:</h4>
             <p>Rs {final_price}</p>
           </div>
