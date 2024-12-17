@@ -22,7 +22,7 @@ html, body {
 }
 
 /* Invoice Sections */
-.invoice_left, .invoice_right {
+#invoice_left, #invoice_right {
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -38,7 +38,7 @@ html, body {
   border: 1px solid black;
   padding: 10px;
   display: flex;
-  justify-content: space-between; /* Space between logo and name */
+  justify-content: center; /* Space between logo and name */
   align-items: center;
   margin-top: 20px;
   width: 100%;
@@ -59,17 +59,16 @@ html, body {
 }
 
 /* Footer Styles */
-.invoice_footer {
+#invoice_footer {
   display: flex;
-  justify-content: flex-end; /* Align to the right */
+  justify-content: space-between; /* Align to the right */
   padding: 10px;
 }
 
 /* Footer Left and Right Styles */
-.invoice_footer_left, .invoice_footer_right {
+#invoice_footer_left, #invoice_footer_right {
   display: flex;
   flex-direction: column;
-  width: 45%; /* Adjusted footer sections */
 }
 
 /* Standard Input Styles */
@@ -106,7 +105,7 @@ textarea {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .invoice_left, .invoice_right {
+  #invoice_left, #invoice_right {
     width: 100%; /* Full width on smaller screens */
   }
 
@@ -115,8 +114,7 @@ textarea {
     align-items: flex-start; /* Align to the left */
   }
 
-  .invoice_footer {
-    flex-direction: column; /* Stack footer elements */
+  #invoice_footer {
     align-items: flex-start; /* Align footer to the left */
   }
 
