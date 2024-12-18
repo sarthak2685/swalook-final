@@ -22,8 +22,8 @@ function AddServicePopup({ onClose }) {
         e.preventDefault();
         const token = localStorage.getItem('token');
 
-        axios.post(`https://k6zshxyvxodu42hndfqijr64wa0jqaxf.lambda-url.us-east-1.on.aws/`, {
-            service_name: service,
+        axios.post(`${config.apiUrl}/api/swalook/add/services/?branch_name=${bid}`, {
+            service: service,
             service_price: service_price,
             service_duration: service_duration
         }, {

@@ -19,8 +19,7 @@ function ServiceDetails() {
     const [loading, setLoading] = useState(true);
     const bid = localStorage.getItem('branch_id');
     const [editServiceData, setEditServiceData] = useState(null);
-    const hasFetched = useRef(false);  
-
+    const hasFetched = useRef(false);  // <-- Track if data is already fetched
 
     useEffect(() => {
         if (!hasFetched.current && fetchService.length === 0) {
@@ -28,9 +27,8 @@ function ServiceDetails() {
                 setLoading(true);
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await axios.get(`https://k6zshxyvxodu42hndfqijr64wa0jqaxf.lambda-url.us-east-1.on.aws/`, {
+                    const response = await axios.get(`${config.apiUrl}/api/swalook/table/services/?branch_name=${bid}`, {
                         headers: {
-                            'branch_name' : `${bid}`,
                             'Authorization': `Token ${token}`,
                             'Content-Type': 'application/json'
                         }
