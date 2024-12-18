@@ -1113,9 +1113,11 @@ const handlePrint = async () => {
         
         </form>
       </div>
-      <div className='generate-button-container'>
+      <div className='flex items-center justify-center mt-8'>
   <button 
-    className='generate-button' 
+    className='flex items-center justify-center px-6 py-2 text-white 
+              bg-blue-500 rounded-md hover:bg-blue-600 
+              focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1' 
     onClick={handleGenerateInvoice} 
     disabled={loading || invoiceGenerated}  
   >

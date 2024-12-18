@@ -17,62 +17,51 @@ function OwnerLogin() {
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
   const handleAdminLogin = async (e) => {
-    e.preventDefault();
     setLoading(true);
-    
+    e.preventDefault();
     try {
-      const response = await axios.post(
-        `https://4qskkbuiu6n3coyj7jfvol22zm0snpll.lambda-url.us-east-1.on.aws/`,
-        { mobileno, password }
-      );
-    
-      if (response.status === 200) {
-        const cleanText = response.data.text.replace(/^\"|\"$/g, '');
-        const cleanType = response.data.type.replace(/^\"|\"$/g, '');
-        const cleanSalonName = response.data.salon_name.replace(/^\"|\"$/g, '');
-        const cleanBranchName = response.data.branch_id.replace(/^\"|\"$/g, '');
-        const cleanToken = response.data.token.replace(/^\"|\"$/g, '');
-    
-        if (cleanText === 'login done!') {
-          Cookies.set('loggedIn', 'true', { expires: 10 });
-          Cookies.set('type', cleanType, { expires: 10 });
-          Cookies.set('salonName', cleanSalonName, { expires: 10 });
-          Cookies.set('branch_n', cleanBranchName, { expires: 10 });
-    
-          localStorage.setItem('branch_name', btoa(cleanBranchName));
-          localStorage.setItem('s-name', cleanSalonName);
-          localStorage.setItem('type', cleanType);
-          localStorage.setItem('token', cleanToken);
-    
-          // const number = btoa(response.data.user.replace(/^\"|\"$/g, ''));
-          // localStorage.setItem('number', number);
-    
-          // Navigate based on user type
-          if (cleanType === 'owner') {
-            navigate(`/${cleanSalonName}`);
-          } else {
-            navigate(`/${cleanSalonName}/${btoa(cleanBranchName)}/dashboard`);
-          }
+      const response = await axios.post(`${config.apiUrl}/api/swalook/centralized/login/`, {
+        mobileno,
+        password,
+      });
+
+      if (response.data.error.message === 'login successful!') {
+        Cookies.set('loggedIn', 'true', { expires: 10 });
+        Cookies.set('type', response.data.data.type, { expires: 10 });
+        const salonName = response.data.data.salon_name;
+        Cookies.set('salonName', salonName, { expires: 10 });
+        Cookies.set('branch_n', response.data.data.branch_name, { expires: 10 });
+        localStorage.setItem('branch_name', btoa(response.data.data.branch_name));
+        localStorage.setItem('s-name', salonName);
+        localStorage.setItem('type', response.data.data.type);
+
+        if (response.data.data.type === 'owner') {
+          navigate(`/${salonName}`);
         } else {
-          setErrorMessage('Invalid login credentials. Please try again.');
-          setShowError(true);
+          navigate(`/${salonName}/${btoa(response.data.data.branch_name)}/dashboard`);
         }
+
+        const token = response.data.data.token;
+        const number = btoa(response.data.data.user);
+        localStorage.setItem('token', token);
+        localStorage.setItem('number', number);
+        localStorage.setItem('branch_id', response.data.data.branch_id);
       }
     } catch (error) {
-      console.error('Error during login:', error);
-      setErrorMessage('Invalid login credentials. Please check your details and try again.');
+      console.log(error);
+      setErrorMessage('Invalid login credentials. Please check your credentials and try again.');
       setShowError(true);
     } finally {
       setLoading(false);
     }
-    };
-    
-    const handleClosePopup = () => {
-      setShowError(false);
-    };
-    
-  
+  };
+
+  const handleClosePopup = () => {
+    setShowError(false);
+  };
+
   return (
     <div className='owner_login_container'>
       <div className='owner_login_main'>
@@ -106,15 +95,26 @@ function OwnerLogin() {
               </div>
             </div>
             <p className="forgot-password">Forgot your password? <a href="#">Reset it</a></p>
-            <button id='btn' type="submit">
-              {loading ? <CircularProgress size={20} color="inherit" /> : 'Login'}
+            <div className='flex items-center justify-center'>
+            <button
+              type="submit"
+              className={`flex items-center justify-center px-6 py-2 text-white 
+              bg-blue-500 rounded-md hover:bg-blue-600 
+              focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1`}
+            >
+              {loading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                'Login'
+              )}
             </button>
+            </div>
           </form>
         </div>
       </div>
       {showError && <Popup message={errorMessage} onClose={handleClosePopup} />}
     </div>
   );
-}  
+}
 
 export default OwnerLogin;

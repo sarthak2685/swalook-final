@@ -20,10 +20,6 @@ const AdminDashboard = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const token = localStorage.getItem("token");
   const bid = localStorage.getItem("branch_id");
-  const sname = localStorage.getItem("s-name");
-  const type = localStorage.getItem("type");
-
-  // console.log("hii",token,bid,sname,type);
 
 
   const sname = localStorage.getItem("s-name");
