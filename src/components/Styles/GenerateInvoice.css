@@ -345,7 +345,7 @@ margin-top: 3rem;
   margin-top: 20px;
 }
 
-.gb_input-field {
+#gb_input-field {
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -360,13 +360,6 @@ margin-top: 3rem;
   margin-top: 20px;
 }
 
-.gb_input-field {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-  width: 100%;
-}
 
 .gbform-group label {
   font-size: 17px;

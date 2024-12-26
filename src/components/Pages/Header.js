@@ -105,7 +105,6 @@ function Header() {
     navigate("/");
   };
 
-
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((prev) => !prev);
   }, []);
@@ -156,7 +155,7 @@ function Header() {
               <span>{selectedBranch || branchName}</span>
               <IoMdArrowDropdown />
             </div>
-            {showBranchDropdown && (
+            {showBranchDropdown && userType !== "staff" && (
               <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20">
                 {loading ? (
                   <div className="text-gray-500 px-4 py-2">Loading...</div>

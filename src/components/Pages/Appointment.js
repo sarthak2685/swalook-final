@@ -49,7 +49,7 @@ function Appointment() {
   const [userExists, setUserExists] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [customerData, setCustomerData] = useState(null);
-  const[api, setAPI] = useState(null);
+  const [api, setAPI] = useState(null);
   const [hasFetchedServices, setHasFetchedServices] = useState(false);
 
 
@@ -65,21 +65,21 @@ function Appointment() {
           'Content-Type': 'application/json'
         }
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       const data = await response.json();
-      console.log("data",response.data)
-  
+      console.log("data", response.data)
+
       setServiceOptions(data.data.map((service) => ({
         key: service.id,
         value: service.service,
         price: service.service_price,
         gst: ''
       })));
-  
+
       // Set flag to true to prevent future calls
       setHasFetchedServices(true);
     } catch (error) {
@@ -96,7 +96,7 @@ function Appointment() {
       console.log('Fetching data')
     }
   };
-  
+
 
   const handleTimeChange = event => {
     const { id, value } = event.target;
@@ -118,7 +118,7 @@ function Appointment() {
         break;
     }
   };
-  const [apiCalled, setApiCalled] = useState(false); 
+  const [apiCalled, setApiCalled] = useState(false);
 
   const fetchStaffData = async () => {
     const token = localStorage.getItem('token');
@@ -371,7 +371,7 @@ function Appointment() {
         const token = localStorage.getItem('token');
 
         const response = await axios.get(
-          `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}`,
+          `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}&branch_name=${bid}`,
           {
             headers: {
               'Authorization': `Token ${token}`,
@@ -406,7 +406,7 @@ function Appointment() {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}`, {
+      const response = await axios.get(`${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobileNo}&branch_name=${bid}`, {
         headers: {
           'Authorization': `Token ${token}`,
           'Content-Type': 'application/json'
@@ -447,10 +447,10 @@ function Appointment() {
 
   return (
     <>
-     <Header />
-     <VertNav />
+      <Header />
+      <VertNav />
       <div className="filters-wrapper">
-       
+
         <div className="appointment-dashboard">
           {userExists && (
             <header className="headers-container">
@@ -459,19 +459,19 @@ function Appointment() {
                   <div className="stat-card">
                     <p>Business</p>
                     <h3>
-                      Rs. {customerId.total_billing_amount} 
+                      Rs. {customerId.total_billing_amount}
                     </h3>
                   </div>
                   <div className="stat-card">
                     <p>Number of Appointments</p>
                     <h3>
-                      {customerId.total_appointment} 
+                      {customerId.total_appointment}
                     </h3>
                   </div>
                   <div className="stat-card">
                     <p>Number of Invoices</p>
                     <h3>
-                      {customerId.total_invoices} 
+                      {customerId.total_invoices}
                     </h3>
                   </div>
                   <div className="user-info-appn">
@@ -509,31 +509,33 @@ function Appointment() {
                       <tbody>
                         {customerData.previous_appointments &&
                           customerData.previous_appointments.length > 0 ? (
-                          customerData.previous_appointments.map(
-                            (item, index) => (
-                              <tr key={index}>
-                                <td>{customerData.customer_name}</td>
-                                <td>{customerData.customer_mobile_no}</td>
-                                <td>{item.time}</td>
-                                <td>{item.Date}</td>
-                                <td>
-                                  {JSON.parse(item.services).map(
-                                    (service, idx) => (
-                                      <div key={idx}>
-                                        {service.Description}
-                                      </div>
-                                    )
-                                  )}
-                                </td>
-                              </tr>
-                            )
-                          )
+                          customerData.previous_appointments.map((item, index) => (
+                            <tr key={index}>
+                              <td>{customerData.customer_name}</td>
+                              <td>{customerData.customer_mobile_no}</td>
+                              <td>{item.time}</td>
+                              <td>{item.Date}</td>
+                              <td>
+                                {(() => {
+                                  try {
+                                    const services = JSON.parse(item.services);
+                                    return services.map((service, idx) => (
+                                      <div key={idx}>{service.Description}</div>
+                                    ));
+                                  } catch (error) {
+                                    return <div>{item.services}</div>;
+                                  }
+                                })()}
+                              </td>
+                            </tr>
+                          ))
                         ) : (
                           <tr>
                             <td colSpan="5">No invoices available</td>
                           </tr>
                         )}
                       </tbody>
+
                     </table>
                   </div>
                 ) : (
@@ -684,7 +686,7 @@ function Appointment() {
               </div>
 
               <div className="appoint-button-containers">
-              <button
+                <button
                   type="submit"
                   className="submits-buttons flex items-center justify-center px-6 py-2 text-white 
               bg-blue-500 rounded-md hover:bg-blue-600 

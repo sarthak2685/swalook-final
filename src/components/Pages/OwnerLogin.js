@@ -75,7 +75,8 @@ function OwnerLogin() {
               <label htmlFor="phone-number">Phone Number:</label>
               <input
                 type="text"
-                id="phone-number"
+                id="phone-number" 
+                className='ml-4'
                 placeholder="Enter your phone number"
                 onChange={(e) => setMobileno(e.target.value)}
                 required
@@ -84,7 +85,7 @@ function OwnerLogin() {
             <div className="OL_input-group">
               <label htmlFor="password">Password:</label>
               <div className="password-input-container">
-                <LockOpenIcon className="lock-icon" />
+                <LockOpenIcon className="lock-icon ml-12" />
                 <input
                   type="password"
                   id="password"
