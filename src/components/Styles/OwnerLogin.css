@@ -58,7 +58,15 @@ input[type="password"] {
   border: 1px solid #ccc; /* Add border color */
   background-color: #fff; /* Solid background for visibility */
   margin-top: 10px;
+  display: flex;
 }
+
+#phone-number,#password
+{
+  margin-left: 3rem;
+}
+
+
 
 .password-input-container {
   position: relative;

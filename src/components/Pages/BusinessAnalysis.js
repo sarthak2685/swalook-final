@@ -92,8 +92,9 @@ function BusinessAnalysis() {
                         <VertNav />
                     </div>
                 </div>
-                <div className='ba_h2'>
-                    <h1 className='ba_heading'>Business Analysis</h1>
+                <h1 className='text-3xl font-bold text-black'>Business Analysis</h1>
+
+                {/* <div className='ba_h2'>
                     <div className='ba_cards'>
                         <div className='ba_card' onClick={() => setSelectedCard('Monthly Analysis')}>
                             <BarChartOutlinedIcon className='ba_card_img' sx={{ color: "white", fontSize: "48px" }} />
@@ -145,7 +146,7 @@ function BusinessAnalysis() {
                             </div>
                         ))}
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     );

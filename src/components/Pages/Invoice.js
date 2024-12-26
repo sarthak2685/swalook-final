@@ -523,7 +523,7 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
       slno: invoiceId,
       json_data: producData,
       loyalty_points_deducted: deductedPoint,
-      payment_mode: payment_mode
+      mode_of_payment: payment_mode || 'cash'
     };
   
     try {

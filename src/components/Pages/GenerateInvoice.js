@@ -67,6 +67,8 @@ function GenerateInvoice() {
   const [customerData, setCustomerData] = useState(null);
   const [apiCalled, setApiCalled] = useState(false);
   const [staffApiCalled, setStaffApiCalled] = useState(false);
+  const [dateOfBirth, setDateOfBirth] = useState(null);
+
 
   const bid = localStorage.getItem('branch_id');
   const token = localStorage.getItem('token');
@@ -446,6 +448,8 @@ function GenerateInvoice() {
           mobile_no: mobile_no,
           email: email,
           membership: selectMembership,
+          d_o_b: dateOfBirth || "",
+          d_o_a: anniversaryDate || ""
         },
         {
           headers: {
@@ -534,6 +538,7 @@ function GenerateInvoice() {
 
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deleteInvoiceId, setDeleteInvoiceId] = useState(null);
+  const [anniversaryDate, setAnniversaryDate] = useState(null);
 
 
   const [userExists, setUserExists] = useState(null);
@@ -616,6 +621,10 @@ function GenerateInvoice() {
           setEmail(userData.email || "");
           setCustomerData(userData);
           setUserExists(true);
+          setDateOfBirth(userData.d_o_b);
+          setAnniversaryDate(userData.d_o_a);
+          setMembershipType(userData.membership)
+          setUserPoints(userData.loyality_profile.current_customer_points)
           return;
         }
       }
@@ -634,8 +643,9 @@ function GenerateInvoice() {
     setCustomer_Name("");
     setEmail("");
     setCustomerData(null);
+    setAnniversaryDate("");
+    setDateOfBirth("")
   };
-  
   
   
   // const fetchCustomerData = async () => {
@@ -675,7 +685,7 @@ function GenerateInvoice() {
       }
   
       const response = await axios.get(
-        `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`,
+        `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}&branch_name=${bid}`,
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -719,7 +729,7 @@ function GenerateInvoice() {
   
     try {
       const response = await axios.get(
-        `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}`,
+        `${config.apiUrl}/api/swalook/get-customer-bill-app-data/?mobile_no=${mobile_no}&branch_name=${bid}`,
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -906,7 +916,7 @@ function GenerateInvoice() {
               <div className='form-container'>
                 {/* Customer Details */}
                 <div className='form-section'>
-                  <h3 id='form-titles'>Customer Details</h3>
+                  <h3 id='form-titles' className='font-semibold'>Customer Details</h3>
                   <div className='form-row'>
                     <div className='form-groups'>
                       <input type="number" id="phone" placeholder='Phone Number' required onBlur={handlePhoneBlur} onChange={(e) => setMobileNo(e.target.value)} />
@@ -1117,7 +1127,31 @@ function GenerateInvoice() {
                         placeholder="Select Served By"
                       />
                     </div>
-                  </div>
+
+                      <div className="forms-groups">
+                        <label htmlFor="dob">Date of Birth:</label>
+                        <input
+                          type="date"
+                          className="w-full p-2 border mt-2 border-gray-300 rounded-md text-[#CCCCCF] font-semibold placeholder-gray-400"
+                          id="gb_input-field"
+                          placeholder="Select Date of Birth"
+                          value={dateOfBirth}
+                          onChange={(e) => !userExists && setDateOfBirth(e.target.value)}                          
+                        />
+                      </div>
+
+                      <div className="forms-groups">
+                        <label htmlFor="anniversary">Date of Anniversary:</label>
+                        <input
+                          type="date"
+                          className="w-full p-2 border mt-2 border-gray-300 rounded-md text-[#CCCCCF] font-semibold placeholder-gray-400"
+                          id="gb_input-field"
+                          placeholder="Select Date of Anniversary"
+                          value={anniversaryDate}
+                          onChange={(e) => !userExists && setAnniversaryDate(e.target.value)}
+                          />
+                      </div>
+                      </div>
 
                   {/* Points Input Field */}
                   {membershipStatus && (
@@ -1125,8 +1159,7 @@ function GenerateInvoice() {
                       <label htmlFor="points">Points:</label>
                       <input
                         type="number"
-                        id="points"
-                        className="gb_input-field"
+                        id="gb_input-field"
                         placeholder='Enter Points'
                         onChange={(e) => setDeductedPoints(e.target.value)}
                       />
@@ -1135,7 +1168,7 @@ function GenerateInvoice() {
                   <div className='form-row'>
                     <div className='form-groups'>
                       <label>Mode of Payment</label>
-                      <select onChange={(e) => setPaymentMode(e.target.value)}>
+                      <select className='mt-[0.30rem]' onChange={(e) => setPaymentMode(e.target.value)}>
                         <option value="">Select Payment Mode</option>
                         <option value="cash">Cash</option>
                         <option value="upi">UPI</option>
@@ -1144,10 +1177,10 @@ function GenerateInvoice() {
                         <option value="other">Other</option>
                       </select>
                     </div>
-                    <div className='form-groups'>
+                    {/* <div className='form-groups'>
                     <label>Discount</label>
                     <input type="number" placeholder='Enter Discount' onChange={(e) => setDiscount(e.target.value)} />
-                  </div>
+                  </div> */}
                     <div className='form-groups'>
                       <label>Comments</label>
                       <input type="text" placeholder='Enter Comments' onChange={(e) => setComments(e.target.value)} />
@@ -1160,8 +1193,7 @@ function GenerateInvoice() {
                   <label htmlFor="gstNumber" style={{ marginRight: '25px' }}>GST No:</label>
                   <input
                     type="text"
-                    id="gstNumber"
-                    className="gb_input-field"
+                    id="gb_input-field"
                     placeholder='Enter GST Number'
                     required
                     onChange={(e) => setGSTNumber(e.target.value)}
@@ -1171,7 +1203,7 @@ function GenerateInvoice() {
 
               {/* Generate Invoice Button */}
               <div className='button-row'>
-                <button className='generate-button-invoice' onClick={handleGenerateInvoice}>Create Invoice</button>
+                <button className='generate-button-invoice mt-4' onClick={handleGenerateInvoice}>Create Invoice</button>
               </div>
             </div>
           </div>
