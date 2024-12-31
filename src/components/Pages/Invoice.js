@@ -425,7 +425,7 @@ const handlePriceBlur = (index, value) => {
   }, [grand_total, Minimum]);
 
 
-  const bname = atob(localStorage.getItem('branch_name'));  
+  const bname = localStorage.getItem('branch_name');  
 
   const final_price = Math.ceil(parseFloat(grand_total) - parseFloat(deductedPoint));
 
