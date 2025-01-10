@@ -31,6 +31,7 @@ import "./index.css"; // Assuming you have global styles
 import ExpensesManagement from './components/Pages/ExpenseMnt';
 import ExpenseSetting from './components/Pages/ExpenseSetting';
 import Damo from './components/Pages/Damo';
+import CustomerLoyality from './components/Pages/CustomerLoyality';
 
 function App() {
   const isLoggedIn = Cookies.get('loggedIn') === 'true';
@@ -66,9 +67,7 @@ function App() {
             <Route path="/:salon_name/:branchName/expense" element={<ExpensesManagement />} />
             <Route path="/:salon_name/:branchName/expenseSetting" element={<ExpenseSetting />} />
             <Route path="/:salon_name/:branchName/demo" element={<Damo />} />
-
-
-
+            <Route path="/:salon_name/:branchName/customer-loyality" element={<CustomerLoyality />} />
           </Route>
           
           <Route path="*" element={<ErrorPage />} />

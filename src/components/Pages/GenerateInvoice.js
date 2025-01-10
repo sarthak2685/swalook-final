@@ -272,7 +272,7 @@ function GenerateInvoice() {
 
 
 
-  console.log('Selected salon:', sname);
+  console.log('Selected salon:', servicesTableData);
   console.log(staffData)
 
 

@@ -46,7 +46,7 @@ body {
   font-size: 18px;
   color: red;
   position: absolute; /* Position it relative to the header */
-  left: 140px; /* Position to the right */
+  left: 20rem; /* Position to the right */
   bottom:0px;
   padding-top: 20px;
 }
