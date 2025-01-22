@@ -71,20 +71,7 @@ html, body {
   flex-direction: column;
 }
 
-/* Standard Input Styles */
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="tel"],
-textarea {
-  width: 100%; /* Full width */
-  padding: 10px;
-  border: 1px solid #CFD3D4; /* Light border */
-  border-radius: 8px; /* Rounded corners */
-  margin: 5px 0 10px; /* Vertical margin */
-  transition: border-color 0.3s ease; /* Transition for focus effect */
-  font-size: 1rem; /* Consistent font size */
-}
+
 
 /* Select Field Styles */
 .appoint_select-field-cont {
@@ -118,14 +105,6 @@ textarea {
     align-items: flex-start; /* Align footer to the left */
   }
 
-  input[type="text"],
-  input[type="number"],
-  input[type="email"],
-  input[type="tel"],
-  textarea,
-  .appoint_select-field-cont select {
-    font-size: 0.9rem; /* Slightly smaller font on mobile */
-  }
 }
 .generate-button{
   height: 60px;

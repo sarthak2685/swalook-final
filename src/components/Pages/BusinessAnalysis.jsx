@@ -72,25 +72,28 @@ function BusinessAnalysis() {
     const fetchData = async () => {
       try {
         let url = `${config.apiUrl}/api/swalook/business-analysis/service/`;
-
-        // Determine the correct URL based on selected period (weekly, monthly, or yearly)
+  
+        // Build the URL dynamically based on selected period
         if (selectedPeriod === "Weekly") {
           url += `?branch_name=${bid}&week=${currentWeek}&month=${currentMonth}&year=${currentYear}`;
         } else if (selectedPeriod === "Monthly") {
-          url += `?branch_name=${bid}&month=${currentMonth}&year=${currentYear}`; // Corrected line
+          url += `?branch_name=${bid}&month=${currentMonth}&year=${currentYear}`;
         } else if (selectedPeriod === "Yearly") {
           url += `?branch_name=${bid}&year=${currentYear}`;
         }
-
+  
+        // Fetch the data
         const response = await fetch(url, {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
         });
-
+  
+        // Parse the response
         const data = await response.json();
-
+  
+        // Check if the response structure is valid
         if (data?.data?.services_list) {
           setSalesData(data.data); // Save the response data for later use
         } else {
@@ -100,7 +103,7 @@ function BusinessAnalysis() {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
   }, [
     token,
@@ -109,13 +112,11 @@ function BusinessAnalysis() {
     currentYear,
     selectedPeriod,
     bid,
-  ]); // Ensure bid is included in dependencies if it's coming from props or state
+  ]);
+  
 
   const donutChartData = useMemo(() => {
-    if (
-      !salesData?.services_list ||
-      Object.keys(salesData.services_list).length === 0
-    ) {
+    if (!salesData?.services_list || Object.keys(salesData.services_list).length === 0) {
       return {
         series: [1], // Fallback series data to render the donut chart with a default value
         options: {
@@ -162,52 +163,60 @@ function BusinessAnalysis() {
         },
       };
     }
-
+  
     const salesPerServiceData = salesData.services_list;
-    const totalSales = Object.values(salesPerServiceData).reduce(
-      (sum, value) => sum + value,
-      0
+    
+    // Calculate the total revenue
+    const totalRevenue = Object.values(salesPerServiceData).reduce(
+      (sum, service) => sum + service.revenue, 0
     );
-
+  
     const otherServices = {
       label: "Other",
       value: 0,
     };
-
+  
     const filteredServices = Object.entries(salesPerServiceData).reduce(
-      (acc, [service, value]) => {
-        const percentage = (value / totalSales) * 100;
+      (acc, [service, { revenue }]) => {
+        const percentage = (revenue / totalRevenue) * 100;
         if (percentage < 5) {
-          otherServices.value += value; // Accumulate the values for "Other"
+          otherServices.value += revenue; // Accumulate the values for "Other"
         } else {
-          acc.push({ label: service, value });
+          acc.push({ label: service, value: revenue });
         }
         return acc;
       },
       []
     );
-
+  
     if (otherServices.value > 0) {
       filteredServices.push(otherServices); // Add "Other" if there are services under 5%
     }
-
+  
     // Prepare series and labels
     const series = filteredServices.map((service) => service.value);
-    const labels = filteredServices.map((service) => service.label);
-
+    const labels = filteredServices.map((service) => `${service.label}: Rs. ${service.value.toLocaleString()}`);
+  
     return {
-      series: series, // Actual series data
+      series: series, // Actual series data based on revenue
       options: {
         chart: {
           type: "donut",
           width: "100%",
         },
-        labels: labels, // Actual labels
+        labels: labels, // Labels corresponding to the services
         plotOptions: {
           pie: {
             donut: {
               size: "70%",
             },
+          },
+        },
+        dataLabels: {
+          enabled: true, // Enable data labels
+          formatter: function (val, opts) {
+            const revenue = opts.w.globals.series[opts.seriesIndex]; // Get the total revenue for the current segment
+            return `₹${revenue.toLocaleString()}`; // Display revenue amount in place of percentage
           },
         },
         legend: {
@@ -243,7 +252,9 @@ function BusinessAnalysis() {
     };
   }, [salesData]);
 
-  const fetchChartData = async () => {
+
+
+    const fetchChartData = async () => {
     if (!selectedDate) return;
 
     const currentDate = new Date(selectedDate);
@@ -807,259 +818,7 @@ function BusinessAnalysis() {
     }, [productData]); // Recalculate when productData changes
   
   
-    
   
-
-  
-
-  const demoData = {
-    // salesPerService: {
-    //   daily: {
-    //     series: [10, 20, 15],
-    //     options: {
-    //       labels: ["Hair Cut", "Shampoo", "Facial"],
-    //       legend: { position: "bottom" },
-    //       chart: { type: "donut" },
-    //     },
-    //   },
-    //   monthly: {
-    //     series: [120, 200, 150],
-    //     options: {
-    //       labels: ["Hair Cut", "Shampoo", "Facial"],
-    //       legend: { position: "bottom" },
-    //       chart: { type: "donut" },
-    //     },
-    //   },
-    //   yearly: {
-    //     series: [1440, 2400, 1800],
-    //     options: {
-    //       labels: ["Hair Cut", "Shampoo", "Facial"],
-    //       legend: { position: "bottom" },
-    //       chart: { type: "donut" },
-    //     },
-    //   },
-    // },
-    // salesPerProduct: {
-    //   daily: {
-    //     series: [8, 12, 9],
-    //     options: {
-    //       labels: ["Shampoo", "Face Wash", "Hair Wax"],
-    //       legend: { position: "bottom" },
-    //       chart: { type: "donut" },
-    //     },
-    //   },
-    //   monthly: {
-    //     series: [70, 110, 120],
-    //     options: {
-    //       labels: ["Shampoo", "Face Wash", "Hair Wax"],
-    //       legend: { position: "bottom" },
-    //       chart: { type: "donut" },
-    //     },
-    //   },
-    //   yearly: {
-    //     series: [900, 1400, 1180],
-    //     options: {
-    //       labels: ["Shampoo", "Face Wash", "Hair Wax"],
-    //       legend: { position: "bottom" },
-    //       chart: { type: "donut" },
-    //     },
-    //   },
-    // },
-    // salesPerCustomer: {
-    //   monthly: {
-    //     series: [
-    //       {
-    //         name: "Sales Per Customer",
-    //         data: [50, 75, 60, 90],
-    //       },
-    //     ],
-    //     options: {
-    //       chart: { type: "line" },
-    //       xaxis: { categories: ["Week 1", "Week 2", "Week 3", "Week 4"] },
-    //       stroke: { curve: "smooth" },
-    //     },
-    //   },
-    //   yearly: {
-    //     series: [
-    //       {
-    //         name: "Sales Per Customer",
-    //         data: [300, 400, 350, 450, 500, 480, 520, 600, 620, 590, 610, 650],
-    //       },
-    //     ],
-    //     options: {
-    //       chart: { type: "line" },
-    //       colors: ["#42a0fc"],
-    //       xaxis: {
-    //         categories: [
-    //           "Jan",
-    //           "Feb",
-    //           "Mar",
-    //           "Apr",
-    //           "May",
-    //           "Jun",
-    //           "Jul",
-    //           "Aug",
-    //           "Sep",
-    //           "Oct",
-    //           "Nov",
-    //           "Dec",
-    //         ],
-    //       },
-    //       stroke: {
-    //         curve: "smooth",
-    //         width: 5,
-    //         colors: ["#328cd2"],
-    //       },
-    //     },
-    //   },
-    // },
-    // overallSales: {
-    //   monthly: {
-    //     series: [
-    //       {
-    //         name: "Overall Sales",
-    //         data: [1200, 1500, 1300, 1600],
-    //       },
-    //     ],
-    //     options: {
-    //       chart: { type: "bar" },
-    //       colors: ["#42a0fc"],
-    //       xaxis: { categories: ["Week 1", "Week 2", "Week 3", "Week 4"] },
-    //       plotOptions: {
-    //         bar: {
-    //           horizontal: false,
-    //           columnWidth: "60%",
-    //           borderRadius: 5,
-    //         },
-    //       },
-    //       stroke: {
-    //         show: true,
-    //         width: 5,
-    //         colors: ["#328cd2"],
-    //       },
-    //       dataLabels: {
-    //         enabled: true,
-    //       },
-    //     },
-    //   },
-    //   yearly: {
-    //     series: [
-    //       {
-    //         name: "Overall Sales",
-    //         data: [
-    //           5000, 6200, 4800, 7000, 7200, 6000, 6500, 7500, 7700, 8100, 8500,
-    //           9000,
-    //         ],
-    //       },
-    //     ],
-    //     options: {
-    //       chart: { type: "bar" },
-    //       colors: ["#42a0fc"],
-    //       xaxis: {
-    //         categories: [
-    //           "Jan",
-    //           "Feb",
-    //           "Mar",
-    //           "Apr",
-    //           "May",
-    //           "Jun",
-    //           "Jul",
-    //           "Aug",
-    //           "Sep",
-    //           "Oct",
-    //           "Nov",
-    //           "Dec",
-    //         ],
-    //       },
-    //       plotOptions: {
-    //         bar: {
-    //           horizontal: false,
-    //           columnWidth: "60%",
-    //           borderRadius: 5,
-    //         },
-    //       },
-    //       stroke: {
-    //         show: true,
-    //         width: 5,
-    //         colors: ["#328cd2"],
-    //       },
-    //       dataLabels: {
-    //         enabled: false,
-    //       },
-    //     },
-    //   },
-    // },
-    // salesPerDay: {
-    //   perEmployee: {
-    //     series: [
-    //       {
-    //         name: "Sales Per Day",
-    //         data: [500, 700, 600, 800, 750],
-    //       },
-    //     ],
-    //     options: {
-    //       chart: { type: "bar" },
-    //       colors: ["#42a0fc"],
-
-    //       xaxis: {
-    //         categories: [
-    //           "Employee A",
-    //           "Employee B",
-    //           "Employee C",
-    //           "Employee D",
-    //           "Employee E",
-    //         ],
-    //       },
-    //       plotOptions: {
-    //         bar: {
-    //           horizontal: false,
-    //           columnWidth: "60%",
-    //           borderRadius: 5,
-    //         },
-    //       },
-    //       stroke: {
-    //         show: true,
-    //         width: 5,
-    //         colors: ["#328cd2"],
-    //       },
-    //     },
-    //   },
-    //   perCustomer: {
-    //     series: [
-    //       {
-    //         name: "Sales Per Day",
-    //         data: [300, 500, 450, 600, 550],
-    //       },
-    //     ],
-    //     options: {
-    //       chart: { type: "bar" },
-    //       colors: ["#42a0fc"],
-
-    //       xaxis: {
-    //         categories: [
-    //           "Customer A",
-    //           "Customer B",
-    //           "Customer C",
-    //           "Customer D",
-    //           "Customer E",
-    //         ],
-    //       },
-    //       plotOptions: {
-    //         bar: {
-    //           horizontal: false,
-    //           columnWidth: "60%",
-    //           borderRadius: 5,
-    //         },
-    //       },
-    //       stroke: {
-    //         show: true,
-    //         width: 5,
-    //         colors: ["#328cd2"],
-    //       },
-    //     },
-    //   },
-    // },
-  };
 
   return (
     <>
