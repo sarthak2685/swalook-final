@@ -1,374 +1,456 @@
-// CLP_Setting.js
 import React, { useState, useEffect } from 'react';
-import '../Styles/CLP_Setting.css';
-import Header from './Header';
-import CLP from '../../assets/crm.png';
 import { Helmet } from 'react-helmet';
-import AddIcon from '@mui/icons-material/Add';
-import config from '../../config';
 import axios from 'axios';
-import CircularProgress from '@mui/material/CircularProgress';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import EditIcon from '@mui/icons-material/Edit';
-import Modal from './Modal';
+import config from '../../config';
+import Header from './Header';
 import VertNav from './VertNav';
+
 
 function CLP_Setting() {
   const [fetchedRows, setFetchedRows] = useState([]);
-  const [newRows, setNewRows] = useState([]);
-  const [threshold, setThreshold] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [edit, setEdit] = useState(null);
-  const [editValues, setEditValues] = useState({ type: '', points: '', expiry: '', charges: '' });
+  const [couponRows, setCouponRows] = useState([]);
   const bid = localStorage.getItem('branch_id');
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    membershipName: "",
+    charges: "",
+    expiry: "",
+    benefit: "",
+    isActive: false,
+  });
+
+  const [couponFormData, setCouponFormData] = useState({
+    couponName: "",
+    charges: "",
+    balance: "",
+    isActive: false,
+  });
+
+  const handleOpenModal = () => setModalOpen(true);
+  const handleCloseModal = () => setModalOpen(false);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSave = () => {
+    console.log("Form Data:", formData);
+    setModalOpen(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      const branchName = localStorage.getItem('branch_name');
       const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/view/?branch_name=${bid}`;
-      
       try {
         const response = await axios.get(apiEndpoint, {
           headers: {
-            'Authorization': `Token ${localStorage.getItem('token')}`,
+            Authorization: `Token ${localStorage.getItem('token')}`,
           },
         });
-        console.log("responseeee--",response.data.data)
         if (response.data.status) {
           setFetchedRows(response.data.data);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-      } 
+      }
     };
 
     fetchData();
-  }, []);
+  }, [bid]);
 
-  const handleInputChange = (index, field, value) => {
-    const updatedNewRows = [...newRows];
-    updatedNewRows[index] = { ...updatedNewRows[index], [field]: value };
-    setNewRows(updatedNewRows);
+  const [showCouponModal, setShowCouponModal] = useState(false);
+
+  const handleOpenCouponModal = () => {
+    setShowCouponModal(true);
   };
 
-  const handleThresholdChange = (e) => {
-    setThreshold(Number(e.target.value));
+  const handleCloseCouponModal = () => {
+    setShowCouponModal(false);
   };
-
-  const handleAddRow = () => {
-    setNewRows([...newRows, { type: '', points: '', expiry: '', charges: '' }]);
-  };
-
-  const handleSave = async () => {
-    const branchName = localStorage.getItem('branch_name');
-    const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/?branch_name=${bid}`;
-
-    setLoading(true);
-
-    try {
-      if (newRows.length > 0) {
-        const response = await axios.post(apiEndpoint, {
-          json_data: newRows,
-          branch_name: atob(branchName),
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${localStorage.getItem('token')}`,
-          },
-        });
-
-        console.log('Success:', response.data);
-        console.log('Error:', newRows)
-        setNewRows([]); // Clear new rows after save
-      } else {
-        console.log('No new rows to save.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/?id=${id}`;
-    
-    try {
-      await axios.delete(apiEndpoint, {
-        headers: {
-          'Authorization': `Token ${localStorage.getItem('token')}`,
-        },
-      });
-      setFetchedRows(fetchedRows.filter(row => row.id !== id));
-    } catch (error) {
-      console.error('Error deleting row:', error);
-    }
-  };
-  const [Minimum , setMinimum] = useState(0);
 
   useEffect(() => {
-    const fetchAmount = async () => {
-      const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/get_minimum_value/?branch_name=${bid}`;
+    const fetchCouponData = async () => {
+      const apiEndpoint = `${config.apiUrl}/api/swalook/coupon/?branch_name=${bid}`;
       try {
         const response = await axios.get(apiEndpoint, {
           headers: {
-            'Authorization': `Token ${localStorage.getItem('token')}`,
+            Authorization: `Token ${localStorage.getItem('token')}`,
           },
         });
         if (response.data.status) {
-          setMinimum(response.data.data);
-          setThreshold(response.data.data);
+          setCouponRows(response.data.data);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
-      } 
-    }
-    fetchAmount();
-  }, []);
-  
-  const handleThresholdSave = async () => {
-    setLoading(true);
-    handleSave();
-    const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/get_minimum_value/?branch_name=${bid}`;
-  
-    try {
-      const response = await axios.post(apiEndpoint, {
-        minimum_amount: threshold, 
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${localStorage.getItem('token')}`,
-        },
-      });
-  
-      console.log('Threshold saved successfully:', response.data);
-      setThreshold(response.data.minimum_amount); 
-      window.location.reload();
-  
-    } catch (error) {
-      console.error('Error saving threshold:', error);
-    } finally {
-      setLoading(false); 
-    }
-  };
-  
-
-  const handleEditClick = (row) => {
-    setEdit(row.id);
-    setEditValues({
-      type: row.program_type,
-      points: row.points_hold,
-      expiry: row.expiry_duration,
-      charges: row.price,
-    });
-  };
-
-  const handleEditSave = async (id) => {
-    if (!editValues.type || !editValues.points || !editValues.expiry || !editValues.charges) {
-      alert('Please fill all fields.');
-      return;
-    }
-  
-    setLoading(true);
-    const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/?id=${id}&branch_name=${bid}`;
-    
-  
-    const newRows = [
-      {
-        type: editValues.type,
-        points: editValues.points,
-        expiry: editValues.expiry,
-        charges: editValues.charges,
+        console.error('Error fetching coupon data:', error);
       }
-    ];
-    console.log('editValues.charges:', editValues.charges); 
+    };
 
-  
+    fetchCouponData();
+  }, [bid]);
+
+  const handleSaveMembership = async () => {
+    const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/`;
+    const payload = {
+      program_type: formData.membershipName,
+      price: formData.charges,
+      expiry_duration: formData.expiry,
+      benefits: formData.benefit,
+      active: formData.isActive,
+      branch_id: bid,
+    };
+
     try {
-      console.log('Sending data to API:', newRows);  
-  
-      const response = await axios.put(apiEndpoint, {
-        json_data: newRows,  
-      }, {
+      const response = await axios.post(apiEndpoint, payload, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${localStorage.getItem('token')}`,
+          Authorization: `Token ${localStorage.getItem('token')}`,
         },
       });
-  
-      setNewRows([]);  
-      console.log('Edit success:', response.data);
-  
-      // Update the fetchedRows state with the updated row
-      setFetchedRows(fetchedRows.map(row => (row.id === id ? response.data : row)));
-  
-      setEdit(null);
+      if (response.data.status) {
+        setFetchedRows((prev) => [...prev, response.data.data]);
+        setModalOpen(false);
+        setFormData({
+          membershipName: "",
+          charges: "",
+          expiry: "",
+          benefit: "",
+          isActive: false,
+        });
+      }
     } catch (error) {
-      console.error('Error updating data:', error);  // Debugging log
-    } finally {
-      setLoading(false);
+      console.error('Error saving membership:', error);
     }
   };
-  
-  
 
-  const handleInputChangeEdit = (e) => {
-    const { name, value } = e.target;
-    setEditValues({
-      ...editValues,
-      [name]: value,
-    });
+  const handleSaveCoupon = async () => {
+    const apiEndpoint = `${config.apiUrl}/api/swalook/coupon/`;
+    const payload = {
+      coupon_name: couponFormData.couponName,
+      charges: couponFormData.charges,
+      balance: couponFormData.balance,
+      active: couponFormData.isActive,
+      branch_id: bid,
+    };
+
+    try {
+      const response = await axios.post(apiEndpoint, payload, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem('token')}`,
+        },
+      });
+      if (response.data.status) {
+        setCouponRows((prev) => [...prev, response.data.data]);
+        setShowCouponModal(false);
+        setCouponFormData({
+          couponName: "",
+          charges: "",
+          balance: "",
+          isActive: false,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving coupon:', error);
+    }
   };
+
 
   return (
     <>
-     <Header />
-     <VertNav/>
-    <div className='clp_setting_container'>
-      <Helmet>
-        <title>CLP Settings</title>
-      </Helmet>
-      <div className='clp_main'>
-        <div className='clp_settings_content'>
-          <h1 className='clp_settings_heading'>Customer Loyalty Programme Settings</h1>
-          <hr className='clp_divider' />
-          <div className='clp_settings_body'>
-            <div className='clps_table_container'>
-              <table>
+      <Header />
+      <VertNav />
+
+      <div className="flex min-h-screen">
+        <div className="flex-1 bg-gray-100 p-6 md:ml-72 ml-0">
+          <Helmet>
+            <title>CLP Settings</title>
+          </Helmet>
+
+          <div className="mx-auto bg-white rounded-lg shadow-md p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-700 mb-2 sm:mb-0">
+                Memberships
+              </h1>
+              <button
+                onClick={handleOpenModal}
+                className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                + New Membership
+              </button>
+
+            </div>
+            {isModalOpen && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Membership</h2>
+                    <button onClick={handleCloseModal} className="text-5xl hover:text-black text-red-700">
+                      &times;
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      name="membershipName"
+                      value={formData.membershipName}
+                      onChange={handleInputChange}
+                      placeholder="Membership Name"
+                      className="w-full border rounded-lg px-3 py-2"
+                    />
+                    <input
+                      type="number"
+                      name="charges"
+                      value={formData.charges}
+                      onChange={handleInputChange}
+                      placeholder="Charges"
+                      className="w-full border rounded-lg px-3 py-2"
+                    />
+                    <input
+                      type="number"
+                      name="expiry"
+                      value={formData.expiry}
+                      onChange={handleInputChange}
+                      placeholder="Expiry (in Months)"
+                      className="w-full border rounded-lg px-3 py-2"
+                    />
+                    <select
+                      name="benefit"
+                      value={formData.benefit}
+                      onChange={handleInputChange}
+                      className="w-full border rounded-lg px-3 py-2"
+                    >
+                      <option value="">Select Benefit</option>
+                      <option value="Points Balance">Points Balance per Rs. 100</option>
+                      <option value="Discount">Discount & Limit</option>
+                    </select>
+                    {formData.benefit === "Points Balance" && (
+                      <input
+                        type="number"
+                        name="pointsBalance"
+                        value={formData.pointsBalance || ""}
+                        onChange={handleInputChange}
+                        placeholder="Points per Rs. 100 spent"
+                        className="w-full border rounded-lg px-3 py-2"
+                      />
+                    )}
+                    {formData.benefit === "Discount" && (
+                      <>
+                        <input
+                          type="number"
+                          name="discountPercentage"
+                          value={formData.discountPercentage || ""}
+                          onChange={handleInputChange}
+                          placeholder="Discount %"
+                          className="w-full border rounded-lg px-3 py-2"
+                        />
+                        <input
+                          type="number"
+                          name="limit"
+                          value={formData.limit || ""}
+                          onChange={handleInputChange}
+                          placeholder="Limit"
+                          className="w-full border rounded-lg px-3 py-2"
+                        />
+                      </>
+                    )}
+                    <label className="flex flex-row text-xl space-x-2">
+                      <input
+                        type="checkbox"
+                        name="isActive"
+                        checked={formData.isActive}
+                        onChange={handleInputChange}
+                        className="form-checkbox text-blue-600"
+                      />
+                      <span>Active</span>
+                    </label>
+                  </div>
+
+                  <button
+                    onClick={handleSaveMembership}
+                    className="w-full mt-4 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border rounded-lg">
                 <thead>
-                  <tr>
-                    <th>Membership Type</th>
-                    <th>Point balance added per Rs.100</th>
-                    <th>Expiry (months)</th>
-                    <th>Charges</th>
-                    <th></th>
-                    <th></th>
+                  <tr className="bg-gray-200 text-left text-gray-600">
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
+                      Membership Name
+                    </th>
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
+                      Expiry (in Months)
+                    </th>
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
+                      Charges
+                    </th>
+                    {/* <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
+                      GST %
+                    </th> */}
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
+                      Benefits
+                    </th>
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
+                      Active
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {fetchedRows.map((row) => (
-                    row.program_type === 'None'?null:(
-                    <tr key={row.id}>
-                      <td>{row.program_type}</td>
-                      <td>{row.points_hold}</td>
-                      <td>{row.expiry_duration}</td>
-                      <td>{row.price}</td>
-                      <td>
-                        <DeleteIcon 
-                          onClick={() => handleDelete(row.id)} 
-                          style={{ cursor: 'pointer' }} 
-                        />
+                    <tr key={row.id} className="border-b">
+                      <td className="py-3 px-4 text-xs sm:text-xl font-semibold text-gray-700">
+                        {row.program_type}
                       </td>
-                      <td>
-                        <EditIcon 
-                          onClick={() => handleEditClick(row)} 
-                          style={{ cursor: 'pointer' }} 
-                        />
+                      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                        {row.expiry_duration}
                       </td>
-                    </tr>
-                    )
-                  ))}
-                  {newRows.map((row, index) => (
-                    <tr key={`new-${index}`}>
-                      <td
-                        contentEditable
-                        onBlur={(e) => handleInputChange(index, 'type', e.target.innerText)}
-                      >
-                        {row.type}
+                      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                        Rs. {row.price}
                       </td>
-                      <td
-                        contentEditable
-                        onBlur={(e) => handleInputChange(index, 'points', e.target.innerText)}
-                      >
-                        {row.points}
+                      {/* <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                        {row.gst || '-'}
+                      </td> */}
+                      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                        {row.benefits}
                       </td>
-                      <td
-                        contentEditable
-                        onBlur={(e) => handleInputChange(index, 'expiry', e.target.innerText)}
-                      >
-                        {row.expiry}
-                      </td>
-                      <td
-                        contentEditable
-                        onBlur={(e) => handleInputChange(index, 'charges', e.target.innerText)}
-                      >
-                        {row.charges}
-                      </td>
-                      <td>
-                        {
-                          loading ? <CircularProgress size={24} /> :
-                          <SaveIcon onClick={handleSave} style={{ cursor: 'pointer' }} />
-                        }
+                      <td className="py-3 px-4 text-xs sm:text-xl">
+                        <span
+                          className={`inline-block w-20 px-3 py-1 border rounded-lg text-xs font-medium text-white text-center ${row.active ? 'bg-green-500 border-green-500' : 'bg-red-500 border-red-500'
+                            }`}
+                        >
+                          {row.active ? 'Active' : 'Inactive'}
+                        </span>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <div className='clp_add_row' style={{ cursor: 'pointer' }} onClick={handleAddRow}>
-                <AddIcon />
-                <span>Add Row</span>
-              </div>
-              <div className='clp_threshold_container'>
-                <label htmlFor='threshold'>Set Minimum Amount:</label>
-                <input
-                  type='number'
-                  id='threshold'
-                  value={threshold}
-                  onChange={handleThresholdChange}
-                  className='clp_threshold_input'
-                  placeholder='Enter amount'
-                />
-              </div>
-              <button className='save_button' onClick={handleThresholdSave}>
-                {loading ? <CircularProgress size={24} /> : 'Save'}
+            </div>
+          </div>
+
+          <div className="mx-auto bg-white rounded-lg shadow-md p-6 mt-8">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-700 mb-2 sm:mb-0">
+                Coupons
+              </h1>
+              <button
+                onClick={handleOpenCouponModal}
+                className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                + New Coupons
               </button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border rounded-lg">
+                <thead>
+                  <tr className="bg-gray-200 text-left text-gray-600">
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Coupon Name</th>
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Expiry (in Months)</th>
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Charges</th>
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Balance</th>
+                    {/* <th className="py-3 px-4 font-semibold text-xs sm:text-xl">GST %</th> */}
+                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Active</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {couponRows.map((coupon) => (
+                    <tr key={coupon.id} className="border-b">
+                      <td className="py-3 px-4 text-xs sm:text-xl font-semibold text-gray-700">
+                        {coupon.coupon_name}
+                      </td>
+                      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                        {coupon.expiry_duration}
+                      </td>
+                      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                        Rs. {coupon.charges}
+                      </td>
+                      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                        Rs. {coupon.balance}
+                      </td>
+                      {/* <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                        {coupon.gst || '-'}
+                      </td> */}
+                      <td className="py-3 px-4 text-xs sm:text-xl">
+                        <span
+                          className={`inline-block w-20 px-3 py-1 border rounded-lg text-xs font-medium text-white text-center ${coupon.active ? 'bg-green-500 border-green-500' : 'bg-red-500 border-red-500'
+                            }`}
+                        >
+                          {coupon.active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {showCouponModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                  <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+                    <button
+                      className="absolute top-4 right-4 text-5xl hover:text-black text-red-700"
+                      onClick={handleCloseCouponModal}
+                    >
+                      &times;
+                    </button>
+                    <h3 className="text-xl font-semibold mb-4 text-center">Coupon</h3>
+                    <form>
+                      <div className="mb-4">
+                        <input
+                          type="text"
+                          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-blue-500"
+                          placeholder="Enter coupon name"
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <input
+                          type="text"
+                          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-blue-500"
+                          placeholder="Enter charges"
+                          onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9]/g, ""))}
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <input
+                          type="text"
+                          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-blue-500"
+                          placeholder="Enter balance"
+                          onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9]/g, ""))}
+                        />
+                      </div>
+                      <div className="mb-6 flex items-center">
+                        <input
+                          type="checkbox"
+                          className="h-5 w-5 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
+                          id="activeCheckbox"
+                        />
+                        <label
+                          htmlFor="activeCheckbox"
+                          className="ml-2 text-gray-700 font-medium text-xl"
+                        >
+                          Active
+                        </label>
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
+                        onClick={handleSaveCoupon}
+                      >
+                        Save
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-      <Modal isOpen={edit !== null} onClose={() => setEdit(null)}>
-        {/* <h2>Edit Row</h2> */}
-        <label>
-          Membership Type:
-          <input 
-            type='text' 
-            name='type' 
-            value={editValues.type} 
-            onChange={handleInputChangeEdit} 
-          />
-        </label>
-        <label>
-          Point balance added per Rs.100:
-          <input 
-            type='text' 
-            name='points' 
-            value={editValues.points} 
-            onChange={handleInputChangeEdit} 
-          />
-        </label>
-        <label>
-          Expiry (months):
-          <input 
-            type='text' 
-            name='expiry' 
-            value={editValues.expiry} 
-            onChange={handleInputChangeEdit} 
-          />
-        </label>
-        <label>
-          Charges:
-          <input 
-            type='text' 
-            name='charges' 
-            value={editValues.charges} 
-            onChange={handleInputChangeEdit} 
-          />
-        </label>
-        <button onClick={() => handleEditSave(edit)}>Save Changes</button>
-        <button onClick={() => setEdit(null)}>Cancel</button>
-      </Modal>
-    </div>
     </>
   );
 }

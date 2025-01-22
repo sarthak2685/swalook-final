@@ -14,6 +14,9 @@ import {
   AccountBalanceWallet,
 } from "@mui/icons-material";
 import Logo from "../../assets/header_crm_logo.webp";
+import { CardGiftcard as CardGiftcardIcon } from '@mui/icons-material';
+
+
 
 const NavItem = ({ to, icon: Icon, label, disabled, isActive, onClick }) => {
   const disabledStyle = disabled ? "pointer-events-none opacity-50" : "";
@@ -178,7 +181,7 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
             handleLinkClick("inventory", `/${sname}/${branchName}/inventory`)
           }
         />
-        <NavItem
+        {/* <NavItem
           to={`/${sname}/${branchName}/clp`}
           icon={CardMembershipIcon}
           label="Customers"
@@ -187,7 +190,7 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
           onClick={() =>
             handleLinkClick("customers", `/${sname}/${branchName}/clp`)
           }
-        />
+        /> */}
 
         {userType !== "staff" && (
           <NavItem
@@ -217,6 +220,16 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
           isActive={activeLink === "expense"}
           onClick={() =>
             handleLinkClick("expense", `/${sname}/${branchName}/expense`)
+          }
+        />
+         <NavItem
+          to={`/${sname}/${branchName}/customer-loyality`}
+          icon={CardGiftcardIcon}
+          label="Customer Loyality"
+          disabled={userType === "staff"}
+          isActive={activeLink === "customer-loyality"}
+          onClick={() =>
+            handleLinkClick("customer-loyality", `/${sname}/${branchName}/customer-loyality`)
           }
         />
       </div>

@@ -22,7 +22,7 @@ body {
   border: 1px solid #ccc;
   max-width: 90%;
   border-radius: 5px;
-  padding: 20px;
+  padding: 25px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   position: relative;
 }
@@ -37,6 +37,7 @@ body {
 .ac_popup_title {
   margin: 0;
   flex-grow: 1; /* Allow title to take up available space */
+  font:bold;
 }
 
 .ac_close_button {
@@ -46,7 +47,7 @@ body {
   font-size: 18px;
   color: red;
   position: absolute; /* Position it relative to the header */
-  left: 140px; /* Position to the right */
+  left: 20rem; /* Position to the right */
   bottom:0px;
   padding-top: 20px;
 }
@@ -71,6 +72,7 @@ body {
   margin-right: 10px; /* Space between label and input */
   font-size: 15px;
   width: 120px; /* Fixed width for labels */
+  font-weight: bold;
 }
 
 .ac_field input {
@@ -83,7 +85,7 @@ body {
 }
 
 .ac_field input:focus {
-  border-color: #666;
+  border-color: black;
 }
 
 .ac_button_container {
