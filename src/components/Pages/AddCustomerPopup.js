@@ -17,6 +17,8 @@ function AddCustomerPopup({ onClose }) {
   const branchName = localStorage.getItem('branch_name');
   const sname = localStorage.getItem('s-name');
   const bid = localStorage.getItem('branch_id');
+  const [dob, setDob] = useState('');  
+  const [doa, setDoa] = useState('');
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -33,7 +35,9 @@ function AddCustomerPopup({ onClose }) {
           name: customerName,
           mobile_no: customerNumber,
           email: email,
-          membership: 'None'
+          membership: 'None',
+          d_o_b: dob, 
+          d_o_a: doa,
         }),
       });
 
@@ -57,7 +61,7 @@ function AddCustomerPopup({ onClose }) {
     <div className="ac_popup_overlay">
       <div className="ac_popup_container">
         <div className="ac_popup_header">
-          <h3 className="ac_popup_title">Add Customer</h3>
+          <h3 className="ac_popup_title font-bold ">Add Customer</h3>
           <button className="ac_close_button" onClick={onClose}>
             <HighlightOffOutlinedIcon style={{ fontSize: '24px', color: 'red' }} />
           </button>
@@ -65,7 +69,7 @@ function AddCustomerPopup({ onClose }) {
         <hr className="ac_divider"/>
         <form onSubmit={handleSubmit}>
           <div className="ac_field">
-            <label htmlFor="customer_name">Name:</label>
+            <label htmlFor="customer_name" >Name:</label>
             <input 
               type="text" 
               id="customer_name" 
@@ -94,6 +98,26 @@ function AddCustomerPopup({ onClose }) {
               name="email"
               placeholder="Email Address"
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="ac_field">
+            <label htmlFor="dob">DOB:</label>
+            <input
+              type="date"
+              id="dob"
+              name="dob"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+            />
+          </div>
+          <div className="ac_field">
+            <label htmlFor="doa">DOA:</label>
+            <input
+              type="date"
+              id="doa"
+              name="doa"
+              value={doa}
+              onChange={(e) => setDoa(e.target.value)}
             />
           </div>
           <div className="ac_button_container">

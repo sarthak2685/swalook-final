@@ -31,7 +31,11 @@ import "./index.css"; // Assuming you have global styles
 import ExpensesManagement from './components/Pages/ExpenseMnt';
 import ExpenseSetting from './components/Pages/ExpenseSetting';
 import Damo from './components/Pages/Damo';
+<<<<<<< HEAD
 import CustomerLoyality from './components/Pages/CustomerLoyality';
+=======
+import ViewAllInvoices from './components/Pages/ViewAllInvoice';
+>>>>>>> 313996e89fc54ee5c79ea2bfff62defe0291a3d4
 
 function App() {
   const isLoggedIn = Cookies.get('loggedIn') === 'true';
@@ -53,6 +57,7 @@ function App() {
             <Route path="/:salon_name/:branchName/appointment" element={<Appointment />} />
             <Route path="/:salon_name/:branchName/settings/personalInformation" element={<PersonalInformation />} />
             <Route path="/:salon_name/:branchName/generatebill" element={<GenerateInvoice />} />
+            <Route path="/:salon_name/:branchName/view-all-invoices" element={<ViewAllInvoices />} />
             <Route path="/:salon_name/:branchName/:slno/invoice" element={<Invoice />} />
             <Route path="/:salon_name/:branchName/viewinvoice/:id" element={<ViewInvoice />} />
             <Route path="/:salon_name/:branchName/analysis" element={<BusinessAnalysis />} />

@@ -8,53 +8,7 @@ import VertNav from './VertNav';
 
 function CLP_Setting() {
   const [fetchedRows, setFetchedRows] = useState([]);
-  const [couponRows, setCouponRows] = useState([ // Dummy data for coupons
-    {
-      id: 1,
-      coupon_name: 'Gold',
-      expiry_duration: 6,
-      charges: 500,
-      balance: 600,
-      gst: 18,
-      active: false,
-    },
-    {
-      id: 2,
-      coupon_name: 'Silver',
-      expiry_duration: 4,
-      charges: 1000,
-      balance: 1100,
-      gst: '-',
-      active: true,
-    },
-    {
-      id: 3,
-      coupon_name: 'Platinum',
-      expiry_duration: 6,
-      charges: 400,
-      balance: 500,
-      gst: 18,
-      active: true,
-    },
-    {
-      id: 4,
-      coupon_name: 'Ruby',
-      expiry_duration: 3,
-      charges: 2000,
-      balance: 2500,
-      gst: '-',
-      active: true,
-    },
-    {
-      id: 5,
-      coupon_name: 'Emerald',
-      expiry_duration: 2,
-      charges: 5000,
-      balance: 6000,
-      gst: 18,
-      active: true,
-    },
-  ]);
+  const [couponRows, setCouponRows] = useState([]);
   const bid = localStorage.getItem('branch_id');
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -63,6 +17,13 @@ function CLP_Setting() {
     charges: "",
     expiry: "",
     benefit: "",
+    isActive: false,
+  });
+
+  const [couponFormData, setCouponFormData] = useState({
+    couponName: "",
+    charges: "",
+    balance: "",
     isActive: false,
   });
 
@@ -111,6 +72,91 @@ function CLP_Setting() {
   const handleCloseCouponModal = () => {
     setShowCouponModal(false);
   };
+
+  useEffect(() => {
+    const fetchCouponData = async () => {
+      const apiEndpoint = `${config.apiUrl}/api/swalook/coupon/?branch_name=${bid}`;
+      try {
+        const response = await axios.get(apiEndpoint, {
+          headers: {
+            Authorization: `Token ${localStorage.getItem('token')}`,
+          },
+        });
+        if (response.data.status) {
+          setCouponRows(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching coupon data:', error);
+      }
+    };
+
+    fetchCouponData();
+  }, [bid]);
+
+  const handleSaveMembership = async () => {
+    const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/`;
+    const payload = {
+      program_type: formData.membershipName,
+      price: formData.charges,
+      expiry_duration: formData.expiry,
+      benefits: formData.benefit,
+      active: formData.isActive,
+      branch_id: bid,
+    };
+
+    try {
+      const response = await axios.post(apiEndpoint, payload, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem('token')}`,
+        },
+      });
+      if (response.data.status) {
+        setFetchedRows((prev) => [...prev, response.data.data]);
+        setModalOpen(false);
+        setFormData({
+          membershipName: "",
+          charges: "",
+          expiry: "",
+          benefit: "",
+          isActive: false,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving membership:', error);
+    }
+  };
+
+  const handleSaveCoupon = async () => {
+    const apiEndpoint = `${config.apiUrl}/api/swalook/coupon/`;
+    const payload = {
+      coupon_name: couponFormData.couponName,
+      charges: couponFormData.charges,
+      balance: couponFormData.balance,
+      active: couponFormData.isActive,
+      branch_id: bid,
+    };
+
+    try {
+      const response = await axios.post(apiEndpoint, payload, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem('token')}`,
+        },
+      });
+      if (response.data.status) {
+        setCouponRows((prev) => [...prev, response.data.data]);
+        setShowCouponModal(false);
+        setCouponFormData({
+          couponName: "",
+          charges: "",
+          balance: "",
+          isActive: false,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving coupon:', error);
+    }
+  };
+
 
   return (
     <>
@@ -223,7 +269,7 @@ function CLP_Setting() {
                   </div>
 
                   <button
-                    onClick={handleSave}
+                    onClick={handleSaveMembership}
                     className="w-full mt-4 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
                   >
                     Save
@@ -245,9 +291,9 @@ function CLP_Setting() {
                     <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
                       Charges
                     </th>
-                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
+                    {/* <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
                       GST %
-                    </th>
+                    </th> */}
                     <th className="py-3 px-4 font-semibold text-xs sm:text-xl">
                       Benefits
                     </th>
@@ -268,9 +314,9 @@ function CLP_Setting() {
                       <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
                         Rs. {row.price}
                       </td>
-                      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                      {/* <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
                         {row.gst || '-'}
-                      </td>
+                      </td> */}
                       <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
                         {row.benefits}
                       </td>
@@ -309,7 +355,7 @@ function CLP_Setting() {
                     <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Expiry (in Months)</th>
                     <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Charges</th>
                     <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Balance</th>
-                    <th className="py-3 px-4 font-semibold text-xs sm:text-xl">GST %</th>
+                    {/* <th className="py-3 px-4 font-semibold text-xs sm:text-xl">GST %</th> */}
                     <th className="py-3 px-4 font-semibold text-xs sm:text-xl">Active</th>
                   </tr>
                 </thead>
@@ -328,9 +374,9 @@ function CLP_Setting() {
                       <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
                         Rs. {coupon.balance}
                       </td>
-                      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                      {/* <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
                         {coupon.gst || '-'}
-                      </td>
+                      </td> */}
                       <td className="py-3 px-4 text-xs sm:text-xl">
                         <span
                           className={`inline-block w-20 px-3 py-1 border rounded-lg text-xs font-medium text-white text-center ${coupon.active ? 'bg-green-500 border-green-500' : 'bg-red-500 border-red-500'
@@ -393,6 +439,7 @@ function CLP_Setting() {
                       <button
                         type="submit"
                         className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
+                        onClick={handleSaveCoupon}
                       >
                         Save
                       </button>

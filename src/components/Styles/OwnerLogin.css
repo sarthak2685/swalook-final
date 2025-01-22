@@ -47,9 +47,18 @@ label {
   font-size: large;
   text-align: center; /* Center label text */
 }
-
-input[type="text"],
-input[type="password"] {
+#phone-number{
+  width: 100%; /* Full width */
+  max-width: 375px; /* Optional max width */
+  height: 58px; /* Fixed height */
+  padding: 8px 16px; /* Padding */
+  border-radius: 8px; /* Uniform rounded corners */
+  border: 1px solid #ccc; /* Add border color */
+  background-color: #fff; /* Solid background for visibility */
+  margin-top: 10px;
+  display: flex;
+}
+#password{
   width: 100%; /* Full width */
   max-width: 375px; /* Optional max width */
   height: 58px; /* Fixed height */
@@ -80,7 +89,7 @@ input[type="password"] {
   color: #888; /* Icon color */
 }
 
-input[type="password"] {
+#password{
   padding-left: 40px; /* Leave space for the icon */
 }
 
@@ -136,11 +145,17 @@ input[type="password"] {
     width: 100px; /* Adjust logo size for mobile */
   }
 
-  input[type="text"],
-  input[type="password"] {
+  #phone-number{
     width: 100%; /* Full width for smaller screens */
     padding-left: 16px; /* Adjust padding for smaller screens */
   }
+
+  #password{
+    width: 100%; /* Full width for smaller screens */
+    padding-left: 16px; /* Adjust padding for smaller screens */
+  }
+
+
 
   #btn {
     width: 100%; /* Full width for smaller screens */

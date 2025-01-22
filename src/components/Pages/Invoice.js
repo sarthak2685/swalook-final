@@ -51,14 +51,18 @@ function Invoice() {
 
     return `${month} ${day}, ${year}`;
   };
+  const GB = location.state.GBselectedServices;
+  console.log("abcd",GB)
+
 
   const isGST = location.state.isGST;
   const customer_name = location.state.customer_name;
   const mobile_no = location.state.mobile_no;
   const email = location.state.email;
   const services = location.state.GBselectedServices;
+ 
   const address = location.state.address;
-  const service_by = location.state.service_by;
+  const service_by = location.state.GBselectedServices;
   const discount = location.state.discount;
   const gst_number = location.state.gst_number;
   const comments = location.state.comments;
@@ -94,6 +98,13 @@ function Invoice() {
   const [productPrice, setProductPrice] = useState(0);
   const [productDetails, setProductDetails] = useState([]);
   const [producData, setProductData] = useState(location.state?.productData || []); // Default to empty array if not set
+
+ 
+const staffNames = service_by.map(service => 
+  service.staff.map(staffMember => staffMember.label) // Returns an array of staff names
+).flat();
+  
+  console.log("anusya is llocve",staffNames);
   
   const GST_RATE = 0.18; // 18% GST
   const CGST_RATE = GST_RATE / 2; // 9% CGST
@@ -425,7 +436,7 @@ const handlePriceBlur = (index, value) => {
   }, [grand_total, Minimum]);
 
 
-  const bname = atob(localStorage.getItem('branch_name'));  
+  const bname = localStorage.getItem('branch_name');  
 
   const final_price = Math.ceil(parseFloat(grand_total) - parseFloat(deductedPoint));
 
@@ -451,6 +462,7 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
       Quantity: quantities[index],
       Discount: discounts[index],
       Tax_amt: taxes[index],
+      Staff: staffNames[index],
       CGST: cgst[index],
       SGST: sgst[index],
       Total_amount: totalAmts[index],
@@ -510,7 +522,7 @@ const [invoiceGenerated, setInvoiceGenerated] = useState(false);
       email: email,
       services: JSON.stringify(newInvoice),
       address: address,
-      service_by: service_by.map(service => service.label).toString(),
+      service_by: '',
       total_prise: total_prise,
       total_quantity: total_quantity,
       total_discount: total_discount,
@@ -723,6 +735,7 @@ const handlePrint = async () => {
     isGST,
     gst_number,
     services,
+    // staff,
     membership,
     membershipPrice,
     membershipTax,
@@ -899,7 +912,7 @@ const handlePrint = async () => {
     
       // Create WhatsApp link
       const phoneNumber = `+91${mobile_no}`;
-      const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${atob(branchName)}.\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${atob(branchName)}\n\nClick on the link to download:: ${downloadURL}`;
+      const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${(sname)}.\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${(sname)}\n\nClick on the link to download:: ${downloadURL}`;
       const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     
       // Open WhatsApp link

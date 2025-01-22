@@ -45,9 +45,15 @@ display: block;
 margin-bottom: 5px;
 font-size: large;
 }
-
-input[type="text"],
-input[type="password"] {
+#phone-number{
+  width: 100%;
+  padding: 10px;
+  padding-right: 10vw;
+  font-size: medium;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  }
+#password{
 width: 100%;
 padding: 10px;
 padding-right: 10vw;

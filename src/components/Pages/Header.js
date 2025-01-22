@@ -23,6 +23,7 @@ function Header() {
   const userType = localStorage.getItem("type");
   const sname = localStorage.getItem("s-name");
   const branchName = localStorage.getItem("branch_name");
+  console.log("branchhh",sname)
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -71,7 +72,9 @@ function Header() {
     };
   }, []); 
 
-
+  const handleService = () => {
+    navigate(`/${sname}/${branchName}/service`);
+  };
 
 
 
@@ -152,7 +155,7 @@ function Header() {
               className="cursor-pointer p-2 bg-gray-100 rounded-md flex items-center gap-2"
               onClick={toggleBranchDropdown}
             >
-              <span>{selectedBranch || branchName}</span>
+              <span>{selectedBranch || sname}</span>
               <IoMdArrowDropdown />
             </div>
             {showBranchDropdown && userType !== "staff" && (
@@ -197,29 +200,30 @@ function Header() {
               <IoMdArrowDropdown />
             </div>
             {showProfileDropdown && (
-              <div
-                className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20"
-                ref={dropdownRef}
-              >
-                {userType === "staff" || userType === "vendor" ? (
-                  <div className="text-gray-500 px-4 py-2 cursor-not-allowed opacity-50 font-semibold">
-                    <span>Service</span>
-                  </div>
-                ) : (
-                  <div className="text-gray-500 px-4 py-2 cursor-pointer hover:bg-gray-300 font-semibold">
-                    <Link to={`/${sname}/${branchName}/service`}>
-                      <span>Service</span>
-                    </Link>
-                  </div>
-                )}
-                <div
-                  className="text-gray-500 px-4 py-2 cursor-pointer hover:bg-gray-300 font-semibold"
-                  onClick={handleLogout}
-                >
-                  <span>Logout</span>
-                </div>
-              </div>
-            )}
+        <div
+          className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20"
+          ref={dropdownRef}
+        >
+          {userType === "staff" || userType === "vendor" ? (
+            <div className="text-gray-500 px-4 py-2 cursor-not-allowed opacity-50 font-semibold">
+              <span>Service</span>
+            </div>
+          ) : (
+            <div
+              className="text-gray-500 px-4 py-2 cursor-pointer hover:bg-gray-300 font-semibold"
+              onClick={handleService}
+            >
+              <span>Service</span>
+            </div>
+          )}
+          <div
+            className="text-gray-500 px-4 py-2 cursor-pointer hover:bg-gray-300 font-semibold"
+            onClick={handleLogout}
+          >
+            <span>Logout</span>
+          </div>
+        </div>
+      )}
           </div>
         </div>
       </nav>

@@ -1,34 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import VertNav from './VertNav';
 import GroupIcon from '@mui/icons-material/Group';
 import { FaInfoCircle } from 'react-icons/fa';
 import AddCustomerPopup from './AddCustomerPopup';
+import axios from 'axios';
+import config from '../../config';
 
 
 function CustomerLoyality() {
-    const customers = [
-        { name: 'Sarthak', phone: '8789000000', membership: 'Inactive', coupons: 'Birthd...', birthday: '1985-12-19', anniversary: '2010-10-10', status: '2024-11-03'},
-        { name: 'Karan', phone: '(205) 555-0100', membership: 'Inactive', coupons: 'Birthd...', birthday: '1992-12-23', anniversary: '2015-12-12', status: 'danger-zone' },
-        { name: 'Debashish', phone: '(302) 555-0107', membership: 'Gold', coupons: 'Birthd...+2', birthday: '1987-12-15', anniversary: '2011-12-05',status: 'confused' },
-        { name: 'Pramoth', phone: '(252) 555-0126', membership: 'Platinum', coupons: 'Inactive', birthday: '1990-12-01', anniversary: '2018-12-20',status: '2024-11-03' },
-        { name: 'Hritik', phone: '(629) 555-0129', membership: 'Inactive', coupons: 'Inactive', birthday: '1989-12-30', anniversary: '2012-12-25',status: '-' },
-        { name: 'Bijit', phone: '(406) 555-0120', membership: 'Inactive', coupons: 'Birthd...+1', birthday: '1993-12-07', anniversary: '2016-12-18',status: '2024-11-03' },
-        { name: 'Archisman', phone: '(208) 555-0125', membership: 'Silver', coupons: 'Birthd...+1', birthday: '1991-12-12', anniversary: '2019-12-09',status: '2024-11-03' },
-        { name: 'Tanay', phone: '(704) 555-0127', membership: 'Inactive', coupons: 'Inactive', birthday: '1995-12-27', anniversary: '2020-12-30',status: '2024-11-03' },
-        { name: 'Aditi', phone: '(209) 555-0188', membership: 'Gold', coupons: 'Active', birthday: '1994-12-22', anniversary: '2014-12-14',status: '2024-11-03' },
-        { name: 'Niharika', phone: '(305) 555-0190', membership: 'Platinum', coupons: 'Birthd...', birthday: '1996-12-03', anniversary: '2013-12-08',status: '2024-11-03' }
-    ];
     const [modalData, setModalData] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [customerData, setCustomerData] = useState([]);
     const [modalTitle, setModalTitle] = useState('');
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const currentMonth = new Date().getMonth();
+    const fetchCustomerData = async () => {
+        const bid = localStorage.getItem('branch_id');
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${bid}`, {
+                headers: { 'Authorization': `Token ${token}` },
+            });
+            console.log("res", response.data)
+            if (response.data.status) {
+                setCustomerData(response.data.data);
+                // setFilteredData(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching customer data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
+        fetchCustomerData();
+    }, []);
     const openModal = (type) => {
         setModalTitle(type === 'birthdays' ? 'Birthdays This Month' : 'Anniversaries This Month');
-        const data = customers.filter((customer) => {
+        const data = customerData.filter((customer) => {
             const date = type === 'birthdays' ? new Date(customer.birthday) : new Date(customer.anniversary);
             return date.getMonth() === currentMonth;
         });
@@ -54,10 +67,10 @@ function CustomerLoyality() {
     const handleSearch = (event) => {
         setSearchQuery(event.target.value.toLowerCase());
     };
-    const filteredCustomers = customers.filter(
+    const filteredCustomers = customerData.filter(
         (customer) =>
             customer.name.toLowerCase().includes(searchQuery) ||
-            customer.phone.includes(searchQuery)
+            customer.mobile_no.includes(searchQuery)
     );
 
     const handleAddCustomerClick = () => setIsPopupOpen(true);
@@ -193,36 +206,36 @@ function CustomerLoyality() {
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-bold">All Customers</h2>
                         <div className='flex justify-center items-center gap-8'>
-                         <button 
-                         onClick={handleAddCustomerClick}
-                         className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                            + New Customer
-                        </button>
-                        {isPopupOpen && <AddCustomerPopup onClose={handleClosePopup} />}
-                        <div className="relative custom-search-bar">
-                            <input
-                                type="texts"
-                                placeholder="Search customers"
-                                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300 !bg-white !text-black !w-full"
-                                value={searchQuery}
-                                onChange={handleSearch}
-                            />
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-5 w-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35"
-                                    />
-                                </svg>
-                            </span>
+                            <button
+                                onClick={handleAddCustomerClick}
+                                className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                                + New Customer
+                            </button>
+                            {isPopupOpen && <AddCustomerPopup onClose={handleClosePopup} />}
+                            <div className="relative custom-search-bar">
+                                <input
+                                    type="texts"
+                                    placeholder="Search customers"
+                                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300 !bg-white !text-black !w-full"
+                                    value={searchQuery}
+                                    onChange={handleSearch}
+                                />
+                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35"
+                                        />
+                                    </svg>
+                                </span>
                             </div>
                         </div>
 
@@ -245,32 +258,22 @@ function CustomerLoyality() {
                                         className={`border-t ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
                                     >
                                         <td className="px-4 py-2">{customer.name}</td>
-                                        <td className="px-4 py-2">{customer.phone}</td>
+                                        <td className="px-4 py-2">{customer.mobile_no}</td>
                                         <td className="px-4 py-2">
-                                            <span
-                                                className={`px-2 py-1 rounded-full text-white text-sm inline-block text-center w-20 ${customer.membership === 'Inactive'
-                                                    ? 'bg-red-500'
-                                                    : customer.membership === 'Gold'
-                                                        ? 'bg-yellow-500'
-                                                        : customer.membership === 'Platinum'
-                                                            ? 'bg-blue-500'
-                                                            : 'bg-green-500'
-                                                    }`}
-                                            >
+                                            {/* <span
+                                                className={`px-2 py-1 rounded-full text-white text-sm inline-block text-center w-20`}
+                                            > */}
                                                 {customer.membership}
-                                            </span>
+                                            {/* </span> */}
                                         </td>
                                         <td className="px-4 py-2">
-                                            <span
-                                                className={`px-2 py-1 rounded-full text-white text-sm inline-block text-center w-20 ${customer.coupons.includes('Inactive')
-                                                    ? 'bg-red-500'
-                                                    : 'bg-green-500'
-                                                    }`}
-                                            >
-                                                {customer.coupons}
-                                            </span>
+                                            {/* <span
+                                                className={`px-2 py-1 rounded-full text-white text-sm inline-block text-center w-20 `}
+                                            > */}
+                                                {customer.coupon || 'None'}
+                                            {/* </span> */}
                                         </td>
-                                        <td className="px-4 py-2">{customer.status}</td>
+                                        <td className="px-4 py-2">{customer.status || '-'} </td>
                                     </tr>
                                 ))}
                             </tbody>
