@@ -408,12 +408,22 @@ function GenerateInvoice() {
   console.log("Selected salon:", sname);
   console.log(staffData);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
   // Handle served by (staff) selection
   const handleServedSelect = (selected, index) => {
     const updatedSelectedList = [...selectedList];
     updatedSelectedList[index].staff = selected; // Update the staff for the selected service
     setSelectedList(updatedSelectedList); // Update the selected list with the new staff
     updateServicesTableData(updatedSelectedList); // Pass the updated list to the table data update function
+    setIsModalOpen(false);
   };
 
   const handleService_Select = () => {
@@ -492,9 +502,7 @@ function GenerateInvoice() {
         ) &&
         productData.every((product) => !product.quantity)
       ) {
-        setPopupMessage(
-          "Please fill the missing field"
-        );
+        setPopupMessage("Please fill the missing field");
         setShowPopup(true);
         return;
       }
@@ -503,7 +511,9 @@ function GenerateInvoice() {
       for (const service of servicesTableData) {
         if (!service.staff || service.staff.length === 0) {
           setDialogTitle("Error");
-          setDialogMessage("Please select 'Served By' for all selected services!");
+          setDialogMessage(
+            "Please select 'Served By' for all selected services!"
+          );
           setDialogOpen(true);
           return;
         }
@@ -1243,20 +1253,62 @@ function GenerateInvoice() {
                             </td>
 
                             <td className="p-2" onClick={fetchStaffData}>
-                              <Multiselect
-                                options={staffData} // Array of staff options
-                                showSearch={true}
-                                onSelect={(selected) =>
-                                  handleServedSelect(selected, index)
-                                }
-                                onRemove={(selected) =>
-                                  handleServedSelect(selected, index)
-                                }
-                                displayValue="label"
-                                placeholder="Select Served By"
-                                selectedValues={service.staff || []} // Pre-selected staff for this service
-                                required
-                              />
+                              {/* Trigger to open the modal */}
+                              <div
+                                className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
+                                onClick={openModal}
+                              >
+                                {service.staff && service.staff.length > 0 ? (
+                                  <span>
+                                    {service.staff
+                                      .map((staff) => staff.label)
+                                      .join(", ")}
+                                  </span>
+                                ) : (
+                                  <span>Select Staff</span>
+                                )}
+                              </div>
+
+                              {/* Modal */}
+                              {isModalOpen && (
+                                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+                                  <div className="bg-white w-96 p-4 rounded shadow-lg">
+                                    <h3 className="text-lg font-bold mb-4">
+                                      Select Staff
+                                    </h3>
+                                    <Multiselect
+                                      options={staffData} // Array of staff options
+                                      showSearch={true}
+                                      onSelect={(selected) =>
+                                        handleServedSelect(selected, index)
+                                      }
+                                      onRemove={(selected) =>
+                                        handleServedSelect(selected, index)
+                                      }
+                                      displayValue="label"
+                                      placeholder="Select Served By"
+                                      selectedValues={service.staff || []} // Pre-selected staff for this service
+                                      required
+                                    />
+                                    <div className="flex justify-end mt-4">
+                                      <button
+                                        type="button"
+                                        className="px-4 py-2 bg-gray-300 text-black rounded mr-2"
+                                        onClick={closeModal}
+                                      >
+                                        Cancel
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                                        onClick={closeModal}
+                                      >
+                                        Done
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </td>
                           </tr>
                         ))}

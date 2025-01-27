@@ -125,7 +125,7 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
     <div
       className={` ${
         sidebarOpen ? "open" : ""
-      } h-[85rem] top-0 left-0 flex flex-col justify-start bg-white absolute p-5 z-50 shadow-lg gap-0 transition-all duration-300 lg:block md:w-[298px] lg:w-[300px]  ${
+      } h-[68rem] top-0 left-0 flex flex-col justify-start bg-white absolute p-5 z-50 shadow-lg gap-0 transition-all duration-300 lg:block md:w-[298px] lg:w-[300px]  ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
