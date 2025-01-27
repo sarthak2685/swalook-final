@@ -5,13 +5,14 @@ import Popup from "./Popup";
 import config from "../../config";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { Category } from "@mui/icons-material";
 
 function AddServicePopup({ onClose }) {
   const navigate = useNavigate();
   const [service, setService] = useState("");
   const [service_price, setServicePrice] = useState("");
   const [service_duration, setServiceDuration] = useState("");
-  const [category, setCategory] = useState(null); // To store selected category (as an object)
+  const [category, setCategory] = useState(); // Now stores only the selected category ID
   const [categories, setCategories] = useState([]); // To store fetched categories
   const [forMen, setForMen] = useState(false); // Gender state for men
   const [forWomen, setForWomen] = useState(false); // Gender state for women
@@ -54,34 +55,28 @@ function AddServicePopup({ onClose }) {
   const handleAddService = (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-
+  
     // Validation for category selection
     if (!category) {
       setPopupMessage("Please select a category.");
       setShowPopup(true);
       return;
     }
-
-    // Setting gender based on the selection
-    const genderPayload = {
-      for_men: forMen, // true if for men, else false
-      for_women: forWomen, // true if for women, else false
-    };
-
+  
+    // Default gender assignment if none are selected
+    const resolvedForMen = forMen || (!forMen && !forWomen); // True if men is selected or none are selected
+    const resolvedForWomen = forWomen || (!forMen && !forWomen); // True if women is selected or none are selected
+  
     // Prepare the payload
     const payload = {
-        service: service,
-        service_price: service_price,
-        service_duration: service_duration,
-        category: {
-          id: category.id,
-          service_category: category.service_category, // Send the category name
-        },
-        for_men: forMen,
-        for_women: forWomen,
-      };
-      
-
+      service: service,
+      service_price: service_price,
+      service_duration: service_duration,
+      for_men: resolvedForMen,
+      for_women: resolvedForWomen,
+      category: category,
+    };
+  
     // Send API request
     axios
       .post(
@@ -106,6 +101,7 @@ function AddServicePopup({ onClose }) {
         setShowPopup(true);
       });
   };
+  
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
@@ -146,28 +142,19 @@ function AddServicePopup({ onClose }) {
             <select
               id="category"
               name="category"
-              value={category ? category.id : ""}
-              onChange={(e) => {
-                const selectedCategory = categories.find(
-                  (cat) => cat.id === e.target.value
-                );
-                setCategory(selectedCategory); // Store full category object
-              }}
+              value={category || ""} // Directly store the ID
+              onChange={(e) => setCategory(e.target.value)} // Set only the ID
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="" disabled>
                 Select a Category
               </option>
-              {categories.length > 0 ? (
-                categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.service_category}
-                  </option>
-                ))
-              ) : (
-                <option disabled>No categories available</option>
-              )}
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.service_category}
+                </option>
+              ))}
             </select>
           </div>
 
