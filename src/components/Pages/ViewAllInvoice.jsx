@@ -160,7 +160,11 @@ const ViewAllInvoices = () => {
                   <td className="border px-4 py-2">
                     Rs. {parseFloat(invoice.grand_total).toFixed(2)}
                   </td>
-                  <td className="border px-4 py-2">{invoice.service_by}</td>
+                  <td className="border px-4 py-2">{JSON.parse(invoice.services).map((service, i) => (
+                      <div key={i}>
+                        {service.Description} - {service.Staff}
+                      </div>
+                    ))}</td>
                   <td className="border px-4 py-2">
                     {JSON.parse(invoice.services).map((service, i) => (
                       <div key={i}>
