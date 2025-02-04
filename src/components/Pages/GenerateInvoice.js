@@ -6,6 +6,7 @@ import { Multiselect } from "multiselect-react-dropdown";
 import Header from "./Header";
 import VertNav from "./VertNav";
 import { FaTimes } from "react-icons/fa";
+import Select from "react-select";
 
 import { Helmet } from "react-helmet";
 import config from "../../config";
@@ -39,7 +40,7 @@ function GenerateInvoice() {
   const [staff, setStaff] = useState([]);
 
   const [discount, setDiscount] = useState(0);
-  const [PaymentMode, setPaymentMode] = useState();
+
   const [isGST, setIsGST] = useState(false);
   const [gst_number, setGSTNumber] = useState("");
   const [comments, setComments] = useState("");
@@ -58,6 +59,9 @@ function GenerateInvoice() {
   const [isServiceModalOpen, setServiceModalOpen] = useState(false);
   const [isProductModalOpen, setProductModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(""); // Tracks selected service category
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [selectedServices, setSelectedServices] = useState([]);
 
   const modalRef = useRef(null);
   // Close modal on outside click
@@ -108,6 +112,8 @@ function GenerateInvoice() {
   const [staffApiCalled, setStaffApiCalled] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState(null);
   const [filter, setFilter] = useState("all"); // "all", "men", "women"
+  const [genderFilter, setGenderFilter] = useState([]); // Default is no filter
+  const [paymentModes, setPaymentModes] = useState({});
 
   const bid = localStorage.getItem("branch_id");
   const token = localStorage.getItem("token");
@@ -204,42 +210,122 @@ function GenerateInvoice() {
     }
   };
 
-  // Fetch service categories from API
   const fetchServiceCategoryData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${config.apiUrl}/api/swalook/test-error/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${config.apiUrl}/api/swalook/table/services/?branch_name=${bid}`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error(`Failed to fetch categories: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      console.log("Fetched categories and services:", data.data);
+      const result = await response.json();
 
-      const categories = data.data.map((category) => ({
-        key: category.category || "Uncategorized",
-        value: category.category || "Uncategorized",
-        services: category.services || [],
-      }));
+      if (!result.status || !Array.isArray(result.data)) {
+        throw new Error("Invalid API response format");
+      }
+
+      // Transform API response into a structured category-service map
+      const categoryMap = new Map();
+
+      result.data.forEach((service) => {
+        // Safely check if service category exists, otherwise default to "Uncategorized"
+        const categoryName =
+          service.category_details?.service_category || "Uncategorized";
+
+        // If the category doesn't exist yet, create an entry for it
+        if (!categoryMap.has(categoryName)) {
+          categoryMap.set(categoryName, {
+            key: categoryName,
+            value: categoryName,
+            services: [],
+          });
+        }
+
+        // Push the service into the appropriate category
+        categoryMap.get(categoryName).services.push({
+          id: service.id,
+          name: service.service || "Unnamed Service",
+          price: service.service_price || 0,
+          duration: service.service_duration || 0,
+          for_men: service.for_men,
+          for_women: service.for_women,
+          quantity: 1,
+          staff: [],
+          note: "No notes added",
+          category: categoryName, // Ensure the category is added to the service
+        });
+
+        // Log category name and service details for debugging
+        console.log("Service Category Name:", categoryName);
+        console.log("Service Details:", service);
+      });
+
+      // Convert the categoryMap to an array
+      const categories = Array.from(categoryMap.values());
+
+      // Log the structured categories before setting the state
+      console.log("Structured Categories: ", categories);
 
       setCategoryServices(categories);
       setHasFetchedServicesCategory(true);
     } catch (error) {
-      console.error("Error fetching category data:", error);
+      console.error("Error fetching categories:", error.message);
     }
   };
 
-  // Handle category click (trigger data fetching if not fetched already)
+  const handleServiceToggle = (isChecked, service) => {
+    setSelectedServices((prev) =>
+      isChecked ? [...prev, service] : prev.filter((s) => s.id !== service.id)
+    );
+  };
+
+  const finalizeSelection = () => {
+    console.log("Selected Services:", selectedServices);
+  };
+
+  // // Fetch service categories from API
+  // const fetchServiceCategoryData = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const response = await fetch(`${config.apiUrl}/api/swalook/test-error/`, {
+  //       headers: {
+  //         Authorization: `Token ${token}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
+
+  //     const data = await response.json();
+  //     console.log("Fetched categories and services:", data.data);
+
+  //     const categories = data.data.map((category) => ({
+  //       key: category.category || "Uncategorized",
+  //       value: category.category || "Uncategorized",
+  //       services: category.services || [],
+  //     }));
+
+  //     setCategoryServices(categories);
+  //     setHasFetchedServicesCategory(true);
+  //   } catch (error) {
+  //     console.error("Error fetching category data:", error);
+  //   }
+  // };
+
+  // Handle category click (Fetch if not already fetched)
   const handleServiceCategoryClick = () => {
-    if (!hasFetchedServicesCategory) {
-      fetchServiceCategoryData();
-    }
+    if (!hasFetchedServicesCategory) fetchServiceCategoryData();
   };
 
   // Handle category selection
@@ -256,89 +342,105 @@ function GenerateInvoice() {
     console.log("Selected categories:", updatedCategoryList);
   };
 
-  // Fetch services from the API
-  const fetchServiceData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${config.apiUrl}/api/swalook/test-error/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+  // Handle gender filter toggle
+  const handleGenderFilterToggle = (gender, isChecked) => {
+    setGenderFilter((prevFilter) => {
+      if (isChecked) {
+        return [...prevFilter, gender];
+      } else {
+        return prevFilter.filter((g) => g !== gender);
       }
-
-      const data = await response.json();
-      console.log("Fetched services data:", data.data);
-
-      const services = data.data
-        .flatMap((category) => category.services)
-        .map((service) => ({
-          key: service.id,
-          value: service.service || "Unnamed Service",
-          price: service.price || 0,
-          duration: service.duration || 0,
-          for_men: service.for_men,
-          for_women: service.for_women,
-        }));
-
-      setServiceOptions(services);
-      setHasFetchedServices(true);
-    } catch (error) {
-      console.error("Error fetching service data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchServiceData();
-  }, []);
-
-  // Handle filter change (gender-based filtering)
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
-  };
-
-  // Combine filtered services based on gender and selected categories
-  const filteredServices = serviceOptions
-    .filter((service) => {
-      if (filter === "men" && !service.for_men) return false;
-      if (filter === "women" && !service.for_women) return false;
-      return true;
-    })
-    .filter((service) => {
-      // Filter services based on selected category values
-      return selectedCategoryValues.some((category) =>
-        category.services.some((catService) => catService.id === service.key)
-      );
     });
+  };
 
-  // Handle service click
-  const handleServiceClick = () => {
-    if (!hasFetchedServices) {
-      fetchServiceData();
+  // // Fetch services from the API
+  // const fetchServiceData = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const response = await fetch(`${config.apiUrl}/api/swalook/test-error/`, {
+  //       headers: {
+  //         Authorization: `Token ${token}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
+
+  //     const data = await response.json();
+  //     console.log("Fetched services data:", data.data);
+
+  //     const services = data.data
+  //       .flatMap((category) => category.services)
+  //       .map((service) => ({
+  //         key: service.id,
+  //         value: service.service || "Unnamed Service",
+  //         price: service.price || 0,
+  //         duration: service.duration || 0,
+  //         for_men: service.for_men,
+  //         for_women: service.for_women,
+  //       }));
+
+  //     setServiceOptions(services);
+  //     setHasFetchedServices(true);
+  //   } catch (error) {
+  //     console.error("Error fetching service data:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchServiceData();
+  // }, []);
+
+  // // Handle service click
+  // const handleServiceClick = () => {
+  //   if (!hasFetchedServices) {
+  //     fetchServiceData();
+  //   }
+  // };
+
+  const filteredCategories = categoryServices.filter(
+    (category) =>
+      category.value?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      category.services.some((service) =>
+        service.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+  );
+
+  const toggleServiceSelection = (service) => {
+    if (selectedList.some((s) => s.id === service.id)) {
+      handleServiceSelect(selectedList.filter((s) => s.id !== service.id)); // Remove service
+    } else {
+      // Check if category is correctly passed here
+      console.log("Selected service category:", service.category);
+      handleServiceSelect([...selectedList, service]); // Add service
     }
   };
 
-  // Handle service selection
   const handleServiceSelect = (selected) => {
+    // Check if selected is properly passed and log the details
+    console.log("Incoming selected service(s):", selected);
     // Update selected services
     setSelectedServiceValues(selected);
 
-    // Create a new list based on the selected services, with initialized values
-    const updatedServiceList = selected.map((service) => ({
-      ...service, // Spread existing service details
-      quantity: 1, // Initialize quantity to 1
-      gst: "No GST", // Initialize GST to 'No GST'
-      staff: [], // Initialize staff as an empty array
-    }));
+    // Check and log each service for category-related issues
+    const updatedServiceList = selected.map((service) => {
+      console.log("Service before category assignment:", service);
 
-    // Update the state for the selected service list
+      return {
+        ...service,
+        quantity: service.quantity || 1,
+        gst: service.gst || "No GST",
+        staff: service.staff || [],
+        note: service.note || "No notes added",
+        category: service.category, // Ensure the category is correctly assigned
+      };
+    });
+
+    // After transformation, log the updated list
     setSelectedList(updatedServiceList);
-
-    console.log("Selected services:", updatedServiceList);
+    console.log("Updated Service List:", updatedServiceList);
   };
 
   const handleProductSelect = (selectedList) => {
@@ -388,32 +490,47 @@ function GenerateInvoice() {
 
   // Update service table data
   const updateServicesTableData = (updatedValues) => {
-    const inputFieldValues = updatedValues.map((service) => service.quantity);
+    const inputFieldValues = updatedValues.map(
+      (service) => service.quantity || 1
+    ); // Default quantity to 1 if missing
+
     const newTableData = updatedValues.map((service, index) => ({
       ...service,
       finalPrice:
         service.gst === "Inclusive"
-          ? (service.price / 1.18).toFixed(2)
+          ? (service.price / 1.18).toFixed(2) // Adjust price for inclusive GST
           : service.gst === "Exclusive"
           ? service.price
-          : service.price,
+          : service.price || 0, // Ensure price defaults to 0 if missing
+
       gst: service.gst || "", // Default to empty string if gst is not set
       inputFieldValue: inputFieldValues[index], // Store quantity in inputFieldValue
       staff: service.staff || [], // Include staff data for the service
+      category: service.category, // Ensure category info is included
     }));
 
-    setServicesTableData(newTableData); // Update the services table data with the new data
+    setServicesTableData(newTableData); // Update the services table data
   };
 
   console.log("Selected salon:", sname);
   console.log(staffData);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (index) => {
+    setIsModalOpen(index); // Set the index of the row whose modal should be open
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(null); // Close modal
+  };
   // Handle served by (staff) selection
   const handleServedSelect = (selected, index) => {
     const updatedSelectedList = [...selectedList];
     updatedSelectedList[index].staff = selected; // Update the staff for the selected service
     setSelectedList(updatedSelectedList); // Update the selected list with the new staff
     updateServicesTableData(updatedSelectedList); // Pass the updated list to the table data update function
+    setIsModalOpen(false);
   };
 
   const handleService_Select = () => {
@@ -492,9 +609,7 @@ function GenerateInvoice() {
         ) &&
         productData.every((product) => !product.quantity)
       ) {
-        setPopupMessage(
-          "Please fill the missing field"
-        );
+        setPopupMessage("Please fill the missing field");
         setShowPopup(true);
         return;
       }
@@ -503,7 +618,9 @@ function GenerateInvoice() {
       for (const service of servicesTableData) {
         if (!service.staff || service.staff.length === 0) {
           setDialogTitle("Error");
-          setDialogMessage("Please select 'Served By' for all selected services!");
+          setDialogMessage(
+            "Please select 'Served By' for all selected services!"
+          );
           setDialogOpen(true);
           return;
         }
@@ -566,7 +683,7 @@ function GenerateInvoice() {
             productData,
             deductedPoints,
             selectMembership,
-            PaymentMode,
+            paymentModes,
           },
         }),
       ]);
@@ -958,6 +1075,60 @@ function GenerateInvoice() {
       setMembershipOptions([]); // Clear options if mobile number is invalid
     }
   }, [mobile_no]);
+  console.log("tabel", servicesTableData);
+
+  const [selectedPayments, setSelectedPayments] = useState([]);
+  const [amounts, setAmounts] = useState({});
+
+  const options = [
+    { value: "cash", label: "Cash" },
+    { value: "upi", label: "UPI" },
+    { value: "card", label: "Card" },
+    { value: "net_banking", label: "Net Banking" },
+    { value: "other", label: "Other" },
+  ];
+
+  const handleSelectChange = (selectedOptions) => {
+    const updatedPayments = {};
+    selectedOptions.forEach((option) => {
+      updatedPayments[option.value] = paymentModes[option.value] || ""; // Preserve existing amount
+    });
+    setPaymentModes(updatedPayments);
+  };
+
+  const handleAmountChange = (mode, value) => {
+    setPaymentModes((prev) => ({
+      ...prev,
+      [mode]: value, // Update the amount for the selected mode
+    }));
+  };
+
+  const totalPayment = Object.values(paymentModes).reduce(
+    (sum, amount) => sum + (parseFloat(amount) || 0),
+    0
+  );
+
+  const grandTotal = selectedList.reduce(
+    (sum, service) => sum + (service.price || 0) * (service.quantity || 1),
+    0
+  );
+
+  // Ensure the grandTotal is a number and has a valid value
+  const formattedGrandTotal = isNaN(grandTotal) ? 0 : grandTotal;
+
+  const grandTotalFormatted = formattedGrandTotal.toFixed(2);
+// Rename the function to avoid conflicts with existing handleSubmit
+const handleInvoiceSubmit = (e) => {
+  if (totalPayment === grandTotal) {
+    // Proceed with form submission or further processing
+    console.log('Form submitted');
+  } else {
+    e.preventDefault();  // Prevent form submission if totals don't match
+    alert('Total payment does not match the grand total.');
+  }
+};
+
+  
 
   return (
     <>
@@ -1178,11 +1349,15 @@ function GenerateInvoice() {
                   <button
                     type="button"
                     className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
-                    onClick={() => setServiceModalOpen(true)}
+                    onClick={() => {
+                      setServiceModalOpen(true); // Open the modal
+                      fetchServiceCategoryData(); // Fetch category data
+                    }}
                     required
                   >
                     Add Services
                   </button>
+
                   <button
                     type="button"
                     className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
@@ -1192,11 +1367,12 @@ function GenerateInvoice() {
                     Add Products
                   </button>
                 </div>
-                <div className="my-4" id="service-tabel">
-                  {selectedList.length > 0 ? ( // Conditionally render the table
-                    <table className="w-full p-4  border border-gray-200">
+                <div className="my-4" id="service-table">
+                  {selectedList.length > 0 ? (
+                    <table className="w-full border border-gray-200">
                       <thead>
-                        <tr className="bg-gray-100 p-4">
+                        <tr className="bg-gray-100">
+                          <th className="border px-4 py-2">Category</th>
                           <th className="border px-4 py-2">Name</th>
                           <th className="border px-4 py-2">Price</th>
                           <th className="border px-4 py-2">Quantity</th>
@@ -1206,66 +1382,146 @@ function GenerateInvoice() {
                       </thead>
                       <tbody className="text-center">
                         {selectedList.map((service, index) => (
-                          <tr key={index}>
-                            <td className="p-2">{service.value}</td>
-                            <td>
-                              {service.gst === "Inclusive" ? (
-                                <>{(service.price / 1.18).toFixed(2)}</>
-                              ) : service.gst === "Exclusive" ? (
-                                <>{service.price}</>
-                              ) : (
-                                <>{service.price}</>
-                              )}
+                          <tr key={index} className="border">
+                            <td className="p-2 border">
+                              {service.category || "Uncategorized"}
                             </td>
-                            <td className="p-2">
+                            <td className="p-2 border">{service.name}</td>
+                            <td className="p-2 border">
+                              {service.gst === "Inclusive"
+                                ? (service.price / 1.18).toFixed(2)
+                                : service.price || 0}
+                            </td>
+                            <td className="p-2 border">
                               <input
-                                type="digit"
-                                className="border w-fit"
-                                placeholder="Enter Quantity"
+                                type="number"
+                                className="border w-20 px-2 py-1 text-center"
+                                placeholder="Qty"
+                                min="1"
                                 value={service.quantity || ""}
-                                required
                                 onChange={(e) =>
                                   handleInputChange(index, e.target.value)
                                 }
                               />
                             </td>
-                            <td className="p-2">
+                            <td className="p-2 border">
                               <select
+                                className="border px-2 py-1"
                                 value={service.gst || ""}
-                                required
                                 onChange={(e) => handleGST(e, index)}
+                                required
                               >
-                                <option value="">Select GST</option>
                                 <option value="No GST">No GST</option>
                                 <option value="Inclusive">Inclusive</option>
                                 <option value="Exclusive">Exclusive</option>
                               </select>
                             </td>
-
-                            <td className="p-2" onClick={fetchStaffData}>
-                              <Multiselect
-                                options={staffData} // Array of staff options
-                                showSearch={true}
-                                onSelect={(selected) =>
-                                  handleServedSelect(selected, index)
-                                }
-                                onRemove={(selected) =>
-                                  handleServedSelect(selected, index)
-                                }
-                                displayValue="label"
-                                placeholder="Select Served By"
-                                selectedValues={service.staff || []} // Pre-selected staff for this service
-                                required
-                              />
+                            <td className="p-2 border" onClick={fetchStaffData}>
+                              <div
+                                className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
+                                onClick={() => openModal(index)}
+                              >
+                                {service.staff && service.staff.length > 0 ? (
+                                  <span>
+                                    {service.staff
+                                      .map((staff) => staff.label)
+                                      .join(", ")}
+                                  </span>
+                                ) : (
+                                  <span>Select Staff</span>
+                                )}
+                              </div>
+                              {isModalOpen === index && (
+                                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+                                  <div className="bg-white w-96 p-4 rounded shadow-lg">
+                                    <h3 className="text-lg font-bold mb-4">
+                                      Select Staff
+                                    </h3>
+                                    <Multiselect
+                                      options={staffData}
+                                      showSearch={true}
+                                      onSelect={(selected) =>
+                                        handleServedSelect(selected, index)
+                                      }
+                                      onRemove={(selected) =>
+                                        handleServedSelect(selected, index)
+                                      }
+                                      displayValue="label"
+                                      placeholder="Select Served By"
+                                      selectedValues={service.staff || []}
+                                      required
+                                    />
+                                    <div className="flex justify-end mt-4">
+                                      <button
+                                        type="button"
+                                        className="px-4 py-2 bg-gray-300 text-black rounded mr-2"
+                                        onClick={closeModal}
+                                      >
+                                        Cancel
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                                        onClick={closeModal}
+                                      >
+                                        Done
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </td>
                           </tr>
                         ))}
                       </tbody>
+                      {/* Table Footer for Grand Total */}
+                      <tfoot>
+                        <tr className="bg-gray-100 font-semibold">
+                          <td className="p-2 border text-left" colSpan="2">
+                            Grand Total
+                          </td>
+                          <td className="p-2 border text-center">
+                            {/* Total Price Calculation */}
+                            {selectedList
+                              .reduce(
+                                (sum, service) =>
+                                  sum +
+                                  (service.price || 0) *
+                                    (service.quantity || 1),
+                                0
+                              )
+                              .toFixed(2)}
+                          </td>
+                          <td className="p-2 border text-center">
+                            {/* Total Quantity Calculation */}
+                            {selectedList.reduce(
+                              (sum, service) =>
+                                sum + (Number(service.quantity) || 1), // Convert to number
+                              0
+                            )}
+                          </td>
+                          <td className="p-2 border text-center">
+                            {/* Total GST Calculation */}
+                            {selectedList
+                              .reduce(
+                                (sum, service) =>
+                                  sum +
+                                  (service.gst === "Inclusive"
+                                    ? service.price * 0.18
+                                    : 0),
+                                0
+                              )
+                              .toFixed(2)}
+                          </td>
+                          <td className="p-2 border"></td>
+                        </tr>
+                      </tfoot>
                     </table>
                   ) : (
-                    <span></span>
+                    <p className="text-center text-gray-500"></p>
                   )}
                 </div>
+
                 <div className="my-4" id="product-tabel">
                   {product_value.length > 0 ? ( // Conditionally render the products table
                     <table className="w-full border p-4 border-gray-200 mt-4">
@@ -1313,148 +1569,134 @@ function GenerateInvoice() {
                   )}
                 </div>
 
-                {/* Service Modal */}
                 {isServiceModalOpen && (
-                  <div className="fixed inset-0 bg-black m-4 md:mr-20 bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white rounded-lg p-6 w-3/4 max-w-lg">
-                      <div
-                        ref={modalRef}
-                        className="bg-white rounded-lg p-6 w-full"
-                      >
-                        <h3 className="text-lg font-bold mb-4">
-                          Select Services
-                        </h3>
-
-                        {/* Category Selection */}
-                        {/* <div
-                        className="mb-4"
-                        onClick={handleServiceCategoryClick}
-                      >
-                        <Multiselect
-                          options={categoryServices}
-                          showSearch={true}
-                          onSelect={handleCategorySelect}
-                          onRemove={handleCategorySelect}
-                          displayValue="value"
-                          placeholder="Select Category"
-                          showCheckbox={true}
-                          selectedValues={selectedCategoryValues}
-                          className="mb-2"
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
+                      {/* Close Button */}
+                      <div className="flex justify-between items-center mb-4">
+                        <span></span>
+                        <FaTimes
+                          size={24}
+                          className="text-red-500 cursor-pointer hover:text-red-700"
+                          aria-label="Close Modal"
+                          onClick={() => setServiceModalOpen(false)}
                         />
-                      </div> */}
+                      </div>
 
-                        {/* Gender Selection */}
-                        {/* <div className="flex flex-row items-center font-semibold m-2 gap-4">
-                        <label className="flex flex-row gap-4">
-                          <input
-                            type="checkbox"
-                            value="men"
-                            onChange={handleFilterChange}
-                          />
-                          Men
-                        </label>
-                        <label className="flex flex-row gap-4">
-                          <input
-                            type="checkbox"
-                            value="women"
-                            onChange={handleFilterChange}
-                          />
-                          Women
-                        </label> */}
-                        {/* </div> */}
+                      {/* Header Section */}
+                      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                        <h3 className="text-2xl font-bold">Select Services</h3>
+                        <input
+                          type="text"
+                          placeholder="Search services or categories..."
+                          className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/3"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                      </div>
 
-                        {/* Service Selection */}
-                        <div className="mb-4" onClick={handleServiceClick}>
-                          <Multiselect
-                            // options={filteredServices}
-                            options={serviceOptions}
-                            showSearch={true}
-                            onSelect={handleServiceSelect}
-                            onRemove={handleServiceSelect}
-                            displayValue="value"
-                            placeholder="Select Service"
-                            showCheckbox={true}
-                            selectedValues={selectedServiceValues}
-                            required
-                          />
-                        </div>
+                      {/* Gender Filter */}
+                      <div className="flex mb-4 items-center gap-4">
+                        {["Male", "Female"].map((gender) => (
+                          <label
+                            key={gender}
+                            className="flex items-center gap-2"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={genderFilter.includes(gender)}
+                              onChange={(e) =>
+                                handleGenderFilterToggle(
+                                  gender,
+                                  e.target.checked
+                                )
+                              }
+                              className="h-4 w-4"
+                            />
+                            <span>{gender}</span>
+                          </label>
+                        ))}
+                      </div>
 
-                        {/* <table className="w-full p-4 border border-gray-200">
-                          <thead>
-                            <tr className="bg-gray-100 p-4">
-                              <th className="border px-4 py-2">Name</th>
-                              <th className="border px-4 py-2">Price</th>
-                              <th className="border px-4 py-2">Quantity</th>
-                              <th className="border px-4 py-2">GST</th>
-                              <th className="border px-4 py-2">Staff</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-center">
-                            {selectedList.map((service, index) => (
-                              <tr key={index}>
-                                <td className="p-2">{service.value}</td>
-                                <td>
-                                  {service.gst === "Inclusive" ? (
-                                    <>{(service.price / 1.18).toFixed(2)}</>
-                                  ) : service.gst === "Exclusive" ? (
-                                    <>{service.price}</>
-                                  ) : (
-                                    <>{service.price}</>
-                                  )}
-                                </td>
-                                <td className="p-2">
-                                  <input
-                                    type="digit"
-                                    className="border w-fit"
-                                    placeholder="Enter Quantity"
-                                    value={service.quantity || ""}
-                                    required
-                                    onChange={(e) =>
-                                      handleInputChange(index, e.target.value)
-                                    }
-                                  />
-                                </td>
-                                <td className="p-2">
-                                  <select
-                                    value={service.gst || ""}
-                                    required
-                                    onChange={(e) => handleGST(e, index)}
+                      {/* Service Categories Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {filteredCategories.map((category) => (
+                          <div
+                            key={category.key}
+                            className="bg-gray-100 p-4 rounded-lg border"
+                          >
+                            <h4 className="text-lg font-semibold mb-4">
+                              {category.value}
+                            </h4>
+                            <ul className="space-y-2">
+                              {category.services
+                                .filter((service) => {
+                                  // Show all if no filter is applied
+                                  if (genderFilter.length === 0) return true;
+
+                                  // Show services based on gender selection
+                                  if (
+                                    genderFilter.includes("Male") &&
+                                    genderFilter.includes("Female")
+                                  ) {
+                                    return true; // Show all if both are selected
+                                  } else if (genderFilter.includes("Male")) {
+                                    return service.for_men;
+                                  } else if (genderFilter.includes("Female")) {
+                                    return service.for_women;
+                                  }
+
+                                  return false;
+                                })
+                                .map((service) => (
+                                  <li
+                                    key={service.id}
+                                    className="flex items-center justify-between"
                                   >
-                                    <option value="">Select GST</option>
-                                    <option value="No GST">No GST</option>
-                                    <option value="Inclusive">Inclusive</option>
-                                    <option value="Exclusive">Exclusive</option>
-                                  </select>
-                                </td>
+                                    <label className="flex items-center gap-3 cursor-pointer">
+                                      <div className="flex gap-4">
+                                        <input
+                                          type="checkbox"
+                                          checked={selectedList.some(
+                                            (s) => s.id === service.id
+                                          )}
+                                          onChange={() =>
+                                            toggleServiceSelection(service)
+                                          }
+                                          className="h-4 w-4"
+                                        />
+                                        <p className="font-medium">
+                                          {service.name}
+                                        </p>
+                                      </div>
+                                    </label>
+                                    <p className="text-base font-semibold text-gray-700">
+                                      ₹{service.price}
+                                    </p>
+                                  </li>
+                                ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
 
-                                <td className="p-2" onClick={fetchStaffData}>
-                                  <Multiselect
-                                    options={staffData} // Array of staff options
-                                    showSearch={true}
-                                    onSelect={(selected) =>
-                                      handleServedSelect(selected, index)
-                                    }
-                                    onRemove={(selected) =>
-                                      handleServedSelect(selected, index)
-                                    }
-                                    displayValue="label"
-                                    placeholder="Select Served By"
-                                    selectedValues={service.staff || []} // Pre-selected staff for this service
-                                    required
-                                  />
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table> */}
-
-                        <div className="flex justify-end mt-4">
+                      {/* Footer */}
+                      <div className="sticky bottom-0 left-0 right-0 bg-white p-4 border-t mt-4">
+                        <div className="flex justify-between items-center">
+                          <p className="text-lg font-semibold">
+                            Selected:{" "}
+                            {selectedList.map((s) => s.name).join(", ") ||
+                              "None"}
+                          </p>
                           <button
                             type="button"
-                            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                            onClick={handleService_Select}
+                            className="bg-blue-500 text-white px-6 py-2 rounded-lg"
+                            onClick={() => {
+                              finalizeSelection(selectedList);
+                              setServiceModalOpen(false);
+                            }}
                           >
-                            Add Services
+                            Add Service
                           </button>
                         </div>
                       </div>
@@ -1464,7 +1706,7 @@ function GenerateInvoice() {
 
                 {/* Product Modal */}
                 {isProductModalOpen && (
-                  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div
                       ref={modalRef}
                       className="bg-white rounded-lg p-6 w-3/4 max-w-lg"
@@ -1628,36 +1870,92 @@ function GenerateInvoice() {
                     />
                   </div>
                 )} */}
-                <div className="form-row">
-                  <div className="form-groups ">
-                    <label>Mode of Payment</label>
-                    <select
-                      className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      onChange={(e) => setPaymentMode(e.target.value)}
+
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-4">
+                  <div className="flex flex-col">
+                    <span className="font-semibold items-start flex mb-4">
+                      Mode of Payment
+                    </span>
+                    <Select
+                      isMulti
+                      options={options}
+                      className=" col-span-1 p-1 rounded-lg font-semibold placeholder-gray-400 z-0"
+                      onChange={handleSelectChange}
+                      placeholder="Select Payment Mode"
                       required
-                    >
-                      <option value="">Select Payment Mode</option>
-                      <option value="cash">Cash</option>
-                      <option value="upi">UPI</option>
-                      <option value="card">Card</option>
-                      <option value="net_banking">Net Banking</option>
-                      <option value="other">Other</option>
-                    </select>
+                    />
                   </div>
+
                   {/* <div className='form-groups'>
                     <label>Discount</label>
                     <input type="number" placeholder='Enter Discount' onChange={(e) => setDiscount(e.target.value)} />
                   </div> */}
-                  <div className="form-groups">
-                    <label>Comments</label>
+                  {/* Comments Section */}
+                  <div className="flex flex-col">
+                    <span className="font-semibold items-start flex mb-4">
+                      Comments
+                    </span>
                     <input
                       type="text"
-                      className="text-[#CCCCCF] border border-[#CFD3D4] rounded-lg p-3 font-semibold placeholder-gray-400"
+                      className="text-[#CCCCCF] p-2 rounded-lg  border border-gray-300 col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Enter Comments"
-                      onChange={(e) => setComments(e.target.value)}
                     />
                   </div>
                 </div>
+                {/* Payment Amount Table */}
+                {Object.keys(paymentModes).length > 0 && (
+                  <div className="mt-4">
+                    <table className="sm:w-full md:w-1/3 border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border border-gray-300 p-2">
+                            Payment Mode
+                          </th>
+                          <th className="border border-gray-300 p-2">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.keys(paymentModes).map((mode) => (
+                          <tr key={mode}>
+                            <td className="border border-gray-300 p-2">
+                              {mode}
+                            </td>
+                            <td className="border border-gray-300 p-2">
+                              <input
+                                type="digit"
+                                placeholder="Enter Amount"
+                                value={paymentModes[mode]}
+                                onChange={(e) =>
+                                  handleAmountChange(
+                                    mode,
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                                className="w-full border border-gray-300 rounded-lg p-2"
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-gray-100 font-semibold">
+                          <td className="p-2 border text-left">
+                            Total Payment
+                          </td>
+                          <td className="p-2 border">{grandTotalFormatted}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+
+                    {/* Error Message if amounts don't match */}
+                    {totalPayment !== grandTotal && (
+                      <p className="text-red-500 mt-2">
+                        Error: Payment total ({totalPayment.toFixed(2)}) does
+                        not match the Grand Total ({grandTotal.toFixed(2)})!
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {isGST && (
@@ -1692,10 +1990,12 @@ function GenerateInvoice() {
 
               {/* Generate Invoice Button */}
               <div className="button-row">
-                <button
-                  type="submit"
-                  className="w-auto p-3 bg-[#3a6eff] text-white text-lg font-bold rounded-lg cursor-pointer mt-4"
-                >
+              <button
+              type="submit"
+      disabled={totalPayment !== grandTotal}  // Disable if totals don't match
+      className={`mt-4 p-2 bg-blue-500 text-white rounded ${totalPayment !== grandTotal ? 'opacity-50 cursor-not-allowed' : ''}`}
+      onClick={handleInvoiceSubmit}
+    >
                   Create Invoice
                 </button>
               </div>

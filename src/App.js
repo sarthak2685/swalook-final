@@ -34,8 +34,6 @@ import Damo from './components/Pages/Damo';
 import CustomerLoyality from './components/Pages/CustomerLoyality';
 import ViewAllInvoices from './components/Pages/ViewAllInvoice';
 import AllAppointment from './components/Pages/AllAppointment';
-
-
 function App() {
   const isLoggedIn = Cookies.get('loggedIn') === 'true';
   const salonName = Cookies.get('salonName');
