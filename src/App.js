@@ -31,11 +31,10 @@ import "./index.css"; // Assuming you have global styles
 import ExpensesManagement from './components/Pages/ExpenseMnt';
 import ExpenseSetting from './components/Pages/ExpenseSetting';
 import Damo from './components/Pages/Damo';
-<<<<<<< HEAD
 import CustomerLoyality from './components/Pages/CustomerLoyality';
-=======
 import ViewAllInvoices from './components/Pages/ViewAllInvoice';
->>>>>>> 313996e89fc54ee5c79ea2bfff62defe0291a3d4
+import AllAppointment from './components/Pages/AllAppointment';
+
 
 function App() {
   const isLoggedIn = Cookies.get('loggedIn') === 'true';
@@ -73,6 +72,8 @@ function App() {
             <Route path="/:salon_name/:branchName/expenseSetting" element={<ExpenseSetting />} />
             <Route path="/:salon_name/:branchName/demo" element={<Damo />} />
             <Route path="/:salon_name/:branchName/customer-loyality" element={<CustomerLoyality />} />
+            <Route path="/:salon_name/:branchName/view-all-Appointments" element={<AllAppointment />} />
+
           </Route>
           
           <Route path="*" element={<ErrorPage />} />
