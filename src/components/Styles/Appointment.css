@@ -121,7 +121,6 @@
     gap: 5px;
     display: flex;
     flex-wrap: wrap;
-    margin-top: 2rem;
   }
   .appointment-dashboard {
     margin: 0 0 0 150px;
@@ -140,7 +139,6 @@
     gap: 50px;
     display: flex;
     flex-wrap: wrap;
-    margin-top: 2rem;
   }
 }
 
@@ -152,7 +150,6 @@
     gap: 100px;
     display: flex;
     flex-wrap: wrap;
-    margin-top: 2rem;
   }
 }
 
@@ -164,7 +161,6 @@
     gap: 100px;
     display: flex;
     flex-wrap: wrap;
-    margin-top: 2rem;
   }
 }
 
@@ -266,7 +262,6 @@
 .customer-details {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 2rem;
 }
 
 #search_input {
