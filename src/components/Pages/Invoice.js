@@ -87,7 +87,7 @@ function Invoice() {
   );
   const [prices, setPrices] = useState(initialPrices);
   const initialQuantity = services.map((service) =>
-    parseFloat(service.inputFieldValue)
+    parseFloat(service.inputFieldValue.quantity)
   );
   const [quantities, setQuantities] = useState(initialQuantity);
 
