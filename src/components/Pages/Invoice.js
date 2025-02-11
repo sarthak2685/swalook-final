@@ -924,7 +924,7 @@ function Invoice() {
 
                 {/* Display Input Field Value */}
                 <Text style={[styles.tableCell, { width: "10%" }]}>
-                  {service.inputFieldValue || "N/A"}
+                  {service.inputFieldValue.quantity || "N/A"}
                 </Text>
 
                 {/* Display Discount */}

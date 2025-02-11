@@ -1,5 +1,6 @@
 const config = {
-   apiUrl: 'https://api.swalookcrm.in',
+  apiUrl: 'https://app.swalookcrm.in',
+   //apiUrl: 'https://api.swalookcrm.in',
    //apiUrl: 'https://swallook.pythonanywhere.com',
 
   };
