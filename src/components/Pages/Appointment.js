@@ -401,6 +401,9 @@ function Appointment() {
     }
   }, [mobileNo]);
 
+  const handleAllAppointment = (id) => {
+    navigate(`/${sname}/${branchName}/view-all-Appointments`);
+  }
 
   const handleViewDetailsClick = async () => {
     try {
@@ -443,6 +446,7 @@ function Appointment() {
       setShowDeletePopup(false);
     }
   };
+ 
 
 
   return (
@@ -546,15 +550,23 @@ function Appointment() {
           )}
 
           <div className="new-appointment-wrapper">
-            <h2 className="appnt-heading font-bold">Appointment</h2>
+          <div className="flex flex-row justify-between">
+            <h2 className="appnt-heading font-bold text-4xl">Appointment</h2>
+              <button
+                onClick={handleAllAppointment}
+                className="text-blue-500 hover:cursor-pointer hover:underline"
+              >
+                View all Appointments
+              </button>
+            </div>
             <form
               onSubmit={handleAddAppointment}
               className="new-appointment-form"
             >
               <div className="forms-sections">
                 <labels>Customer Details:</labels>
-                <div className="customer-details">
-                  <div className="form-groups">
+<div className="customer-details -mt-7">
+                    <div className="form-groups">
                     <input
                       type="text"
                       placeholder="Phone Number*"

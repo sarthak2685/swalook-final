@@ -301,7 +301,11 @@ function CustomerLoyality() {
             </td>
             <td className="px-4 py-2">{customer.mobile_no}</td>
             <td className="px-4 py-2">{customer.membership || 'None'}</td>
-            <td className="px-4 py-2">{customer.coupon || 'None'}</td>
+            <td className="px-4 py-2">
+  {customer.coupon.length > 0 
+    ? customer.coupon.map(c => c.coupon_name.coupon_name).join(', ') 
+    : 'None'}
+</td>
             <td className="px-4 py-2">{customer.status || '-'}</td>
         </tr>
     ))}
