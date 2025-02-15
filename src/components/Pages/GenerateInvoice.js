@@ -490,19 +490,29 @@ function GenerateInvoice() {
     updateServicesTableData(updatedSelectedList);
   };
 
-  // Handle input change for quantity
-  const handleInputChange = (index, value) => {
+  // Handle input change for quantity and price
+  const handleInputChange = (index, field, value) => {
     const updatedSelectedList = [...selectedList];
-    updatedSelectedList[index].quantity = value;
+
+    if (field === "quantity") {
+      updatedSelectedList[index].quantity = value;
+    } else if (field === "price") {
+      updatedSelectedList[index].price = value;
+    }
+
     setSelectedList(updatedSelectedList);
     updateServicesTableData(updatedSelectedList);
   };
 
   // Update service table data
   const updateServicesTableData = (updatedValues) => {
-    const inputFieldValues = updatedValues.map(
-      (service) => service.quantity || 1
-    ); // Default quantity to 1 if missing
+    const inputFieldValues = updatedValues.map((service) => ({
+      quantity: service.quantity || 1, // Default quantity to 1 if missing
+      price: service.price || 0, // Default price to 0 if missing
+    }));
+
+    // Do something with inputFieldValues if needed
+    console.log(inputFieldValues);
 
     const newTableData = updatedValues.map((service, index) => ({
       ...service,
@@ -1533,10 +1543,26 @@ const handleMembershipGST = (gstValue) => {
                             </td>
                             <td className="p-2 border">{service.name}</td>
                             <td className="p-2 border">
-                              {service.gst === "Inclusive"
-                                ? (service.price / 1.18).toFixed(2)
-                                : service.price || 0}
+                              <input
+                                type="number"
+                                className="border w-20 px-2 py-1 text-center"
+                                placeholder="Price"
+                                min="0"
+                                value={
+                                  service.gst === "Inclusive"
+                                    ? (service.price / 1.18).toFixed(2) // Adjust price for GST-inclusive services
+                                    : service.price || ""
+                                }
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "price",
+                                    e.target.value
+                                  )
+                                }
+                              />
                             </td>
+
                             <td className="p-2 border">
                               <input
                                 type="number"
@@ -1545,10 +1571,15 @@ const handleMembershipGST = (gstValue) => {
                                 min="1"
                                 value={service.quantity || ""}
                                 onChange={(e) =>
-                                  handleInputChange(index, e.target.value)
+                                  handleInputChange(
+                                    index,
+                                    "quantity",
+                                    e.target.value
+                                  )
                                 }
                               />
                             </td>
+
                             <td className="p-2 border">
                               <select
                                 className="border px-2 py-1"
@@ -2269,12 +2300,16 @@ const handleMembershipGST = (gstValue) => {
 
               {/* Generate Invoice Button */}
               <div className="button-row">
-              <button
-              type="submit"
-      disabled={totalPayment !== grandTotal}  // Disable if totals don't match
-      className={`mt-4 p-2 bg-blue-500 text-white rounded ${totalPayment !== grandTotal ? 'opacity-50 cursor-not-allowed' : ''}`}
-      onClick={handleInvoiceSubmit}
-    >
+                <button
+                  type="submit"
+                  disabled={totalPayment !== grandTotal} // Disable if totals don't match
+                  className={`mt-4 p-2 bg-blue-500 text-white rounded ${
+                    totalPayment !== grandTotal
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  onClick={handleInvoiceSubmit}
+                >
                   Create Invoice
                 </button>
               </div>

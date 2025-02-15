@@ -216,7 +216,6 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
           to={`/${sname}/${branchName}/expense`}
           icon={AccountBalanceWallet}
           label="Expense"
-          disabled={userType === "staff"}
           isActive={activeLink === "expense"}
           onClick={() =>
             handleLinkClick("expense", `/${sname}/${branchName}/expense`)
