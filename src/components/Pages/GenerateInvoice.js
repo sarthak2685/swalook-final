@@ -1495,7 +1495,7 @@ const handleMembershipGST = (gstValue) => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-wrap md:gap-12 ">
+              <div className="flex flex-wrap gap-0 lg:gap-12 ">
               <div className="mb-4">
                 <h3 className="text-xl font-bold flex mb-4">
                   Select Services/Products:
@@ -1965,7 +1965,7 @@ const handleMembershipGST = (gstValue) => {
 
               {userExists && (hasMembership || hasCoupon) ? (
                 <>
-<div className="flex justify-center mt-24 mb-8">
+<div className="flex justify-center mt-0 lg:mt-24 mb-8">
   <table className="w-3/5 border border-gray-200 shadow-md rounded-lg overflow-hidden">
     <thead>
       <tr className="bg-gray-100 text-black">
@@ -2035,7 +2035,7 @@ const handleMembershipGST = (gstValue) => {
     )}
   </>
 ) : mobile_no.length === 10 || mobile_no.length === 12 ? (
-  <div className="flex flex-wrap gap-8 sm:-mt-12 md:mt-0">
+  <div className="flex flex-wrap gap-8 md:mt-0">
     {/* Membership Dropdown - Only if Membership is Not Selected */}
     {!hasMembership && (
       <div className="flex flex-col items-start">
@@ -2085,25 +2085,25 @@ const handleMembershipGST = (gstValue) => {
 
 {/* Table for selected membership and coupons */}
 {(selectMembership || selectedCoupons.length > 0) && (
-  <table className="w-full border border-gray-200 mt-4">
+  <table className="lg:w-[42%] md:w-[70%] w-[76%] border border-gray-200 mt-4">
     <thead>
       <tr className="bg-gray-100">
-        <th className="border px-4 py-2">Name</th>
-        <th className="border px-4 py-2">Price</th>
-        <th className="border px-4 py-2">GST</th>
+        <th className="border px-4 py-2 text-center">Name</th>
+        <th className="border px-4 py-2 text-center">Price</th>
+        <th className="border px-4 py-2 text-center">GST</th>
       </tr>
     </thead>
     <tbody>
       {/* Show Membership if selected */}
       {selectMembership && (
         <tr className="border">
-          <td className="p-2 border">{selectMembership.program_type}</td>
-          <td className="p-2 border">
+          <td className="p-2 border text-center">{selectMembership.program_type}</td>
+          <td className="p-2 border text-center">
             {selectMembership.gst === "Inclusive"
               ? (selectMembership.price / 1.18).toFixed(2)
               : selectMembership.price || 0}
           </td>
-          <td className="p-2 border">
+          <td className="p-2 border text-center">
             <select
               className="border px-2 py-1"
               value={selectMembership.gst || ""}
@@ -2122,9 +2122,9 @@ const handleMembershipGST = (gstValue) => {
       {selectedCoupons.length > 0 &&
         selectedCoupons.map((coupon, index) => (
           <tr key={index} className="border">
-            <td className="p-2 border">{coupon.coupon_name}</td>
-            <td className="p-2 border">{coupon.coupon_price}</td>
-            <td className="p-2 border">
+            <td className="p-2 border text-center">{coupon.coupon_name}</td>
+            <td className="p-2 border text-center">{coupon.coupon_price}</td>
+            <td className="p-2 border text-center">
               <select
                 className="border px-2 py-1"
                 value={coupon.gst || ""}
