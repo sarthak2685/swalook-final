@@ -56,10 +56,8 @@ function Invoice() {
 
     return `${month} ${day}, ${year}`;
   };
-  const GB = location.state.GBselectedServices;
-  console.log("abcd", GB);
 
-  const isGST = location.state.isGST;
+
   const customer_name = location.state.customer_name;
   const mobile_no = location.state.mobile_no;
   const email = location.state.email;
@@ -69,6 +67,10 @@ function Invoice() {
       console.log("services", service, service.name, service.category)
     );
   }
+  console.log("anaf",services)
+  const isGST = services.length > 0 && services[0].gst === "Exclusive";
+
+  console.log("servicessdklfjjka", isGST)
 
   const address = location.state.address;
   const service_by = location.state.GBselectedServices;
@@ -77,8 +79,9 @@ function Invoice() {
   const comments = location.state.comments;
   const invoiceId = location.state.InvoiceId;
   const payment_mode = location.state.paymentModes;
-
-  console.log("payment mode", payment_mode);
+  const membership_points = location.state.deductedPoints || 0;
+  const coupon_points = location.state.valueDeductedPoints || 0;
+  console.log("payment mode", membership_points,coupon_points);
   const sname = localStorage.getItem("s-name");
   const [deductedPoint, setDeductedPoint] = useState(0);
 
@@ -92,6 +95,8 @@ function Invoice() {
   const [quantities, setQuantities] = useState(initialQuantity);
 
   const token = localStorage.getItem("token");
+  const coupon = location.state.selectedCoupons;
+  console.log("coupon", coupon)
 
   const [discounts, setDiscounts] = useState(
     Array(services.length).fill(discount)
@@ -213,59 +218,57 @@ function Invoice() {
 
   // Add dependencies for useEffect
 
-  const [membershipPrice, setMembershipPrice] = useState(0);
 
-  const [membership, setMembership] = useState(
-    location.state?.selectMembership
-  );
+   const Memebrship = location.state?.selectMembership;
+   const membershipPrice = Memebrship.price || 0;
+   const membership_name = Memebrship.program_type
+   const membergst = Memebrship.gst
   const branchId = localStorage.getItem("branch_id");
-
-  const apiEndpoint = `${config.apiUrl}/api/swalook/loyality_program/view/?branch_name=${branchId}`;
-
-  useEffect(() => {
-    const fetchMembershipData = async () => {
-      try {
-        const response = await axios.get(apiEndpoint, {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        });
-
-        const membershipData = response.data.data;
-        console.log("membership", membershipData);
-
-        // Ensure membershipData is an array
-        if (Array.isArray(membershipData)) {
-          // If membership is "None" or not valid, skip fetching
-          if (membership === "None" || !membership) {
-            setMembershipPrice(0);
-            return;
-          }
-          console.log("Fetching members", membership, setMembershipPrice);
-
-          // Find the selected membership price
-          const selectedMembership = membershipData.find(
-            (m) => m.program_type === membership
-          );
-          console.log("selectedMembership", selectedMembership);
-
-          const price = selectedMembership ? selectedMembership.price : 0;
-          console.log("price-", price);
-
-          setMembershipPrice(price);
-        } else {
-          console.error("Unexpected response format:", response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching membership data:", error);
-      }
-    };
-
-    // Only fetch data if membership is not "None" or invalid
-    if (membership && membership !== "None") {
-      fetchMembershipData();
+  // const couponPrice = coupon.coupon_price || 0;
+  // const coupon_name = coupon.coupon_name;
+  // const couponTax = 0
+  const isCouponGst = coupon.length > 0 && coupon[0].gst === "Exclusive";
+  const quantity = coupon.length || 0;
+  const totalCouponTax = coupon.reduce((acc, coupon) => {
+    let couponTax = 0;
+    if (coupon.gst === "Exclusive") {
+      const couponCGST = coupon.coupon_price * CGST_RATE;
+      const couponSGST = coupon.coupon_price * SGST_RATE;
+      couponTax = couponCGST + couponSGST;
     }
-  }, [membership, apiEndpoint, token]);
+    return acc + couponTax;
+  }, 0);
+  const coupon_tax = totalCouponTax / 2;
+  const totalCouponGrandTotal = coupon.reduce((acc, coupon) => {
+    let couponTax = 0;
+    let couponTotal = coupon.coupon_price || 0;
+  
+    if (coupon.gst === "Exclusive") {
+      const couponCGST = coupon.coupon_price * CGST_RATE;
+      const couponSGST = coupon.coupon_price * SGST_RATE;
+      couponTax = couponCGST + couponSGST;
+      couponTotal += couponTax;
+    }
+  
+    return acc + couponTotal;
+  }, 0);
+  const totalCouponPrice = coupon.reduce((acc, coupon) => {
+    return acc + (coupon.coupon_price || 0);
+  }, 0);
+
+  console.log("kjfdsfhsj", coupon_tax)
+  // const couponCGST = 0
+  // const couponTotal = 0;
+  // const couponSGST = 0;
+  // if (coupongst === "Exclusive") {
+  //    couponCGST = couponPrice * CGST_RATE;
+  //    couponSGST = couponPrice * SGST_RATE;
+  //   couponTax = couponCGST + couponSGST;
+  //   couponTotal = couponPrice + couponTax;
+  //   // console.log("sahil",membershipSGST,membershipCGST);
+  // }
+
+
 
   useEffect(() => {
     const GST_RATE = 0.18;
@@ -328,17 +331,17 @@ function Invoice() {
       };
     });
 
-    let membershipTotal = membershipPrice;
+    let membershipTotal = Memebrship.price || 0;
     let membershipTax = 0;
     let membershipCGST = 0;
     let membershipSGST = 0;
-
+    const isMemGst = membergst === "Exclusive"
     // Calculate GST values only if GST is applied
-    if (isGST) {
-      const membershipCGST = membershipPrice * CGST_RATE;
-      const membershipSGST = membershipPrice * SGST_RATE;
+    if (membergst === "Exclusive") {
+      const membershipCGST = Memebrship.price * CGST_RATE;
+      const membershipSGST = Memebrship.price * SGST_RATE;
       membershipTax = membershipCGST + membershipSGST;
-      membershipTotal = membershipPrice + membershipTax;
+      membershipTotal = Memebrship.price + membershipTax;
       // console.log("sahil",membershipSGST,membershipCGST);
     }
     // Aggregate totals for services and products
@@ -388,6 +391,7 @@ function Invoice() {
       (acc, { totalAmt }) => acc + totalAmt,
       0
     );
+    console.log("false", isGST, isMemGst, isCouponGst)
 
     // Product totals
     const totalProductTax = updatedProductTaxes.reduce(
@@ -409,17 +413,17 @@ function Invoice() {
 
     // Final totals including membership
     const finalTotalPrice =
-      totalServicePrices + totalProductPrices + membershipPrice;
+      totalServicePrices + totalProductPrices + membershipPrice + totalCouponPrice;
     const finalGrandTotal =
-      totalServiceGrandTotal + totalProductGrandTotal + membershipTotal;
+      totalServiceGrandTotal + totalProductGrandTotal + membershipTotal + totalCouponGrandTotal;
 
     // Update states
     setTotalPrice(finalTotalPrice.toFixed(2));
     setTotalQuantity(totalQuantity); // Updated with membership quantity
     setTotalDiscount(totalServiceDiscount);
-    setTotalTax((totalServiceTax + totalProductTax + membershipTax).toFixed(2));
-    setTotalCGST((totalServiceCGST + totalProductCGST).toFixed(2));
-    setTotalSGST((totalServiceSGST + totalProductSGST).toFixed(2));
+    setTotalTax((totalServiceTax + totalProductTax + membershipTax + totalCouponTax).toFixed(2));
+    setTotalCGST((totalServiceCGST + totalProductCGST + coupon_tax).toFixed(2));
+    setTotalSGST((totalServiceSGST + totalProductSGST + coupon_tax).toFixed(2));
     setGrandTotal(finalGrandTotal.toFixed(2));
     setTaxes(
       updatedServiceTaxes
@@ -447,7 +451,7 @@ function Invoice() {
     discounts,
     services,
     productDetails,
-    membershipPrice,
+    Memebrship.price,
   ]);
 
   const handlePriceBlur = (index, value) => {
@@ -516,21 +520,15 @@ function Invoice() {
     fetchAmount();
   }, []);
 
-  useEffect(() => {
-    if (grand_total > Minimum) {
-      setDeductedPoint(location.state.deductedPoints || 0);
-    } else {
-      setDeductedPoint(0);
-    }
-  }, [grand_total, Minimum]);
+
 
   const bname = localStorage.getItem("branch_name");
 
   const final_price = Math.ceil(
-    parseFloat(grand_total) - parseFloat(deductedPoint)
+    parseFloat(grand_total) - parseFloat(membership_points) - parseFloat(coupon_points)
   );
 
-  const grandTotalInWords = numberToWords(final_price);
+  const grandTotalInWords = numberToWords(final_price-membership_points-coupon_points);
 
   const [invoiceGenerated, setInvoiceGenerated] = useState(false);
 
@@ -624,6 +622,9 @@ function Invoice() {
       slno: invoiceId,
       json_data: producData,
       loyalty_points_deducted: deductedPoint,
+      coupon_points_deducted: coupon,
+      membership: Memebrship,
+      coupon : coupon,
       // If payment_mode is an object, convert it to a list of dictionaries
       new_mode:
         Object.keys(payment_mode).length > 0
@@ -677,17 +678,18 @@ function Invoice() {
 
   const branchName = localStorage.getItem("branch_name");
   // Calculate taxes and totals for the membership
-  let membershipTotal = membershipPrice;
+  let membershipTotal = Memebrship.price;
   let membershipTax = 0;
   let cgsts = 0;
   let sgsts = 0;
+  const isMemGst = membergst === "Exclusive"
 
   // Calculate GST values only if GST is applied
-  if (isGST) {
-    cgsts = membershipPrice * CGST_RATE;
-    sgsts = membershipPrice * SGST_RATE;
+  if (membergst === "Exclusive") {
+    cgsts = Memebrship.price * CGST_RATE;
+    sgsts = Memebrship.price * SGST_RATE;
     membershipTax = cgsts + sgsts;
-    membershipTotal = membershipPrice + membershipTax;
+    membershipTotal = Memebrship.price + membershipTax;
     console.log("shjbfhbhgbefbehjbfhjdb", cgsts, sgsts);
   }
 
@@ -812,15 +814,37 @@ function Invoice() {
       },
       footer: {
         marginTop: 20,
+        paddingHorizontal: 10,
+      },
+      footerRow: {
+        flexDirection: "column", // Arrange items in a column for line-by-line layout
+      },
+      footerText: {
+        fontWeight: "bold",
+        fontSize: 12,
         flexDirection: "row",
         justifyContent: "space-between",
-        fontSize: 10, // Smaller text size for footer
+        marginBottom: 5, // Add spacing between lines
       },
-      footerText: { fontWeight: "bold" },
-      fieldName: { fontWeight: "600" }, // Semibold for field names
+      footerValue: {
+        fontWeight: "600",
+        textAlign: "right", // Align numbers to the right
+      },
+      paymentTitle: {
+        fontWeight: "bold",
+        fontSize: 14,
+        marginBottom: 5,
+      },
+      paymentText: {
+        fontSize: 12,
+        marginBottom: 2,
+      },
+      bold: {
+        fontWeight: "bold",
+      },
+      
     });
 
-    // Example Data - Replace with actual dynamic data
     const invoiceData = {
       sname,
       customer_name,
@@ -834,8 +858,7 @@ function Invoice() {
       gst_number,
       services,
       // staff,
-      membership,
-      membershipPrice,
+      membership_name,
       membershipTax,
       cgsts,
       sgsts,
@@ -850,6 +873,12 @@ function Invoice() {
       grandTotalInWords,
       final_price,
       comments,
+      membership_points,
+      coupon_points,
+      isCouponGst,
+      isMemGst,
+      coupon,
+      quantity,
     };
 
     const InvoiceDocument = () => (
@@ -865,12 +894,12 @@ function Invoice() {
               <Text>{address}</Text>
               <Text>{email}</Text>
               <Text>{mobile_no}</Text>
-              <Text>Payment Mode:</Text>
-              {Object.keys(payment_mode).map((mode) => (
-                <div key={mode}>
-                  <b>{mode}:</b> {payment_mode[mode]}
-                </div>
-              ))}
+              <Text style={styles.paymentTitle}>Payment Mode:</Text>
+  {Object.keys(payment_mode).map((mode) => (
+    <Text key={mode} style={styles.paymentText}>
+      <Text style={styles.bold}>{mode}:</Text> {payment_mode[mode]}
+    </Text>
+  ))}
             </View>
             <View style={styles.sectionColumn}>
               <Text>Date of Invoice: {getCurrentDate()}</Text>
@@ -890,7 +919,7 @@ function Invoice() {
               <Text style={[styles.tableCell, { width: "15%" }]}>PRICE</Text>
               <Text style={[styles.tableCell, { width: "10%" }]}>QUANTITY</Text>
               <Text style={[styles.tableCell, { width: "10%" }]}>DISCOUNT</Text>
-              {isGST && (
+              {isGST || isMemGst || isCouponGst && (
                 <>
                   <Text style={[styles.tableCell, { width: "10%" }]}>
                     TAX AMT
@@ -933,7 +962,7 @@ function Invoice() {
                 </Text>
 
                 {/* Check if GST fields should be displayed */}
-                {isGST && (
+                {isGST || isMemGst || isCouponGst && (
                   <>
                     <Text style={[styles.tableCell, { width: "10%" }]}>
                       {service.gst || "N/A"}
@@ -955,20 +984,20 @@ function Invoice() {
             ))}
 
             {/* Membership Row */}
-            {membership && membership !== "None" && (
+            {membership_name && membership_name !== "None" && (
               <View style={styles.tableRow}>
                 <Text style={[styles.tableCell, { width: "10%" }]}>
                   {services.length + 1}
                 </Text>
                 <Text style={[styles.tableCell, { width: "30%" }]}>
-                  {membership}
+                  {membership_name}
                 </Text>
                 <Text style={[styles.tableCell, { width: "15%" }]}>
                   {membershipPrice}
                 </Text>
                 <Text style={[styles.tableCell, { width: "10%" }]}>1</Text>
                 <Text style={[styles.tableCell, { width: "10%" }]}>0</Text>
-                {isGST && (
+                {isGST || isMemGst || isCouponGst && (
                   <>
                     <Text style={[styles.tableCell, { width: "10%" }]}>
                       {membershipTax}
@@ -981,7 +1010,7 @@ function Invoice() {
                     </Text>
                   </>
                 )}
-                {isGST ? (
+                {isGST || isMemGst || isCouponGst ? (
                   <Text style={[styles.tableCell, { width: "15%" }]}>
                     {membershipTotal}
                   </Text>
@@ -995,6 +1024,46 @@ function Invoice() {
                 </Text>
               </View>
             )}
+{coupon.map((coupon, index) => {
+  const couponPrice = coupon.coupon_price || 0;
+  const couponName = coupon.coupon_name;
+  const isCouponExclusive = coupon.gst === "Exclusive";
+
+  let couponCGST = 0,
+    couponSGST = 0,
+    couponTax = 0,
+    couponTotal = couponPrice * quantity;
+
+  if (isCouponExclusive) {
+    couponCGST = couponPrice * CGST_RATE;
+    couponSGST = couponPrice * SGST_RATE;
+    couponTax = couponCGST + couponSGST;
+    couponTotal = (couponPrice + couponTax) * quantity;
+  }
+  return (
+    <View style={styles.tableRow} key={index}>
+      <Text style={[styles.tableCell, { width: "10%" }]}>{index + 1}</Text>
+      <Text style={[styles.tableCell, { width: "30%" }]}>{couponName}</Text>
+      <Text style={[styles.tableCell, { width: "15%" }]}>{couponPrice}</Text>
+      <Text style={[styles.tableCell, { width: "10%" }]}>{quantity}</Text>
+      <Text style={[styles.tableCell, { width: "10%" }]}>0</Text>
+
+      {isGST || isMemGst || isCouponGst ? (
+        <>
+          <Text style={[styles.tableCell, { width: "10%" }]}>{couponTax.toFixed(2)}</Text>
+          <Text style={[styles.tableCell, { width: "10%" }]}>{couponCGST.toFixed(2)}</Text>
+          <Text style={[styles.tableCell, { width: "10%" }]}>{couponSGST.toFixed(2)}</Text>
+        </>
+      ) : null}
+
+      <Text style={[styles.tableCell, { width: "15%" }]}>
+        {isGST || isMemGst || isCouponGst
+          ? couponTotal.toFixed(2)
+          : (couponTotal - couponTax).toFixed(2)}
+      </Text>
+    </View>
+  );
+})};
 
             {/* Product Rows */}
             {productDetails.map((product, index) => (
@@ -1012,7 +1081,7 @@ function Invoice() {
                   {product.quantity}
                 </Text>
                 <Text style={[styles.tableCell, { width: "10%" }]}>0</Text>
-                {isGST && (
+                {isGST || isMemGst || isCouponGst && (
                   <>
                     <Text style={[styles.tableCell, { width: "10%" }]}>
                       {product.tax}
@@ -1025,7 +1094,7 @@ function Invoice() {
                     </Text>
                   </>
                 )}
-                {isGST ? (
+                {isGST || isMemGst || isCouponGst ? (
                   <Text style={[styles.tableCell, { width: "15%" }]}>
                     {product.total - product.cgst - product.sgst}
                   </Text>
@@ -1044,12 +1113,12 @@ function Invoice() {
               {total_prise}
             </Text>
             <Text style={[styles.tableCell, { width: "15%" }]}>
-              {membership === "None" ? total_quantity - 1 : total_quantity}
+            {Memebrship ? total_quantity + quantity: total_quantity + quantity-1}
             </Text>
             <Text style={[styles.tableCell, { width: "10%" }]}>
               {total_discount}
             </Text>
-            {isGST && (
+            {isGST || isMemGst || isCouponGst && (
               <>
                 <Text style={[styles.tableCell, { width: "10%" }]}>
                   {total_tax}
@@ -1070,9 +1139,30 @@ function Invoice() {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Text>Amount in Words: {grandTotalInWords} Rupees Only</Text>
-            <Text>FINAL VALUE: Rs {final_price}</Text>
-          </View>
+  <View style={styles.footerRow}>
+    {membership_points > 0 && (
+      <Text style={styles.footerText}>
+        Membership Discount:
+        <Text style={styles.footerValue}> {membership_points} Rupees Only</Text>
+      </Text>
+    )}
+    {coupon_points > 0 && (
+      <Text style={styles.footerText}>
+        Coupon Discount:
+        <Text style={styles.footerValue}> {coupon_points} Rupees Only</Text>
+      </Text>
+    )}
+    <Text style={styles.footerText}>
+      Amount in Words:
+      <Text style={styles.footerValue}> {grandTotalInWords} Rupees Only</Text>
+    </Text>
+    <Text style={styles.footerText}>
+      FINAL VALUE:
+      <Text style={styles.footerValue}> Rs {final_price}</Text>
+    </Text>
+  </View>
+</View>
+
         </Page>
       </Document>
     );
@@ -1186,7 +1276,7 @@ function Invoice() {
                     <th style={{ width: "10%" }}>QUANTITY</th>
                     <th style={{ width: "10%" }}>DISCOUNT</th>
                     {/* <th style={{ width: '10%' }}>CGST(2.5%)</th> */}
-                    {isGST ? (
+                    {isGST || isMemGst || isCouponGst ? (
                       <>
                         <th style={{ width: "10%" }}>TAX AMT(18%)</th>
                         <th style={{ width: "10%" }}>CGST(9%)</th>
@@ -1277,7 +1367,7 @@ function Invoice() {
                           }
                         />
                       </td>
-                      {isGST ? (
+                      {isGST || isMemGst || isCouponGst ? (
                         <>
                           <td
                             scope="col"
@@ -1315,7 +1405,7 @@ function Invoice() {
                     </tr>
                   ))}
 
-                  {membership && membership !== "None" && (
+                  {Memebrship && membership_name !== "None" && (
                     <tr
                       style={{
                         border: "1px solid #787871",
@@ -1331,7 +1421,7 @@ function Invoice() {
                         className="text-center"
                         style={{ textAlign: "center" }}
                       >
-                        {membership}
+                        {membership_name}
                       </td>
                       <td
                         scope="col"
@@ -1361,7 +1451,7 @@ function Invoice() {
                         0
                       </td>{" "}
                       {/* Discount is always 0 */}
-                      {isGST ? (
+                      {isGST || isMemGst || isCouponGst ? (
                         <>
                           <td
                             scope="col"
@@ -1389,7 +1479,7 @@ function Invoice() {
                           {/* Calculated SGST */}
                         </>
                       ) : null}
-                      {isGST ? (
+                      {isGST || isMemGst || isCouponGst ? (
                         <td
                           scope="col"
                           style={{
@@ -1415,6 +1505,93 @@ function Invoice() {
                       )}
                     </tr>
                   )}
+
+{coupon.map((coupon, index) => {
+      const couponPrice = coupon.coupon_price || 0;
+      const coupon_name = coupon.coupon_name;
+      let couponCGST = 0,
+        couponSGST = 0,
+        couponTax = 0,
+        couponTotal = couponPrice;
+
+      if (coupon.gst === "Exclusive") {
+        couponCGST = couponPrice * CGST_RATE;
+        couponSGST = couponPrice * SGST_RATE;
+        couponTax = couponCGST + couponSGST;
+        couponTotal = couponPrice + couponTax;
+      }
+
+      return (
+        <tr
+          key={index}
+          style={{
+            border: "1px solid #787871",
+            padding: "3px",
+            backgroundColor: "#fff",
+          }}
+        >
+          <td scope="col" style={{ textAlign: "center" }}>
+            {index + 1}
+          </td>
+          <td scope="col" className="text-center" style={{ textAlign: "center" }}>
+            {coupon_name}
+          </td>
+          <td scope="col" className="text-center" style={{ textAlign: "center" }}>
+            <input
+              type="number"
+              className="editable-field"
+              value={couponPrice}
+              readOnly
+            />
+          </td>
+          <td scope="col" className="text-center" style={{ textAlign: "center" }}>
+            {quantity}
+          </td>
+          <td scope="col" className="text-center" style={{ textAlign: "center" }}>
+            0
+          </td>
+
+          {/* Show GST, CGST, SGST, and Total if applicable */}
+          {isGST || isMemGst || isCouponGst ? (
+            <>
+              <td scope="col" className="text-center" style={{ textAlign: "center" }}>
+                {couponTax.toFixed(2)}
+              </td>
+              <td scope="col" className="text-center" style={{ textAlign: "center" }}>
+                {couponCGST.toFixed(2)}
+              </td>
+              <td scope="col" className="text-center" style={{ textAlign: "center" }}>
+                {couponSGST.toFixed(2)}
+              </td>
+            </>
+          ) : null}
+
+          {isGST || membergst || coupon.gst === "Exclusive" ? (
+            <td
+              scope="col"
+              style={{
+                width: "20%",
+                color: "black",
+                textAlign: "center",
+              }}
+            >
+              {couponTotal.toFixed(2)}
+            </td>
+          ) : (
+            <td
+              scope="col"
+              style={{
+                width: "20%",
+                color: "black",
+                textAlign: "center",
+              }}
+            >
+              {(couponTotal - couponTax).toFixed(2)}
+            </td>
+          )}
+        </tr>
+      );
+    })}
                   {productDetails.length > 0 && (
                     <>
                       <tr
@@ -1460,7 +1637,7 @@ function Invoice() {
                         >
                           0
                         </td>
-                        {isGST ? (
+                        {isGST || isMemGst || isCouponGst ? (
                           <>
                             <td
                               scope="col"
@@ -1485,7 +1662,7 @@ function Invoice() {
                             </td>
                           </>
                         ) : null}
-                        {isGST ? (
+                        {isGST || membergst ? (
                           <td
                             scope="col"
                             style={{
@@ -1549,9 +1726,7 @@ function Invoice() {
                       style={{ width: "10%", padding: "0.7%" }}
                       className="text-center"
                     >
-                      {membership === "None"
-                        ? total_quantity - 1
-                        : total_quantity}
+                      {Memebrship ? total_quantity + quantity: total_quantity + quantity-1}
                     </th>
                     <th
                       style={{ width: "10%", padding: "0.7%" }}
@@ -1559,7 +1734,7 @@ function Invoice() {
                     >
                       {total_discount}
                     </th>
-                    {isGST ? (
+                    {isGST || isMemGst || isCouponGst  ? (
                       <>
                         <th
                           style={{ width: "10%", padding: "0.7%" }}
@@ -1571,13 +1746,13 @@ function Invoice() {
                           style={{ width: "10%", padding: "0.7%" }}
                           className="text-center"
                         >
-                          {total_cgst}
+                          {total_cgst }
                         </th>
                         <th
                           style={{ width: "10%", padding: "0.7%" }}
                           className="text-center"
                         >
-                          {total_sgst}
+                          {total_sgst }
                         </th>
                       </>
                     ) : null}
@@ -1589,9 +1764,9 @@ function Invoice() {
                         color: "white",
                       }}
                     >
-                      <small style={{ color: "white" }}>
+                      {/* <small style={{ color: "white" }}>
                         Loyalty Points used: {deductedPoint}
-                      </small>{" "}
+                      </small>{" "} */}
                       <br />
                       Total: {grand_total}
                     </th>
@@ -1606,16 +1781,34 @@ function Invoice() {
               </div>
             ) : null}
 
-            <div id="invoice_footer">
-              <div id="invoice_footer_left">
-                <h4>Amount in Words:</h4>
-                <p>{grandTotalInWords} Rupees Only</p>
-              </div>
-              <div id="invoice_footer_right">
-                <h4>FINAL VALUE:</h4>
-                <p>Rs {final_price}</p>
-              </div>
-            </div>
+<div id="invoice_footer">
+  <div id="invoice_footer_left">
+    {membership_points > 0 && (
+      <>
+        <h4>Membership Points Discount:</h4>
+      </>
+    )}
+      {coupon_points > 0 && (
+      <>
+        <h4>coupon Points Discount:</h4>
+      </>
+    )}
+    <h4>Amount in Words:</h4>
+    <p>{grandTotalInWords} Rupees Only</p>
+  </div>
+  <div id="invoice_footer_right">
+  {membership_points > 0 &&(
+  <p className="text-black font-bold">- {membership_points} Points</p>
+)}
+  {coupon_points > 0 &&(
+  <p className="text-black font-bold">- {coupon_points} Points</p>
+)}
+
+    <h4>FINAL VALUE:</h4>
+    <p className="text-black font-bold">Rs {final_price}</p>
+  </div>
+</div>
+
           </div>
         </form>
       </div>
