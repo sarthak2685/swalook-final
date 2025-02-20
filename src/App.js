@@ -8,7 +8,7 @@ import ServiceDetails from './components/Pages/ServiceDetails';
 import AdminDashboard from './components/Pages/AdminDashboard';
 import Settings from './components/Pages/Settings';
 import PersonalInformation from './components/Pages/PersonalInformation';
-import Appointment from './components/Pages/Appointment';
+import Appointment from './components/Pages/Appointment.jsx';
 import GenerateInvoice from './components/Pages/GenerateInvoice';
 import Invoice from './components/Pages/Invoice';
 import ForgetPassword from './components/Pages/ForgetPassword';
