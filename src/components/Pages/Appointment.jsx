@@ -457,6 +457,9 @@ const finalizeSelection = () => {
       setApiCalled(true);
     }
   };
+  const handleAllAppointment = (id) => {
+    navigate(`/${sname}/${branchName}/view-all-Appointments`);
+  }
 
   return (
     <>
@@ -593,12 +596,20 @@ const finalizeSelection = () => {
           {/* Appointment Form Section */}
 
           <div className=" bg-white rounded-lg shadow-md p-10 mb-10">
-            <h2 className="text-3xl font-bold text-start mb-6">Appointment</h2>
+            <div className="flex flex-row justify-between">
+            <h2 className="appnt-heading font-bold text-2xl">Appointment</h2>
+              <button
+                onClick={handleAllAppointment}
+                className="text-blue-500 hover:cursor-pointer hover:underline"
+              >
+                View all Appointments
+              </button>
+            </div>
             <form
               onSubmit={handleAddAppointment}
               className="flex flex-col gap-6"
             >
-              <div>
+              <div className="mt-8">
                 <label className="text-xl font-bold text-start">
                   Customer Details:
                 </label>
