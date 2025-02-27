@@ -16,6 +16,8 @@ import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
 import CustomDialog from "./CustomDialog";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 
 function getCurrentDate() {
   const currentDate = new Date();
@@ -32,11 +34,13 @@ function GenerateInvoice() {
 
   const [customer_name, setCustomer_Name] = useState("");
   const [email, setEmail] = useState("");
-  const [mobile_no, setMobileNo] = useState(0);
+  const [mobile_no, setMobileNo] = useState("");
   const [address, setAddress] = useState("");
   const [GBselectedServices, GBsetSelectedServices] = useState([]);
   const [value, selectedValues] = useState([]);
   const [service_by, setServiceBy] = useState([]);
+  const [service, setService] = useState([]);
+
   const [staff, setStaff] = useState([]);
 
   const [discount, setDiscount] = useState(0);
@@ -523,7 +527,7 @@ function GenerateInvoice() {
           ? service.price
           : service.price || 0, // Ensure price defaults to 0 if missing
 
-      gst: service.gst || "", // Default to empty string if gst is not set
+      gst: service.gst || "No GST", // Default to empty string if gst is not set
       inputFieldValue: inputFieldValues[index], // Store quantity in inputFieldValue
       staff: service.staff || [], // Include staff data for the service
       category: service.category, // Ensure category info is included
@@ -1287,6 +1291,25 @@ const handleMembershipGST = (gstValue) => {
   }));
 };
 
+  // Use useLocation to access the passed state
+  const location = useLocation();
+  const { appointment } = location.state || {};
+   // Set initial values from appointment data
+   useEffect(() => {
+    if (appointment) {
+      setCustomer_Name(appointment.customerName || "");
+      setMobileNo(appointment.phoneNumber || "");
+      setEmail(appointment.email || "")
+      setAnniversaryDate(appointment.d_o_a || "")
+      setDateOfBirth(appointment.d_o_b|| "")
+      setService(appointment.services || [])
+
+      setSelectedList(appointment.services || [])
+      console.log ("scheduler",appointment.service)
+      setStaff(appointment.service_by|| "")
+    }
+  }, [appointment]);
+
   return (
     <>
       <div className="bg-gray-100">
@@ -1437,15 +1460,16 @@ const handleMembershipGST = (gstValue) => {
                   <div className="grid sm:grid-cols-2 md:grid-cols-3  mt-4">
                     <input
                       type="number"
-                      className="text-[#CCCCCF] border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                      className="border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Phone Number"
+                      value={mobile_no}
                       required
                       onBlur={handlePhoneBlur}
                       onChange={(e) => setMobileNo(e.target.value)}
                     />
                     <input
                       type="text"
-                      className="text-[#CCCCCF] border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                      className="border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Full Name"
                       value={customer_name}
                       readOnly={userExists} // Read-only for existing user
@@ -1456,7 +1480,7 @@ const handleMembershipGST = (gstValue) => {
                     />
                     <input
                       type="email"
-                      className="text-[#CCCCCF] border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                      className="border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Email Address"
                       value={email}
                       readOnly={userExists} // Read-only for existing user
@@ -1472,6 +1496,7 @@ const handleMembershipGST = (gstValue) => {
   type="date"
   id="date_input_field"
   className="text-[#CCCCCF] col-span-1 font-semibold placeholder-gray-400"
+  max={new Date().toISOString().split('T')[0]}
   placeholder="Date of Birth"
   value={dateOfBirth || ""}
   onChange={(e) => setDateOfBirth(e.target.value)}  // Allow editing for all users
@@ -1486,6 +1511,7 @@ const handleMembershipGST = (gstValue) => {
   type="date"
   id="date_input_field"
   className="text-[#CCCCCF] col-span-1 font-semibold placeholder-gray-400"
+  max={new Date().toISOString().split('T')[0]}
   placeholder="Date of Anniversary"
   value={anniversaryDate || ""}
   onChange={(e) => setAnniversaryDate(e.target.value)}  // Allow editing for all users
@@ -1541,7 +1567,7 @@ const handleMembershipGST = (gstValue) => {
                             <td className="p-2 border">
                               {service.category || "Uncategorized"}
                             </td>
-                            <td className="p-2 border">{service.name}</td>
+                            <td className="p-2 border">{service.name || service.Description }</td>
                             <td className="p-2 border">
                               <input
                                 type="number"
@@ -1569,7 +1595,7 @@ const handleMembershipGST = (gstValue) => {
                                 className="border w-20 px-2 py-1 text-center"
                                 placeholder="Qty"
                                 min="1"
-                                value={service.quantity || ""}
+                                value={service.quantity || "1"}
                                 onChange={(e) =>
                                   handleInputChange(
                                     index,
@@ -1583,7 +1609,7 @@ const handleMembershipGST = (gstValue) => {
                             <td className="p-2 border">
                               <select
                                 className="border px-2 py-1"
-                                value={service.gst || ""}
+                                value={service.gst || "No GST"}
                                 onChange={(e) => handleGST(e, index)}
                                 required
                               >

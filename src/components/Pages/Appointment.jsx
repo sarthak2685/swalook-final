@@ -44,7 +44,7 @@ function Appointment() {
   const [deleteInvoiceId, setDeleteInvoiceId] = useState(null);
   const sname = localStorage.getItem("sname");
   const branchName = localStorage.getItem("branch_name");
-  const [staffData, setStaffData] = useState([]);
+  const [staffData, setStaffData] = useState("");
   const [service_by, setServiceBy] = useState([]);
   const [userExists, setUserExists] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -57,7 +57,8 @@ function Appointment() {
   const [servicesTableData, setServicesTableData] = useState([]);
   const [appointment, setAppointment] = useState([]);
   const [categoryServices, setCategoryServices] = useState([]);
-  const [hasFetchedServicesCategory, setHasFetchedServicesCategory] = useState(false);
+  const [hasFetchedServicesCategory, setHasFetchedServicesCategory] =
+    useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [genderFilter, setGenderFilter] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
@@ -74,16 +75,16 @@ function Appointment() {
   useEffect(() => {
     const newAppointment = [
       ...services.map((service) => ({
-        Description: service.name,
+        name: service.name,
         category: service.category,
         price: service.price,
-        staff: service.staff,
-            })),
+        staff: service.service_by,
+      })),
     ];
     setAppointment(newAppointment);
   }, [services]);
 
-  console.log("appointment",appointment)
+  console.log("appointment", appointment);
   // Fetch staff data
   const fetchStaffData = async () => {
     const token = localStorage.getItem("token");
@@ -104,22 +105,17 @@ function Appointment() {
 
       const staffData = await staffResponse.json();
       const staffArray = Array.isArray(staffData.table_data)
-        ? staffData.table_data
+        ? staffData.table_data.map((staff) => staff.staff_name)
         : [];
 
-      // Format the options
-      const formattedOptions = staffArray.map((staff) => {
-        const hasSpaceInName =
-          typeof staff.staff_name === "string" && /\s/.test(staff.staff_name);
-        return {
-          labels: `${staff.staff_name} (${staff.staff_role})`,
-        };
-      });
+      console.log("staffArray", staffArray);
 
-      setStaffData(formattedOptions);
+      // Convert the array to a comma-separated string
+      const staffString = staffArray.join(", ");
+      setStaffData(staffString);
     } catch (error) {
       console.error("Error fetching staff data:", error);
-      setStaffData([]);
+      setStaffData(""); // maintain as string
     }
   };
 
@@ -151,8 +147,9 @@ function Appointment() {
     setBookAppointment(true);
 
     let errorMessage = "Please fix the following issues:\n";
-    if (services.length === 0) errorMessage += ' - Select at least one service.\n';
-  
+    if (services.length === 0)
+      errorMessage += " - Select at least one service.\n";
+
     if (!bookingTime) errorMessage += " - Select a time.\n";
     if (!bookingDate) errorMessage += " - Select a date.\n";
     if (!/^(\+91)?[0-9]{10}$/.test(mobileNo))
@@ -174,8 +171,8 @@ function Appointment() {
           customer_name: customerName,
           mobile_no: mobileNo,
           email: email,
-          dateof_birth: dateOfBirth,
-          dateof_aniversery: anniversaryDate,
+          d_o_b: dateOfBirth || "",
+          d_o_a: anniversaryDate || "",
           service_by: service_by,
           services: JSON.stringify(appointment),
           booking_time: bookingTime,
@@ -194,9 +191,7 @@ function Appointment() {
         setPopupMessage("Appointment added successfully!");
         setShowPopup(true);
         const phoneNumber = `+91${mobileNo}`;
-        const serviceNames = services
-          .map((service) => service.name)
-          .join(", ");
+        const serviceNames = services.map((service) => service.name).join(", ");
         const message = `Hi ${customerName}!\nYour appointment is booked for: ${bookingTime} | ${bookingDate}\nServices: ${serviceNames}\nSee you soon!`;
         const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
           message
@@ -303,12 +298,11 @@ function Appointment() {
     setSelectedList(updatedServiceList);
   };
 
-// Finalize service selection
-const finalizeSelection = () => {
-  setServices(selectedList); // Correcting the variable
-  console.log("Selected Services:", selectedList);
-};
-
+  // Finalize service selection
+  const finalizeSelection = () => {
+    setServices(selectedList); // Correcting the variable
+    console.log("Selected Services:", selectedList);
+  };
 
   // Handle delete confirmation
   const handleDeleteConfirm = async () => {
@@ -459,7 +453,7 @@ const finalizeSelection = () => {
   };
   const handleAllAppointment = (id) => {
     navigate(`/${sname}/${branchName}/view-all-Appointments`);
-  }
+  };
 
   return (
     <>
@@ -597,7 +591,7 @@ const finalizeSelection = () => {
 
           <div className=" bg-white rounded-lg shadow-md p-10 mb-10">
             <div className="flex flex-row justify-between">
-            <h2 className="appnt-heading font-bold text-2xl">Appointment</h2>
+              <h2 className="appnt-heading font-bold text-2xl">Appointment</h2>
               <button
                 onClick={handleAllAppointment}
                 className="text-blue-500 hover:cursor-pointer hover:underline"
@@ -652,6 +646,7 @@ const finalizeSelection = () => {
                         type="date"
                         id="date_input_field"
                         className="text-[#CCCCCF] col-span-1 font-semibold placeholder-gray-400"
+                        max={new Date().toISOString().split('T')[0]}
                         placeholder="Date of Birth"
                         value={dateOfBirth}
                         onChange={(e) =>
@@ -667,6 +662,7 @@ const finalizeSelection = () => {
                         type="date"
                         id="date_input_field"
                         className="text-[#CCCCCF] col-span-1 font-semibold placeholder-gray-400"
+                        max={new Date().toISOString().split('T')[0]}
                         placeholder="Date of Anniversary"
                         value={anniversaryDate}
                         onChange={(e) =>
@@ -693,7 +689,6 @@ const finalizeSelection = () => {
                 >
                   Add Services
                 </button>
-
               </div>
               {isServiceModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -829,15 +824,15 @@ const finalizeSelection = () => {
                 </label>
                 <select
                   onClick={handleDropdownClick}
-                  onChange={(e) => setServiceBy([{ labels: e.target.value }])}
+                  onChange={(e) => setServiceBy(e.target.value)}
                   className="sm:w-full md:w-1/4 p-2 border border-gray-300 rounded-lg"
                 >
                   <option value="" disabled selected>
                     Select Served By
                   </option>
-                  {staffData.map((staff, index) => (
-                    <option key={index} value={staff.labels}>
-                      {staff.labels}
+                  {staffData.split(", ").map((staff, index) => (
+                    <option key={index} value={staff}>
+                      {staff}
                     </option>
                   ))}
                 </select>
@@ -853,6 +848,7 @@ const finalizeSelection = () => {
                     id="date"
                     onChange={(e) => setBookingDate(e.target.value)}
                     className="p-2 border border-gray-300 rounded-lg"
+                    min={new Date().toISOString().split('T')[0]}
                   />
                   <select
                     id="hours"
