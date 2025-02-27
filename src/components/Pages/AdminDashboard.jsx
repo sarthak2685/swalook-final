@@ -7,6 +7,7 @@ import ApexCharts from "react-apexcharts";
 import config from "../../config";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import Scheduler from "./Scheduler";
 
 const AdminDashboard = () => {
   const [chartData, setChartData] = useState([]);
@@ -17,7 +18,7 @@ const AdminDashboard = () => {
   const [selectedDate1, setSelectedDate1] = useState(new Date());
 
   const [selectedPeriod, setSelectedPeriod] = useState("Weekly");
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const token = localStorage.getItem("token");
   const bid = localStorage.getItem("branch_id");
 
@@ -314,6 +315,7 @@ const AdminDashboard = () => {
 
   // const [monthlyData, setMonthlyData] = useState([]);
   // const [yearlyData, setYearlyData] = useState([]);
+  const [modeOfPaymentData, setModeOfPaymentData] = useState([]);
 
 
   const fetchStaffData = async (event) => {
@@ -362,7 +364,8 @@ const AdminDashboard = () => {
       setStaffData(processedStaffData||[]);
 
       // Set mode of payment data
-      setModeOfPaymentData(data.mode_of_payment || []);
+      setModeOfPaymentData(data.mode_of_payment|| data.new_mode || []);
+
     } catch (error) {
       console.error("Error fetching staff data:", error);
     }
@@ -373,16 +376,21 @@ const AdminDashboard = () => {
   }, []);
 
 
-  const [modeOfPaymentData, setModeOfPaymentData] = useState([]);
 
   const donutChartData = useMemo(() => {
     // Find the data for the selected month
     const filteredData = modeOfPaymentData.find(
       (item) => Number(item.month) === selectedMonth
     );
+
+
+
   
     // If data exists for the selected month, extract the payment modes array
     const paymentModes = filteredData?.payment_modes || [];
+
+    console.log('Filtered Data:', filteredData);
+    console.log('Payment Modes:', paymentModes);
   
     // Map the revenue values and the corresponding payment modes
     const series = paymentModes.map((mode) => mode.total_revenue);
@@ -516,6 +524,7 @@ const AdminDashboard = () => {
               </div>
             </div>
           </div>
+          <Scheduler />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Total Sales Bar Chart */}
@@ -575,7 +584,6 @@ const AdminDashboard = () => {
                   <select
                     className="border mb-4 px-3 py-1 rounded-md"
                     onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                    value={selectedMonth}
                   >
                     <option value="01">January</option>
                     <option value="02">February</option>
