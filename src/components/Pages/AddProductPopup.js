@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/AddProductPopup.css';
 import Popup from './Popup';
 import config from '../../config';
 import CircularProgress from '@mui/material/CircularProgress';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
+import axios from 'axios';
 
 function AddProductPopup({ onClose }) {
     const navigate = useNavigate();
@@ -17,15 +18,54 @@ function AddProductPopup({ onClose }) {
     const [description, setDescription] = useState('');
     const [unit, setUnit] = useState('');
     const [loading, setLoading] = useState(false);
+    const [category, setCategory] = useState(); 
+    const [categories, setCategories] = useState([]);
   
     const branchName = localStorage.getItem('branch_name');
     const sname = localStorage.getItem('s-name');
+    const bid = localStorage.getItem("branch_id");
+
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+    
+        axios
+          .get(
+            `${config.apiUrl}/api/swalook/product_category/?branch_name=${bid}`,
+            {
+              headers: {
+                Authorization: `Token ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+          .then((response) => {
+            console.log("cat",response.data.data)
+            if (response.data.status) {
+              setCategories(response.data.data); // Populate categories from API response
+            } else {
+              setPopupMessage("Failed to fetch categories.");
+              setShowPopup(true);
+            }
+          })
+          .catch((err) => {
+            console.error("Error fetching categories:", err);
+            setPopupMessage("Failed to fetch categories.");
+            setShowPopup(true);
+          });
+      }, [bid]);
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         const token = localStorage.getItem('token');
         const bid = localStorage.getItem('branch_id');
+        if (!category) {
+            setPopupMessage("Please select a category.");
+            setShowPopup(true);
+            return;
+          }
 
         const payload = {
             product_name: product,
@@ -33,7 +73,8 @@ function AddProductPopup({ onClose }) {
             product_description: description,
             product_id: sku,
             stocks_in_hand: parseInt(invent, 10),
-            unit: unit
+            unit: unit,
+            category: category,
         };
 
         try {
@@ -64,7 +105,7 @@ function AddProductPopup({ onClose }) {
             setShowPopup(true);
         }
     };
-
+    console.log("i",categories)
     return (
         <div className="ad_p_popup_overlay">
             <div className="ad_p_popup_container">
@@ -80,6 +121,31 @@ function AddProductPopup({ onClose }) {
                         <label htmlFor="product_name">Name:</label>
                         <input type="text" id="product_name" name="product_name" placeholder='Product Name' required onChange={(e) => setProduct(e.target.value)} />
                     </div>
+                    <div className="mb-4 flex gap-12">
+            <label
+              htmlFor="category"
+              className="block text-start text-sm font-medium text-gray-700 mb-2 ml-4"
+            >
+              Category:
+            </label>
+            <select
+              id="category"
+              name="category"
+              value={category || ""} 
+              onChange={(e) => setCategory(e.target.value)} 
+              required
+              className="w-52 px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="" disabled>
+                Select a Category
+              </option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.product_category}
+                </option>
+              ))}
+            </select>
+          </div>
                     <div className="adp2">
                         <label htmlFor="sku">SKU:</label>
                         <input type="text" id="sku" name="sku" placeholder="Id of product" required onChange={(e) => setSKU(e.target.value)} />

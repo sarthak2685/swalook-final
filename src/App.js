@@ -21,7 +21,7 @@ import GlobalErrorPage from './components/Pages/GlobalErrorPage';
 import BusinessAnalysis from './components/Pages/BusinessAnalysis';
 import Help from './components/Pages/Help';
 import AppointAsInv from './components/Pages/AppointAsInv';
-import Inventory from './components/Pages/Inventory';
+import Inventory from './components/Pages/Inventory.jsx';
 import CLP_Setting from './components/Pages/CLP_Setting';
 import CustomerL from './components/Pages/CustomerL';
 import StaffManagement from './components/Pages/StaffManagement';
@@ -34,6 +34,7 @@ import Damo from './components/Pages/Damo';
 import CustomerLoyality from './components/Pages/CustomerLoyality';
 import ViewAllInvoices from './components/Pages/ViewAllInvoice';
 import AllAppointment from './components/Pages/AllAppointment';
+import InvenotrySetting from './components/Pages/InvenotrySetting.jsx';
 function App() {
   const isLoggedIn = Cookies.get('loggedIn') === 'true';
   const salonName = Cookies.get('salonName');
@@ -71,6 +72,8 @@ function App() {
             <Route path="/:salon_name/:branchName/demo" element={<Damo />} />
             <Route path="/:salon_name/:branchName/customer-loyality" element={<CustomerLoyality />} />
             <Route path="/:salon_name/:branchName/view-all-Appointments" element={<AllAppointment />} />
+            <Route path="/:salon_name/:branchName/invetorysetting" element={<InvenotrySetting />} />
+            
 
           </Route>
           

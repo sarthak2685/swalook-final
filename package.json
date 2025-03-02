@@ -26,6 +26,7 @@
     "html2pdf.js": "^0.10.2",
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.2",
+    "lucide-react": "^0.475.0",
     "multiselect-react-dropdown": "^2.0.25",
     "number-to-words": "^1.2.4",
     "pdfmake": "^0.2.15",

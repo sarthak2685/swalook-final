@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../Styles/ExpenseModal.css";
 import config from "../../config";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
 const ExpenseModal = ({ onClose }) => {
     const [formData, setFormData] = useState({
@@ -18,6 +19,11 @@ const ExpenseModal = ({ onClose }) => {
     const [staffData, setStaffData] = useState([]);
     const [inventoryData, setInventoryData] = useState([]);
     const [categoryData, setCategoryData] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState('');
+    const [category, setCategory] = useState();
+
 
     useEffect(() => {
         fetchStaffData();
@@ -29,27 +35,50 @@ const ExpenseModal = ({ onClose }) => {
 
     const handleChange = (e, index = null, field = null) => {
         const { name, value } = e.target;
-
+    
         if (field === "inventory") {
-            const updatedInventory = [...formData.inventory];
-            updatedInventory[index][name] = value;
-            console.log("Inventory Updated:", updatedInventory);
-            setFormData({ ...formData, inventory: updatedInventory });
+            setFormData((prevFormData) => {
+                const updatedInventory = prevFormData.inventory ? [...prevFormData.inventory] : [];
+    
+                if (!updatedInventory[index]) {
+                    updatedInventory[index] = { item: "", quantity: "", price: "", itemId: null };
+                }
+    
+                const selectedIndex = e.target.selectedIndex;
+    
+                if (selectedIndex >= 0 && e.target.options.length > 0) {
+                    const selectedOption = e.target.options[selectedIndex];
+                    const selectedId = selectedOption?.getAttribute("data-id") || null;
+    
+                    updatedInventory[index] = {
+                        ...updatedInventory[index],
+                        [name]: value,
+                        itemId: selectedId,
+                    };
+                } else {
+                    updatedInventory[index] = {
+                        ...updatedInventory[index],
+                        [name]: value,
+                    };
+                }
+    
+                return { ...prevFormData, inventory: updatedInventory };
+            });
         } else {
-            console.log(`Field ${name} Updated:`, value);
-            setFormData({ ...formData, [name]: value });
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                [name]: value,
+            }));
         }
     };
-
-
-    const handleAddInventory = () => {
-        const newInventory = { item: "", quantity: "", price: "" };
-        setFormData({ ...formData, inventory: [...formData.inventory, newInventory] });
-    };
-
+    
+    
+    
+    
     const handleSubmit = async () => {
         const payload = {
             date: formData.date,
+            category: formData.category,
             expense_type: formData.expenseType,
             expense_account: formData.expenseAccount,
             expense_amount: parseFloat(formData.expenseAmount) || 0, // Ensure it is parsed as a number
@@ -57,9 +86,9 @@ const ExpenseModal = ({ onClose }) => {
             invoice_id: formData.invoiceId || "",
             comment: formData.notes,
             inventory_item: formData.inventory.map((inv) => ({
-                item: inv.item,
+                item: inv.itemId || null ,
                 quantity: parseFloat(inv.quantity),
-                price: parseFloat(inv.price)
+                price: parseFloat(inv.price),
             }))
         };
 
@@ -76,13 +105,13 @@ const ExpenseModal = ({ onClose }) => {
 
             if (response.ok) {
                 toast.success("Expense added successfully");
-            
+
                 setTimeout(() => {
                     window.location.reload();
                     onClose();
                 }, 2000); // Delay in milliseconds (2 seconds)
             }
-             else {
+            else {
                 const errorData = await response.json();
                 alert(`Error: ${errorData.message}`);
             }
@@ -157,6 +186,8 @@ const ExpenseModal = ({ onClose }) => {
                     value: product.product_name,
                     unit: product.unit,
                     quantity: product.stocks_in_hand,
+                    category: product.category_details ? product.category_details.id : null, 
+
                 }))
             );
         } catch (error) {
@@ -201,9 +232,56 @@ const ExpenseModal = ({ onClose }) => {
         fetchExpenseCategory();
     }, []);
 
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+
+        axios
+            .get(
+                `${config.apiUrl}/api/swalook/product_category/?branch_name=${bid}`,
+                {
+                    headers: {
+                        Authorization: `Token ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then((response) => {
+                console.log("cat", response.data.data)
+                if (response.data.status) {
+                    setCategories(response.data.data); // Populate categories from API response
+                } else {
+                    setPopupMessage("Failed to fetch categories.");
+                    setShowPopup(true);
+                }
+            })
+            .catch((err) => {
+                console.error("Error fetching categories:", err);
+                setPopupMessage("Failed to fetch categories.");
+                setShowPopup(true);
+            });
+    }, [bid]);
+    const handleCategoryChange = (e, index) => {
+        const newCategory = e.target.value;
+        const updatedInventory = [...formData.inventory];
+
+        updatedInventory[index].category = newCategory;
+        updatedInventory[index].item = ""; // Reset selected item when category changes
+
+        setFormData({ ...formData, inventory: updatedInventory });
+    };
+
+
+    const handleAddInventory = () => {
+        setFormData({
+            ...formData,
+            inventory: [...formData.inventory, { category: "", item: "", quantity: "", price: "" }],
+        });
+    };
+
+
     return (
         <div className="modal-overlay">
-                    <Toaster />
+            <Toaster />
 
             <div className="modal-content">
                 <div className="modal-header">
@@ -283,43 +361,86 @@ const ExpenseModal = ({ onClose }) => {
                 {/* Inventory Details Section */}
                 <div className="forms-sections">
                     <h3>Inventory Details:</h3>
-                    {formData.inventory.map((item, index) => (
-                        <div key={index} className="forms-rows">
-                            <select
-                                id="inventory-field"
-                                name="item" // Matches the key in `formData.inventory`
-                                value={item.item} // This must match a value in `inventoryData`
-                                onChange={(e) => handleChange(e, index, "inventory")}
-                                disabled={formData.expenseType !== "Invoice"}
-                                required
-                            >
-                                <option value="">Inventory Item*</option>
-                                {inventoryData.map((inv) => (
-                                    <option key={inv.key} value={inv.value}>
-                                        {inv.value} (Stock: {inv.quantity})
+
+                    {formData.inventory.map((item, index) => {
+                        console.log("Selected Category for index", index, ":", item.category);
+                        return (
+                            <div key={index} className="forms-rows">
+                                <select
+                                    id={`category-${index}`}
+                                    name="category"
+                                    value={item.category || ""}
+                                    onChange={(e) => handleCategoryChange(e, index)} // Function to update category in formData
+                                    required
+                                    className="w-52 px-4 py-2 border font-extrabold rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 b border-[#ccc] bg-[#F9F9F9] text-[#C5C5C6]"
+                                >
+                                    <option value="" disabled>
+                                        Select a Category
                                     </option>
-                                ))}
-                            </select>
+                                    {categories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.product_category}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <select
+                                    id={`inventory-field-${index}`}
+                                    name="item"
+                                    value={item.item || ""}
+                                    onChange={(e) => handleChange(e, index, "inventory")}
+                                    disabled={formData.expenseType !== "Invoice"}
+                                    required
+                                    className="w-52 px-4 py-2 border font-extrabold rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 border-[#ccc] bg-[#F9F9F9] text-[#C5C5C6]"
+                                >
+                                    <option value="">Inventory Item*</option>
+                                    {console.log("Full Inventory Data:", inventoryData)}
+  {console.log("Filtering by Category:", item.category)}
+  {inventoryData
+  .filter((inv) => inv.category === item.category) // Compare with 'category' instead of 'key'
+  .map((inv) => (
+    <option key={inv.key} value={inv.value} data-id={inv.key}>
+      {inv.value} (Stock: {inv.quantity})
+    </option>
+  ))}
 
 
-                            <input type="number" id="inventory-field" name="quantity"
-                                value={item.quantity}
-                                onChange={(e) => handleChange(e, index, "inventory")}
-                                placeholder="Inventory Quantity*" disabled={formData.expenseType !== "Invoice"}
-                                required />
-                            <input type="number" id="inventory-field" name="price"
-                                value={item.price}
-                                onChange={(e) => handleChange(e, index, "inventory")}
-                                disabled={formData.expenseType !== "Invoice"}
-                                placeholder="Purchase Price*" required />
-                        </div>
-                    ))}
+
+
+                                </select>
+
+                                <input
+                                    type="number"
+                                    id={`inventory-quantity-${index}`}
+                                    name="quantity"
+                                    value={item.quantity || ""}
+                                    onChange={(e) => handleChange(e, index, "inventory")}
+                                    placeholder="Inventory Quantity*"
+                                    disabled={formData.expenseType !== "Invoice"}
+                                    required
+                                    className="w-52 px-4 py-2 border font-bold rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 b border-[#ccc] bg-[#F9F9F9]"                                />
+                                <input
+                                    type="number"
+                                    id={`inventory-price-${index}`}
+                                    name="price"
+                                    value={item.price || ""}
+                                    onChange={(e) => handleChange(e, index, "inventory")}
+                                    disabled={formData.expenseType !== "Invoice"}
+                                    placeholder="Purchase Price*"
+                                    required
+                                    className="w-52 px-4 py-2 border font-bold rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 b border-[#ccc] bg-[#F9F9F9]"                                />
+                            </div>
+                        );
+                    })}
+
+                    {/* Button to Add More Inventory Items */}
                     <div id="buttons-add">
-                        <buttons id="add-inventory-btn" onClick={handleAddInventory}>
+                        <button id="add-inventory-btn" onClick={handleAddInventory}>
                             + Inventory Item
-                        </buttons>
+                        </button>
                     </div>
                 </div>
+
 
                 {/* Notes Section */}
                 <div className="forms-sections">

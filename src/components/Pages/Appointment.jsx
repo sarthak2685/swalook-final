@@ -264,6 +264,11 @@ function Appointment() {
       return () => clearTimeout(timeoutId);
     }
   }, [mobileNo]);
+  useEffect(() => {
+    if (mobileNo.length === 10) {
+      handlePhoneBlur();
+    }
+  }, [mobileNo]);
 
   const fetchCustomerData = async () => {
     try {
@@ -611,30 +616,36 @@ function Appointment() {
                   <div className="grid sm:grid-cols-2 md:grid-cols-3  mt-4">
                     <input
                       type="number"
-                      className="text-[#CCCCCF] border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                      className="text-black border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Phone Number"
                       required
-                      onBlur={handlePhoneBlur}
-                      onChange={(e) => setMobileNo(e.target.value)}
+                      // onBlur={handlePhoneBlur}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                    
+                        // Allow only 10 digits
+                        if (value.length <= 10) {
+                          setMobileNo(value);
+                        }
+                      }}
                     />
                     <input
                       type="text"
-                      className="text-[#CCCCCF] border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                      className="text-black border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Full Name"
                       value={customerName}
-                      readOnly={userExists} // Read-only for existing user
                       required
                       onChange={(e) =>
-                        !userExists && setCustomerName(e.target.value)
+                        setCustomerName(e.target.value)
                       } // Editable only for new user
                     />
                     <input
                       type="email"
-                      className="text-[#CCCCCF] border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                      className="text-black border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Email Address"
                       value={email}
                       readOnly={userExists} // Read-only for existing user
-                      onChange={(e) => !userExists && setEmail(e.target.value)} // Editable only for new user
+                      onChange={(e) => setEmail(e.target.value)} // Editable only for new user
                     />
                   </div>
                   <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-4">
@@ -645,7 +656,7 @@ function Appointment() {
                       <input
                         type="date"
                         id="date_input_field"
-                        className="text-[#CCCCCF] col-span-1 font-semibold placeholder-gray-400"
+                        className="text-black col-span-1 font-semibold placeholder-gray-400"
                         max={new Date().toISOString().split('T')[0]}
                         placeholder="Date of Birth"
                         value={dateOfBirth}
@@ -661,7 +672,7 @@ function Appointment() {
                       <input
                         type="date"
                         id="date_input_field"
-                        className="text-[#CCCCCF] col-span-1 font-semibold placeholder-gray-400"
+                        className="text-black col-span-1 font-semibold placeholder-gray-400"
                         max={new Date().toISOString().split('T')[0]}
                         placeholder="Date of Anniversary"
                         value={anniversaryDate}
