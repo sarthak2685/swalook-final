@@ -44,8 +44,8 @@ body {
   font-size: 18px;
   color: red;
   position: absolute;
-  left: 240px;
-  top: 1px; /* Adjust this value to move the button above the line */
+  left: 341px;
+  top: 27px;
 }
 
 .close_button:hover {

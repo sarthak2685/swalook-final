@@ -31,7 +31,7 @@ function GenerateInvoice() {
   const navigate = useNavigate();
   const [serviceOptions, setServiceOptions] = useState([]);
   const [categoryServices, setCategoryServices] = useState([]);
-
+  const [productCategory, setProductCategory] = useState([]);
   const [customer_name, setCustomer_Name] = useState("");
   const [email, setEmail] = useState("");
   const [mobile_no, setMobileNo] = useState("");
@@ -54,7 +54,7 @@ function GenerateInvoice() {
   const [hasFetchedServices, setHasFetchedServices] = useState(false);
   const [hasFetchedServicesCategory, setHasFetchedServicesCategory] =
     useState(false);
-
+  const [hasFetchedProducts, setHasFetchedProducts] = useState(false);
   const [selectedList, setSelectedList] = useState([]); // Initialize selectedList as an empty array
   const [selectedCategoryValues, setSelectedCategoryValues] = useState([]); // Initialize selectedList as an empty array
   const [selectedCategoryList, setSelectedCategoryList] = useState([]); // Initialize selectedList as an empty array
@@ -132,14 +132,13 @@ function GenerateInvoice() {
   const bid = localStorage.getItem("branch_id");
   const token = localStorage.getItem("token");
 
-  const fetchData = async () => {
+  const fetchData = async () => { 
     try {
-      if (apiCalled) return; // Prevent redundant API calls
+      if (apiCalled) return; // Prevent duplicate API calls
 
       const branchName = localStorage.getItem("branch_name");
       const token = localStorage.getItem("token");
 
-      // Validate necessary data
       if (!branchName || !token) {
         console.error("Branch name or token is missing.");
         return;
@@ -157,27 +156,55 @@ function GenerateInvoice() {
       );
 
       if (!response.ok) {
-        console.error(`API Error: ${response.status} - ${response.statusText}`);
-        return;
+        throw new Error(`Failed to fetch products: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const result = await response.json();
 
-      // Transform and set inventory data
-      const formattedData =
-        data.data?.map((product) => ({
-          key: product.id,
-          value: product.product_name,
-          unit: product.unit,
-          quantity: product.stocks_in_hand,
-        })) || [];
+      console.log("API Response Data: ", result); // ✅ Debugging Step
 
-      setInventoryData(formattedData);
-      setApiCalled(true); // Mark API as called
+      if (!result.status || !Array.isArray(result.data)) {
+        throw new Error("Invalid API response format");
+      }
+
+      // Transform API response into a structured category-product map
+      const categoryMap = new Map();
+
+      result.data.forEach((product) => {
+        const categoryName =
+          product.category_details?.product_category || "Uncategorized";
+
+        if (!categoryMap.has(categoryName)) {
+          categoryMap.set(categoryName, {
+            key: categoryName,
+            value: categoryName,
+            products: [],
+          });
+        }
+        // console.log("check", categoryMap,product)
+        categoryMap.get(categoryName).products.push({
+          id: product.id,
+          name: product.product_name || "Unnamed Product",
+          price: product.product_price || 0,
+          quantity: 1,
+          staff: [],
+          note: "No notes added",
+          category: categoryName, 
+        });
+      });
+
+      const categories = Array.from(categoryMap.values());
+
+      console.log("Structured Categories: ", categories); // ✅ Debugging Step
+
+      setProductCategory(categories);
+      setHasFetchedProducts(true);
     } catch (error) {
-      console.error("Error fetching inventory data:", error);
+      console.error("Error fetching products:", error.message);
     }
-  };
+};
+
+
 
   const fetchStaffData = async () => {
     try {
@@ -421,7 +448,14 @@ function GenerateInvoice() {
         service.name?.toLowerCase().includes(searchQuery.toLowerCase())
       )
   );
-
+  const filteredproduct = productCategory.filter(
+    (category) =>
+      category.value?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      category.product.some((product) =>
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+  );
+  // toggleProductSelection
   const toggleServiceSelection = (service) => {
     if (selectedList.some((s) => s.id === service.id)) {
       handleServiceSelect(selectedList.filter((s) => s.id !== service.id)); // Remove service
@@ -431,6 +465,18 @@ function GenerateInvoice() {
       handleServiceSelect([...selectedList, service]); // Add service
     }
   };
+  const toggleProductSelection = (product) => {
+    setSelectedList((prevSelected) => {
+      const isAlreadySelected = prevSelected.some((p) => p.id === product.id);
+      
+      if (isAlreadySelected) {
+        return prevSelected.filter((p) => p.id !== product.id);
+      } else {
+        return [...prevSelected, product];
+      }
+    });
+  };
+  
 
   const handleServiceSelect = (selected) => {
     // Check if selected is properly passed and log the details
@@ -1283,6 +1329,11 @@ const handleInvoiceSubmit = (e) => {
     alert('Total payment does not match the grand total.');
   }
 };
+useEffect(() => {
+  if (mobile_no.length === 10) {
+    handlePhoneBlur();
+  }
+}, [mobile_no]);
 
 const handleMembershipGST = (gstValue) => {
   setSelectMembership((prev) => ({
@@ -1458,24 +1509,30 @@ const handleMembershipGST = (gstValue) => {
                 <h3 className="text-xl font-bold flex">Customer Details</h3>
                 <div className="gap-4 mb-4">
                   <div className="grid sm:grid-cols-2 md:grid-cols-3  mt-4">
-                    <input
-                      type="number"
-                      className="border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
-                      placeholder="Phone Number"
-                      value={mobile_no}
-                      required
-                      onBlur={handlePhoneBlur}
-                      onChange={(e) => setMobileNo(e.target.value)}
-                    />
+                  <input
+  type="number"
+  className="border border-[#CFD3D4] rounded-lg m-2 p-3 col-span-1 font-semibold placeholder-gray-400"
+  placeholder="Phone Number"
+  value={mobile_no}
+  required
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // Allow only 10 digits
+    if (value.length <= 10) {
+      setMobileNo(value);
+    }
+  }}
+/>
+
                     <input
                       type="text"
                       className="border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Full Name"
                       value={customer_name}
-                      readOnly={userExists} // Read-only for existing user
                       required
                       onChange={(e) =>
-                        !userExists && setCustomer_Name(e.target.value)
+                        setCustomer_Name(e.target.value)
                       } // Editable only for new user
                     />
                     <input
@@ -1483,8 +1540,7 @@ const handleMembershipGST = (gstValue) => {
                       className="border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Email Address"
                       value={email}
-                      readOnly={userExists} // Read-only for existing user
-                      onChange={(e) => !userExists && setEmail(e.target.value)} // Editable only for new user
+                      onChange={(e) =>  setEmail(e.target.value)} // Editable only for new user
                     />
                   </div>
                   <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-4">
@@ -1495,7 +1551,7 @@ const handleMembershipGST = (gstValue) => {
                       <input
   type="date"
   id="date_input_field"
-  className="text-[#CCCCCF] col-span-1 font-semibold placeholder-gray-400"
+  className="text-black col-span-1 font-semibold placeholder-gray-400"
   max={new Date().toISOString().split('T')[0]}
   placeholder="Date of Birth"
   value={dateOfBirth || ""}
@@ -1510,7 +1566,7 @@ const handleMembershipGST = (gstValue) => {
                       <input
   type="date"
   id="date_input_field"
-  className="text-[#CCCCCF] col-span-1 font-semibold placeholder-gray-400"
+  className="text-black col-span-1 font-semibold placeholder-gray-400"
   max={new Date().toISOString().split('T')[0]}
   placeholder="Date of Anniversary"
   value={anniversaryDate || ""}
@@ -1540,13 +1596,17 @@ const handleMembershipGST = (gstValue) => {
                   </button>
 
                   <button
-                    type="button"
-                    className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
-                    onClick={() => setProductModalOpen(true)}
-                    required
-                  >
-                    Add Products
-                  </button>
+  type="button"
+  className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
+  onClick={async () => {
+    await fetchData(); // Wait for data to load
+    setProductModalOpen(true); // Open modal AFTER data is fetched
+  }}
+  required
+>
+  Add Products
+</button>
+
                 </div>
                 <div className="my-4" id="service-table">
                   {selectedList.length > 0 ? (
@@ -1908,85 +1968,94 @@ const handleMembershipGST = (gstValue) => {
 
                 {/* Product Modal */}
                 {isProductModalOpen && (
-                  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div
-                      ref={modalRef}
-                      className="bg-white rounded-lg p-6 w-3/4 max-w-lg"
-                    >
-                      <h3 className="text-lg font-bold mb-4">
-                        Select Products
-                      </h3>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
+      
+      {/* Close Button */}
+      <div className="flex justify-between items-center mb-4">
+        <span></span>
+        <FaTimes
+          size={24}
+          className="text-red-500 cursor-pointer hover:text-red-700"
+          aria-label="Close Modal"
+          onClick={() => setProductModalOpen(false)}
+        />
+      </div>
 
-                      {/* Multiselect for Products */}
-                      <div onClick={fetchData}>
-                        <Multiselect
-                          options={inventoryData}
-                          showSearch={true}
-                          onSelect={handleProductSelect}
-                          onRemove={handleProductSelect}
-                          displayValue="value"
-                          placeholder="Select Product"
-                          showCheckbox={true}
-                          selectedValues={product_value}
-                          className="sar-product"
-                        />
-                      </div>
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+        <h3 className="text-2xl font-bold">Select Products</h3>
+        <input
+          type="text"
+          placeholder="Search products or categories..."
+          className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/3"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+      {console.log("Filtered Categories:", filteredproduct)}
 
-                      {/* Product Table
-                      <table className="w-full border border-gray-200 mt-4">
-                        <thead>
-                          <tr className="bg-gray-100">
-                            <th className="border px-4 py-2">Product Name</th>
-                            <th className="border px-4 py-2">Quantity</th>
-                            <th className="border px-4 py-2">Unit</th>
-                            <th className="border px-4 py-2">Available</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {product_value.map((product, index) => (
-                            <tr key={index}>
-                              <td>{product.value}</td>
-                              <td>
-                                <input
-                                  type="digit"
-                                  className="gb_service-table-field m-2"
-                                  placeholder="Enter Quantity"
-                                  required
-                                  onChange={(e) =>
-                                    handleProductInputChange(
-                                      index,
-                                      e.target.value
-                                    )
-                                  }
-                                  style={{
-                                    borderColor:
-                                      product.quantity === "" ||
-                                      product.quantity === "0"
-                                        ? "red"
-                                        : "black", // Highlight empty or invalid inputs
-                                  }}
-                                />
-                              </td>
-                              <td>{product.unit}</td>
-                              <td>{product.quantity}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table> */}
+      {filteredproduct.length === 0 ? (
+      <p className="text-center text-gray-500">No products available</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredproduct.map((category) => (
+            <div
+              key={category.key}
+              className="bg-gray-100 p-4 rounded-lg border"
+            >
+              <h4 className="text-lg font-semibold mb-4">{category.value}</h4>
+              <ul className="space-y-2">
+                {category.products.map((product) => (
+                  <li key={product.id} className="flex items-center justify-between">
+                    <label className="flex flex-row items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedList.some(
+                          (p) => p.id === product.id
+                        )}
+                        onChange={() =>
+                          toggleProductSelection(product)
+                        }
+                        className="h-4 w-4"
+                      />
+                      <p className="font-medium">{product.name}</p>
+                    </label>
+                    <p className="text-base font-semibold text-gray-700">
+                      ₹{product.price}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
 
-                      {/* Add Product Button */}
-                      <div className="flex justify-end mt-4">
-                        <button
-                          type="button"
-                          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                          onClick={handleProduct_Select} // Handle adding products logic
-                        >
-                          Add Products
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+      {/* Footer */}
+      <div className="sticky bottom-0 left-0 right-0 bg-white p-4 border-t mt-4">
+        <div className="flex justify-between items-center">
+          <p className="text-lg font-semibold">
+            Selected:{" "}
+            {selectedList.map((p) => p.name).join(", ") || "None"}
+          </p>
+          <button
+            type="button"
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg"
+            onClick={() => {
+              finalizeSelection(selectedList);
+              setProductModalOpen(false);
+            }}
+          >
+            Add Product
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+)}
+
+
               </div>
 
               {userExists && (hasMembership || hasCoupon) ? (
@@ -2233,7 +2302,7 @@ const handleMembershipGST = (gstValue) => {
                     </span>
                     <input
                       type="text"
-                      className="text-[#CCCCCF] p-2 rounded-lg  border border-gray-300 col-span-1 font-semibold placeholder-gray-400"
+                      className="text-black p-2 rounded-lg  border border-gray-300 col-span-1 font-semibold placeholder-gray-400"
                       placeholder="Enter Comments"
                     />
                   </div>

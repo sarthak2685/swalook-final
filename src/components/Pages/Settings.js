@@ -10,7 +10,7 @@ import ES from '../../assets/ES.png'
 import axios from 'axios';
 import config from '../../config';
 import VertNav from './VertNav';
-
+import Inventory  from '../../assets/inventory.jpg';
 function Settings() {
   const [newRows, setNewRows] = useState([]);
   
@@ -86,6 +86,11 @@ function Settings() {
           <img src={ES} alt="expense Setting" /> {/* Make sure the path is correct for the team image */}
           <h2>Expense category Setting</h2>
           <p>Edit Expense Category</p>
+        </Link>
+        <Link to={`/${sname}/${branchName}/invetorysetting`} className="settings_box">
+          <img src={Inventory} alt="expense Setting" /> {/* Make sure the path is correct for the team image */}
+          <h2>Inventory  Setting</h2>
+          <p>Edit Your Inventory</p>
         </Link>
       </div>
     </div>

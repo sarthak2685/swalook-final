@@ -295,7 +295,7 @@ function CustomerLoyality() {
                         <strong className="text-gray-800">DOA:</strong> {customer.d_o_a || 'N/A'}
                     </p>
                     <p className="text-sm text-gray-700 mt-2">
-                        <strong className="text-gray-800">points:</strong> {customer.loyality_profile.current_customer_points || 'N/A'}
+                        <strong className="text-gray-800">points:</strong> {customer.loyality_profile?.current_customer_points || 'N/A'}
                     </p>
                 </div>
             </td>

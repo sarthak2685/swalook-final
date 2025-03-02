@@ -13,14 +13,14 @@ function AllAppointment() {
       const [currentDate, setCurrentDate] = useState(getYesterdayDate());
       const [selectedDate, setSelectedDate] = useState(getYesterdayDate());
       const [currentPage, setCurrentPage] = useState(1);
-      const [invoices, setInvoices] = useState([]);
+      const [appointment, setAppointment] = useState([]);
       const [error, setError] = useState(null);
       const [showModal, setShowModal] = useState(false);
       const [deleteId, setDeleteId] = useState(null); // ID of the invoice to delete
     
       const itemsPerPage = 10;
     
-      const fetchInvoices = async (date) => {
+      const fetchappointment = async (date) => {
         const token = localStorage.getItem("token");
         const bid = localStorage.getItem("branch_id");
         if (!token) {
@@ -39,7 +39,7 @@ function AllAppointment() {
             }
           );
           console.log("response", response.data)
-          setInvoices(response.data.table_data);
+          setAppointment(response.data.table_data);
         } catch (err) {
           console.error("Error fetching data:", err);
           setError("Error fetching data");
@@ -55,8 +55,8 @@ function AllAppointment() {
         }
     
         // Optimistically update the UI
-        const updatedInvoices = invoices.filter((invoice) => invoice.id !== deleteId);
-        setInvoices(updatedInvoices);
+        const updatedappointment = appointment.filter((invoice) => invoice.id !== deleteId);
+        setAppointment(updatedappointment);
     
         try {
             const response = await axios.delete(
@@ -76,23 +76,23 @@ function AllAppointment() {
                 // Handle any unexpected responses
                 setError("Unexpected response from server");
                 // Revert UI update if necessary
-                setInvoices(invoices); // Restore the original state
+                setAppointment(appointment); // Restore the original state
             }
         } catch (err) {
             console.error("Error deleting invoice:", err);
             setError("Error deleting invoice");
             // Revert UI update on error
-            setInvoices(invoices);
+            setAppointment(appointment);
         }
     };
     
     
       useEffect(() => {
-        fetchInvoices(selectedDate);
+        fetchappointment(selectedDate);
       }, [selectedDate]);
     
-      const totalPages = Math.ceil(invoices.length / itemsPerPage);
-      const currentData = invoices.slice(
+      const totalPages = Math.ceil(appointment.length / itemsPerPage);
+      const currentData = appointment.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
       );
