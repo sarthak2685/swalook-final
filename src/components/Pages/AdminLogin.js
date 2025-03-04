@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../Styles/AdminLogin.css';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useParams } from 'react-router-dom';
 import ForgetPassword from './ForgetPassword';

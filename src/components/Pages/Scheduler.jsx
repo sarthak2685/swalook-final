@@ -227,12 +227,10 @@ const Scheduler = () => {
   );
 
   return (
-    <div className="bg-white shadow-md p-6 rounded-lg mx-auto mb-8 grid grid-cols-1 md:grid-cols-5 gap-4">
+    <div className="bg-white shadow-md p-6 rounded-lg mx-auto mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       {/* Appointment Details Section */}
-      <div className="col-span-1 bg-gray-50 p-4 rounded-lg">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">
-          Appointment
-        </h2>
+      <div className="col-span-1 sm:col-span-2 md:col-span-1 bg-gray-50 p-4 rounded-lg">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">Appointment</h2>
         {selectedAppointment ? (
           <div className="flex flex-col items-center">
             <div
@@ -243,12 +241,10 @@ const Scheduler = () => {
               <p className="text-gray-700">
                 <strong className="font-semibold text-lg">Services: </strong>
                 {selectedAppointment.services.map((service, index) => (
-                  <div key={index} className="text-gray-700 inline-block">
+                  <span key={index} className="text-gray-700 inline-block">
                     {service.name}
-                    {index < selectedAppointment.services.length - 1
-                      ? ", "
-                      : ""}
-                  </div>
+                    {index < selectedAppointment.services.length - 1 ? ", " : ""}
+                  </span>
                 ))}
               </p>
               <p className="text-gray-700">
@@ -263,10 +259,9 @@ const Scheduler = () => {
               <p className="text-gray-700">
                 <strong>Phone Number:</strong> {selectedAppointment.phoneNumber}
               </p>
-              <p className="text-gray-700 break-all w-full sm:w-auto ">
+              <p className="text-gray-700 break-all w-full sm:w-auto">
                 <strong>Email:</strong> {selectedAppointment.email}
               </p>
-
               <p className="text-gray-700">
                 <strong>Schedule Date:</strong> {selectedAppointment.date}
               </p>
@@ -290,31 +285,14 @@ const Scheduler = () => {
           <p className="text-gray-500">Click on a schedule to see details.</p>
         )}
       </div>
-
+  
       {/* Schedule Section */}
-      <div className="col-span-1 md:col-span-3 bg-white p-4 rounded-lg">
+      <div className="col-span-1 sm:col-span-2 md:col-span-3 bg-white p-4 rounded-lg">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold text-gray-600">
             {selectedStaff || "staff"}'s Schedule
           </h3>
           <div className="flex flex-row gap-4">
-            {/* {view === "weekly" && (
-              <div className="flex items-center bg-orange-200 rounded-full px-4 py-2 shadow-md">
-                <button
-                  className="text-gray-400 hover:text-gray-600"
-                  onClick={handlePreviousWeek}
-                >
-                  <FaChevronLeft size={16} />
-                </button>
-                <span className="mx-4 text-white font-semibold">Week</span>
-                <button
-                  className="text-gray-400 hover:text-gray-600"
-                  onClick={handleNextWeek}
-                >
-                  <FaChevronRight size={16} />
-                </button>
-              </div>
-            )} */}
             <select
               className="p-2 border rounded"
               value={view}
@@ -325,14 +303,14 @@ const Scheduler = () => {
             </select>
           </div>
         </div>
-
+  
         {view === "today" ? (
           <div className="w-full overflow-x-auto">
             <div className="flex w-max text-center text-sm font-semibold">
               {timeSlots.map((slot, index) => (
                 <div
                   key={index}
-                  className="border border-orange-100 py-2 px-4 text-gray-700 min-w-[150px] text-center"
+                  className="border border-orange-100 py-2 px-4 text-gray-700 min-w-[120px] md:min-w-[150px] text-center"
                 >
                   {slot.label}
                 </div>
@@ -340,8 +318,8 @@ const Scheduler = () => {
             </div>
             <div className="relative min-h-[400px] w-max">
               {filteredAppointments.map((appointment, index) => {
-                const leftPosition = appointment.booking_time * 150;
-
+                const leftPosition = appointment.booking_time * 120;
+  
                 const appointmentColors = [
                   "bg-blue-200",
                   "bg-green-200",
@@ -355,14 +333,14 @@ const Scheduler = () => {
                 ];
                 const appointmentColor =
                   appointmentColors[index % appointmentColors.length];
-
+  
                 appointment.color = appointmentColor;
-
+  
                 return (
                   <div
                     key={index}
                     onClick={() => setSelectedAppointment(appointment)}
-                    className={`absolute ${appointmentColor} p-2 m-1 rounded-full text-sm text-center min-w-[140px] cursor-pointer hover:bg-opacity-80 transition`}
+                    className={`absolute ${appointmentColor} p-2 m-1 rounded-full text-sm text-center min-w-[100px] md:min-w-[140px] cursor-pointer hover:bg-opacity-80 transition`}
                     style={{
                       left: `${leftPosition}px`,
                       top: "10px",
@@ -386,7 +364,7 @@ const Scheduler = () => {
               {weekDates.map((dayObj, index) => (
                 <div
                   key={index}
-                  className="border border-orange-100 py-2 px-4 min-w-[150px] text-center"
+                  className="border border-orange-100 py-2 px-4 min-w-[120px] md:min-w-[150px] text-center"
                 >
                   <div className="text-gray-700">{dayObj.day}</div>
                   <div className="text-gray-700">{dayObj.date}</div>
@@ -397,7 +375,7 @@ const Scheduler = () => {
               {weekDates.map((dayObj, dayIndex) => (
                 <div
                   key={dayIndex}
-                  className="min-h-[100px] py-2 px-4 border-orange-100 border rounded-lg min-w-[150px] flex flex-col"
+                  className="min-h-[100px] py-2 px-4 border-orange-100 border rounded-lg min-w-[120px] md:min-w-[150px] flex flex-col"
                 >
                   {filteredAppointments
                     .filter((appointment) => {
@@ -422,9 +400,9 @@ const Scheduler = () => {
                       ];
                       const scheduleColor =
                         scheduleColors[index % scheduleColors.length];
-
+  
                       schedule.color = scheduleColor;
-
+  
                       return (
                         <div
                           key={index}
@@ -441,50 +419,29 @@ const Scheduler = () => {
           </div>
         )}
       </div>
-
+  
       {/* Staff Selection Section */}
-      <div className="col-span-1 bg-gray-50 p-4 rounded-lg">
-        <h3 className="text-md font-semibold text-gray-600 mb-2">
-          Select Staff
-        </h3>
-        <div className="grid grid-cols-2 gap-2">
-          {staffData.split(", ").map((staff, index) => {
-            // Generate a unique color for each staff member
-            const staffColors = [
-              "bg-blue-500",
-              "bg-green-500",
-              "bg-yellow-500",
-              "bg-purple-500",
-              "bg-indigo-500",
-              "bg-pink-500",
-              "bg-teal-500",
-              "bg-orange-500",
-              "bg-lime-500",
-            ];
-            const staffColor = staffColors[index % staffColors.length]; // Cycle through colors
-
-            return (
-              <button
-                key={index}
-                onClick={() => {
-                  setSelectedStaff(staff);
-                  setSelectedAppointment(null);
-                  fetchAppointmentData(staff);
-                }}
-                className={`p-2 rounded-full text-sm w-full text-center transition duration-200 ${
-                  selectedStaff === staff
-                    ? `${staffColor} text-white`
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+      <div className="col-span-1 sm:col-span-2 md:col-span-1 bg-gray-50 p-4 rounded-lg">
+        <h3 className="text-md font-semibold text-gray-600 mb-2">Select Staff</h3>
+        <div className="grid grid-cols-2 gap-2 overflow-auto">
+          {staffData.split(", ").map((staff, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setSelectedStaff(staff);
+                setSelectedAppointment(null);
+                fetchAppointmentData(staff);
+              }}
+              className="p-2 rounded-full text-sm text-center bg-gray-200 text-gray-700 hover:bg-gray-300 transition min-w-fit"
               >
-                {staff}
-              </button>
-            );
-          })}
+              {staff}
+            </button>
+          ))}
         </div>
       </div>
     </div>
   );
+  
 };
 
 export default Scheduler;
