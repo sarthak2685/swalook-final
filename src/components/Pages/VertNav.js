@@ -61,7 +61,7 @@ const SupportButton = ({ sname, branchName }) => {
 const SettingsButton = ({ userType, sname, branchName }) => {
   return (
     <>
-      {userType === "staff" || userType === "vendor" ? (
+      {userType === "staff" && sname !== "Sparkle's" || userType === "vendor" ? (
         <button className="pointer-events-none opacity-50 bg-[#5570F1] text-white w-[200px] h-[45px]  rounded-[5px] cursor-pointer  px-5 py-2.5 text-lg font-montserrat flex items-center justify-center">
           <span className="text-black font-inter text-sm">Settings</span>
         </button>
@@ -91,6 +91,8 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
   const branchId = localStorage.getItem("branch_id");
   const sname = localStorage.getItem("s-name");
   const userType = localStorage.getItem("type");
+  const isSparkles = sname === "Sparkle's";
+
 
 
   useEffect(() => {
@@ -165,7 +167,7 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
           to={`/${sname}/${branchName}/analysis`}
           icon={ShowChartIcon}
           label="Analysis"
-          disabled={userType === "staff"}
+          disabled={userType === "staff" && !isSparkles}
           isActive={activeLink === "analysis"}
           onClick={() =>
             handleLinkClick("analysis", `/${sname}/${branchName}/analysis`)
@@ -175,7 +177,7 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
           to={`/${sname}/${branchName}/inventory`}
           icon={StorefrontIcon}
           label="Inventory"
-          disabled={userType === "staff"}
+          disabled={userType === "staff" && !isSparkles}
           isActive={activeLink === "inventory"}
           onClick={() =>
             handleLinkClick("inventory", `/${sname}/${branchName}/inventory`)
@@ -192,7 +194,7 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
           }
         /> */}
 
-        {userType !== "staff" && (
+        {(userType !== "staff" || isSparkles) && (
           <NavItem
             to={`/${sname}/${branchName}/staff`}
             icon={PeopleIcon}
@@ -225,7 +227,7 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
           to={`/${sname}/${branchName}/customer-loyality`}
           icon={CardGiftcardIcon}
           label="Customer Loyality"
-          disabled={userType === "staff"}
+          disabled={userType === "staff" && !isSparkles}
           isActive={activeLink === "customer-loyality"}
           onClick={() =>
             handleLinkClick("customer-loyality", `/${sname}/${branchName}/customer-loyality`)

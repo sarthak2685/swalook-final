@@ -204,7 +204,7 @@ function Header() {
           className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20"
           ref={dropdownRef}
         >
-          {userType === "staff" || userType === "vendor" ? (
+          {userType === "staff" && sname !== "Sparkle's" || userType === "vendor" ? (
             <div className="text-gray-500 px-4 py-2 cursor-not-allowed opacity-50 font-semibold">
               <span>Service</span>
             </div>

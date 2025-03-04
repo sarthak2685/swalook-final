@@ -84,9 +84,9 @@ label {
 
 .add-staff-button-group {
   display: flex;
-  justify-content: flex-start; /* Align buttons to the left */
+  justify-content: space-between; /* Align buttons to the left */
   margin-top: 20px;
-  margin-left: -80px; /* Move the button group slightly left */
+  margin-left: 0px; /* Move the button group slightly left */
 }
 
 .add-staff-submit-button,

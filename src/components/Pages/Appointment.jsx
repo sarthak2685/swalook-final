@@ -11,6 +11,8 @@ import { Helmet } from "react-helmet";
 import config from "../../config";
 import CircularProgress from "@mui/material/CircularProgress";
 import CustomDialog from "./CustomDialog";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function getCurrentDate() {
   const currentDate = new Date();
@@ -51,7 +53,7 @@ function Appointment() {
   const [customerData, setCustomerData] = useState(null);
   const [api, setAPI] = useState(null);
   const [hasFetchedServices, setHasFetchedServices] = useState(false);
-  const [dateOfBirth, setDateOfBirth] = useState(null);
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [anniversaryDate, setAnniversaryDate] = useState(null);
   const [isServiceModalOpen, setServiceModalOpen] = useState(false);
   const [servicesTableData, setServicesTableData] = useState([]);
@@ -188,8 +190,9 @@ function Appointment() {
       );
 
       if (response.status === 200) {
-        setPopupMessage("Appointment added successfully!");
-        setShowPopup(true);
+        toast.success("👍Great! Appointment successfully created!", {
+          onClose: () => window.location.reload(), // Refresh page when toast closes
+        });        setShowPopup(true);
         const phoneNumber = `+91${mobileNo}`;
         const serviceNames = services.map((service) => service.name).join(", ");
         const message = `Hi ${customerName}!\nYour appointment is booked for: ${bookingTime} | ${bookingDate}\nServices: ${serviceNames}\nSee you soon!`;
@@ -202,9 +205,8 @@ function Appointment() {
       const errorMessage = error.response
         ? error.response.data.message
         : error.message;
-      setPopupMessage(`Failed to add appointment: ${errorMessage}`);
-      setShowPopup(true);
-      console.error("Failed to add appointment:", error);
+        toast.error("Failed to create appointment. Please try again.");
+        setShowPopup(true);
     } finally {
       setBookAppointment(false);
     }
@@ -355,8 +357,9 @@ function Appointment() {
   };
 
   // Handle close popup
+ 
   const handleClosePopup = () => {
-    setIsPopupVisible(false);
+    window.location.reload();
   };
 
   // Fetch service category data
@@ -383,7 +386,6 @@ function Appointment() {
         throw new Error("Invalid API response format");
       }
 
-      // Transform API response into a structured category-service map
       const categoryMap = new Map();
 
       result.data.forEach((service) => {
@@ -935,6 +937,7 @@ function Appointment() {
                 </button>
               </div>
             </form>
+            <ToastContainer position="top-center" />
           </div>
         </div>
       </div>

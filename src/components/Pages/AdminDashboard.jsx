@@ -22,6 +22,7 @@ const AdminDashboard = () => {
   const token = localStorage.getItem("token");
   const bid = localStorage.getItem("branch_id");
 
+
   const fetchChartData = async () => {
     if (!selectedDate) return;
 
