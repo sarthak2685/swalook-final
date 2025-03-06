@@ -143,18 +143,6 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
                     }
                 />
                 <NavItem
-                    to={`/${sname}/${branchName}/appointment`}
-                    icon={BookOnlineIcon}
-                    label="Appointments"
-                    isActive={activeLink === "appointments"}
-                    onClick={() =>
-                        handleLinkClick(
-                            "appointments",
-                            `/${sname}/${branchName}/appointment`
-                        )
-                    }
-                />
-                <NavItem
                     to={`/${sname}/${branchName}/inquiries`}
                     icon={FindInPageIcon}
                     label="Inquiries"
@@ -166,6 +154,19 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
                         )
                     }
                 />
+                <NavItem
+                    to={`/${sname}/${branchName}/appointment`}
+                    icon={BookOnlineIcon}
+                    label="Appointments"
+                    isActive={activeLink === "appointments"}
+                    onClick={() =>
+                        handleLinkClick(
+                            "appointments",
+                            `/${sname}/${branchName}/appointment`
+                        )
+                    }
+                />
+
                 <NavItem
                     to={`/${sname}/${branchName}/generatebill`}
                     icon={DescriptionIcon}
