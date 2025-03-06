@@ -66,7 +66,6 @@ function CLP_Setting() {
                 } else {
                     setFetchedRows([]); // Ensure fetchedRows is always an array
                 }
-                
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -99,7 +98,6 @@ function CLP_Setting() {
                 } else {
                     setCouponRows([]); // Ensure it's always an array
                 }
-                
             } catch (error) {
                 console.error("Error fetching coupon data:", error);
             }
@@ -162,9 +160,8 @@ function CLP_Setting() {
                     discountPercentage: "",
                     limit: "",
                 });
-                toast.success("Membership added Successfully")
+                toast.success("Membership added Successfully");
             }
-
         } catch (error) {
             console.error("Error saving membership:", error);
         }
@@ -254,7 +251,7 @@ function CLP_Setting() {
             if (!response.ok) {
                 throw new Error("Failed to update membership details");
             }
-            toast.success("Membership updated Successfully")
+            toast.success("Membership updated Successfully");
             setIsEditModalOpen(false); // Close modal after successful update
         } catch (error) {
             console.error("Error updating membership details:", error);
@@ -287,10 +284,9 @@ function CLP_Setting() {
                     isActive: false,
                 });
             }
-            toast.success("Coupon added Successfully")
-
+            toast.success("Coupon added Successfully");
         } catch (error) {
-            toast.error("failed to add coupon")
+            toast.error("failed to add coupon");
             console.error("Error saving coupon:", error);
         }
     };
@@ -326,10 +322,10 @@ function CLP_Setting() {
 
             const result = await response.json();
             if (response.ok) {
-                toast.success("Coupon updated Successfully")
+                toast.success("Coupon updated Successfully");
                 handleCloseEditCouponModal(); // Close the edit modal
             } else {
-                toast.error("failed to update coupon")
+                toast.error("failed to update coupon");
                 console.error("Error updating coupon:", result.message);
             }
         } catch (error) {
@@ -339,7 +335,7 @@ function CLP_Setting() {
 
     return (
         <>
-        <ToastContainer />
+            <ToastContainer />
             <div className="bg-gray-100">
                 <Header />
                 <VertNav />
@@ -512,48 +508,72 @@ function CLP_Setting() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {Array.isArray(fetchedRows) && fetchedRows.length > 0 ? (
-  fetchedRows.filter(row => row).map((row, index) => (
-    <tr key={row.id} className="border-b">
-      <td className="py-3 px-4 text-xs sm:text-xl font-semibold text-gray-700">
-        {row?.program_type || "N/A"}
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
-        {row?.expiry_duration || "N/A"}
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
-        Rs. {row?.price || "0"}
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
-        {row?.points_hold ? `${row.points_hold} P` : `${row?.discount || 0}%`}
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl">
-        <span
-          className={`inline-block w-20 px-3 py-1 border rounded-lg text-xs font-medium text-white text-center ${
-            row?.active ? "bg-green-500 border-green-500" : "bg-red-500 border-red-500"
-          }`}
-        >
-          {row?.active ? "Active" : "Inactive"}
-        </span>
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl">
-        <button
-          onClick={() => handleEditModalOpen(row)}
-          className="text-blue-500 hover:text-blue-700"
-        >
-          <MdEdit className="w-5 h-5" />
-        </button>
-      </td>
-    </tr>
-  ))
-) : (
-  <tr>
-    <td colSpan="6" className="text-center py-4 text-gray-500">
-      No data available
-    </td>
-  </tr>
-)}
-
+                                        {Array.isArray(fetchedRows) &&
+                                        fetchedRows.length > 0 ? (
+                                            fetchedRows
+                                                .filter((row) => row)
+                                                .map((row, index) => (
+                                                    <tr
+                                                        key={row.id}
+                                                        className="border-b"
+                                                    >
+                                                        <td className="py-3 px-4 text-xs sm:text-xl font-semibold text-gray-700">
+                                                            {row?.program_type ||
+                                                                "N/A"}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                                                            {row?.expiry_duration ||
+                                                                "N/A"}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                                                            Rs.{" "}
+                                                            {row?.price || "0"}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                                                            {row?.points_hold
+                                                                ? `${row.points_hold} P`
+                                                                : `${
+                                                                      row?.discount ||
+                                                                      0
+                                                                  }%`}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl">
+                                                            <span
+                                                                className={`inline-block w-20 px-3 py-1 border rounded-lg text-xs font-medium text-white text-center ${
+                                                                    row?.active
+                                                                        ? "bg-green-500 border-green-500"
+                                                                        : "bg-red-500 border-red-500"
+                                                                }`}
+                                                            >
+                                                                {row?.active
+                                                                    ? "Active"
+                                                                    : "Inactive"}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl">
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleEditModalOpen(
+                                                                        row
+                                                                    )
+                                                                }
+                                                                className="text-blue-500 hover:text-blue-700"
+                                                            >
+                                                                <MdEdit className="w-5 h-5" />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                        ) : (
+                                            <tr>
+                                                <td
+                                                    colSpan="6"
+                                                    className="text-center py-4 text-gray-500"
+                                                >
+                                                    No data available
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
@@ -766,45 +786,68 @@ function CLP_Setting() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {Array.isArray(couponRows) && couponRows.length > 0 ? (
-  couponRows.filter(coupon => coupon).map((coupon, index) => (
-    <tr key={coupon?.id || index} className="border-b">
-      <td className="py-3 px-4 text-xs sm:text-xl font-semibold text-gray-700">
-        {coupon?.coupon_name || "N/A"}
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
-        Rs. {coupon?.coupon_price || "0"}
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
-        Rs. {coupon?.coupon_points_hold || "0"}
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl">
-        <span
-          className={`inline-block w-20 px-3 py-1 border rounded-lg text-xs font-medium text-white text-center ${
-            coupon?.active ? "bg-green-500 border-green-500" : "bg-red-500 border-red-500"
-          }`}
-        >
-          {coupon?.active ? "Active" : "Inactive"}
-        </span>
-      </td>
-      <td className="py-3 px-4 text-xs sm:text-xl">
-        <button
-          onClick={() => handleEditCouponModalOpen(coupon)}
-          className="text-blue-500 hover:text-blue-700"
-        >
-          <MdEdit className="w-5 h-5" />
-        </button>
-      </td>
-    </tr>
-  ))
-) : (
-  <tr>
-    <td colSpan="5" className="text-center py-4 text-gray-500">
-      No data available
-    </td>
-  </tr>
-)}
-
+                                        {Array.isArray(couponRows) &&
+                                        couponRows.length > 0 ? (
+                                            couponRows
+                                                .filter((coupon) => coupon)
+                                                .map((coupon, index) => (
+                                                    <tr
+                                                        key={
+                                                            coupon?.id || index
+                                                        }
+                                                        className="border-b"
+                                                    >
+                                                        <td className="py-3 px-4 text-xs sm:text-xl font-semibold text-gray-700">
+                                                            {coupon?.coupon_name ||
+                                                                "N/A"}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                                                            Rs.{" "}
+                                                            {coupon?.coupon_price ||
+                                                                "0"}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl text-gray-700">
+                                                            Rs.{" "}
+                                                            {coupon?.coupon_points_hold ||
+                                                                "0"}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl">
+                                                            <span
+                                                                className={`inline-block w-20 px-3 py-1 border rounded-lg text-xs font-medium text-white text-center ${
+                                                                    coupon?.active
+                                                                        ? "bg-green-500 border-green-500"
+                                                                        : "bg-red-500 border-red-500"
+                                                                }`}
+                                                            >
+                                                                {coupon?.active
+                                                                    ? "Active"
+                                                                    : "Inactive"}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-3 px-4 text-xs sm:text-xl">
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleEditCouponModalOpen(
+                                                                        coupon
+                                                                    )
+                                                                }
+                                                                className="text-blue-500 hover:text-blue-700"
+                                                            >
+                                                                <MdEdit className="w-5 h-5" />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                        ) : (
+                                            <tr>
+                                                <td
+                                                    colSpan="5"
+                                                    className="text-center py-4 text-gray-500"
+                                                >
+                                                    No data available
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                                 {showCouponModal && (

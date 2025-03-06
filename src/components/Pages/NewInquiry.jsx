@@ -6,6 +6,7 @@ import { FaTimes } from "react-icons/fa";
 import { Multiselect } from "multiselect-react-dropdown";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 const NewInquiry = () => {
     const [customerName, setCustomerName] = useState("");
     const [mobileNo, setMobileNo] = useState("");
@@ -33,18 +34,6 @@ const NewInquiry = () => {
 
     const bid = localStorage.getItem("branch_id");
     const [productCategory, setProductCategory] = useState([]);
-
-    useEffect(() => {
-        const NewInquiry = [
-            ...services.map((service) => ({
-                name: service.name,
-                category: service.category,
-                price: service.price,
-            })),
-        ];
-
-        setInquiry(NewInquiry);
-    }, [services]);
 
     const handleClosePopup = () => setIsPopupVisible(false);
 
@@ -137,7 +126,7 @@ const NewInquiry = () => {
 
             const result = await response.json();
 
-            console.log("API Response Data: ", result); // ✅ Debugging Step
+            console.log("API Response Data: ", result);
 
             if (!result.status || !Array.isArray(result.data)) {
                 throw new Error("Invalid API response format");
@@ -172,7 +161,7 @@ const NewInquiry = () => {
 
             const categories = Array.from(categoryMap.values());
 
-            console.log("Structured Categories: ", categories); // ✅ Debugging Step
+            console.log("Structured Categories: ", categories);
 
             setProductCategory(categories);
             setHasFetchedProducts(true);
@@ -198,10 +187,10 @@ const NewInquiry = () => {
     );
 
     const finalizeSelection = () => {
-        setServices(selectedList);
-        setProductData(selectedList2);
-        console.log("Selected Services:", selectedList);
-        console.log("Selected Products:", productData);
+        setServices(selectedList.map((service) => service.name).join(", "));
+        setProductData(selectedList2.map((product) => product.name).join(", "));
+        console.log("Selected Services:", selectedList[0].name);
+        console.log("Selected Products:", selectedList2);
     };
 
     const toggleServiceSelection = (service) => {
@@ -262,7 +251,8 @@ const NewInquiry = () => {
         });
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        await addCustomer();
         const token = localStorage.getItem("token");
         if (!token) {
             alert("User not authenticated");
@@ -295,6 +285,47 @@ const NewInquiry = () => {
             toast.success("Inquiry created successfully!");
         } catch (error) {
             console.error("Error creating inquiry:", error.message);
+        }
+    };
+
+    const addCustomer = async () => {
+        const token = localStorage.getItem("token");
+        const branchId = localStorage.getItem("branch_id");
+
+        try {
+            const response = await axios.post(
+                `${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${branchId}`,
+                {
+                    name: customerName,
+                    mobile_no: mobileNo,
+                    email: " ",
+                    membership: "",
+                    d_o_b: "",
+                    d_o_a: "",
+                    coupon: [],
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Token ${token}`,
+                    },
+                }
+            );
+
+            const { status, data } = response;
+            console.log("API Response:", data);
+
+            if (status >= 200 && status < 300 && data.success) {
+                return true; // Indicate success
+            } else {
+                throw new Error(data.message || "Failed to add customer.");
+            }
+        } catch (error) {
+            const errorMessage =
+                error.response?.data?.message || "An error occurred.";
+
+            console.error("Error:", error.response?.data || error.message);
+            return false; // Indicate failure
         }
     };
 
@@ -335,35 +366,35 @@ const NewInquiry = () => {
                                 />
                             </div>
                         </div>
+
                         <div className="mb-4">
                             <h3 className="font-semibold text-xl mb-2">
                                 Inquired About:
                             </h3>
                             <div className="flex-wrap space-x-2">
                                 <button
-                                    type="button"
+                                    type="button" // Ensure this is type="button"
                                     className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
                                     onClick={() => {
                                         setServiceModalOpen(true);
                                         fetchServiceCategoryData();
                                     }}
-                                    required
                                 >
                                     Add Services
                                 </button>
                                 <button
-                                    type="button"
+                                    type="button" // Ensure this is type="button"
                                     className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
                                     onClick={async () => {
                                         await fetchData();
                                         setProductModalOpen(true);
                                     }}
-                                    required
                                 >
                                     Add Products
                                 </button>
                             </div>
                         </div>
+
                         {isServiceModalOpen && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                                 <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
@@ -506,7 +537,7 @@ const NewInquiry = () => {
                                                     .join(", ") || "None"}
                                             </p>
                                             <button
-                                                type="button"
+                                                type="button" // Ensure this is type="button"
                                                 className="bg-blue-500 text-white px-6 py-2 rounded-lg"
                                                 onClick={() => {
                                                     finalizeSelection(
@@ -522,11 +553,10 @@ const NewInquiry = () => {
                                 </div>
                             </div>
                         )}
-                        {/* Product Modal */}
+
                         {isProductModalOpen && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                                 <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
-                                    {/* Close Button */}
                                     <div className="flex justify-between items-center mb-4">
                                         <span></span>
                                         <FaTimes
@@ -538,7 +568,6 @@ const NewInquiry = () => {
                                             }
                                         />
                                     </div>
-
                                     <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
                                         <h3 className="text-2xl font-bold">
                                             Select Products
@@ -553,11 +582,6 @@ const NewInquiry = () => {
                                             }
                                         />
                                     </div>
-                                    {console.log(
-                                        "Filtered Categories:",
-                                        filteredproduct
-                                    )}
-
                                     {filteredproduct.length === 0 ? (
                                         <p className="text-center text-gray-500">
                                             No products available
@@ -618,8 +642,6 @@ const NewInquiry = () => {
                                             ))}
                                         </div>
                                     )}
-
-                                    {/* Footer */}
                                     <div className="sticky bottom-0 left-0 right-0 bg-white p-4 border-t mt-4">
                                         <div className="flex justify-between items-center">
                                             <p className="text-lg font-semibold">
@@ -629,7 +651,7 @@ const NewInquiry = () => {
                                                     .join(", ") || "None"}
                                             </p>
                                             <button
-                                                type="button"
+                                                type="button" // Ensure this is type="button"
                                                 className="bg-blue-500 text-white px-6 py-2 rounded-lg"
                                                 onClick={() => {
                                                     finalizeSelection(
@@ -645,6 +667,7 @@ const NewInquiry = () => {
                                 </div>
                             </div>
                         )}
+
                         <div className="mb-4">
                             <h3 className="font-semibold text-xl mb-2">
                                 Comments:
@@ -656,8 +679,12 @@ const NewInquiry = () => {
                                 onChange={(e) => setComments(e.target.value)}
                             />
                         </div>
+
                         <div className="flex justify-center">
-                            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg">
+                            <button
+                                type="submit" // Ensure this is type="submit"
+                                className="bg-blue-600 text-white px-6 py-2 rounded-lg"
+                            >
                                 Create Inquiry
                             </button>
                         </div>

@@ -199,7 +199,10 @@ function Appointment() {
                 toast.success("👍Great! Appointment successfully created!", {
                     onClose: () => window.location.reload(), // Refresh page when toast closes
                 });
+                await addCustomer();
+
                 setShowPopup(true);
+
                 const phoneNumber = `+91${mobileNo}`;
                 const serviceNames = services
                     .map((service) => service.name)
@@ -476,6 +479,47 @@ function Appointment() {
     };
     const handleAllAppointment = (id) => {
         navigate(`/${sname}/${branchName}/view-all-Appointments`);
+    };
+
+    const addCustomer = async () => {
+        const token = localStorage.getItem("token");
+        const branchId = localStorage.getItem("branch_id");
+
+        try {
+            const response = await axios.post(
+                `${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${branchId}`,
+                {
+                    name: customerName,
+                    mobile_no: mobileNo,
+                    email: email || "",
+                    d_o_b: dateOfBirth || "",
+                    d_o_a: anniversaryDate || "",
+                    membership: "",
+                    coupon: [],
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Token ${token}`,
+                    },
+                }
+            );
+
+            const { status, data } = response;
+            console.log("API Response:", data);
+
+            if (status >= 200 && status < 300 && data.success) {
+                return true; // Indicate success
+            } else {
+                throw new Error(data.message || "Failed to add customer.");
+            }
+        } catch (error) {
+            const errorMessage =
+                error.response?.data?.message || "An error occurred.";
+
+            console.error("Error:", error.response?.data || error.message);
+            return false; // Indicate failure
+        }
     };
 
     return (
