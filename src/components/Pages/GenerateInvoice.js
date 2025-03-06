@@ -18,6 +18,7 @@ import CustomDialog from "./CustomDialog";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
+
 function getCurrentDate() {
     const currentDate = new Date();
     const day = currentDate.getDate();
@@ -49,7 +50,7 @@ function GenerateInvoice() {
     const [comments, setComments] = useState("");
     const [servicesTableData, setServicesTableData] = useState([]);
     const [inputFieldValue, setInputFieldValue] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [hasFetchedServices, setHasFetchedServices] = useState(false);
     const [hasFetchedServicesCategory, setHasFetchedServicesCategory] =
         useState(false);
@@ -672,6 +673,7 @@ function GenerateInvoice() {
     console.log(servicesTableData, "servicesTableData");
     const handleGenerateInvoice = async (e) => {
         e.preventDefault(); // Prevent form's default submit behavior
+        setLoading(true); // Start loading
 
         try {
             // Fetch the InvoiceId and ensure it's valid
@@ -682,6 +684,8 @@ function GenerateInvoice() {
                     "Failed to generate Invoice ID. Please try again."
                 );
                 setDialogOpen(true);
+                setLoading(false);
+
                 return;
             }
 
@@ -694,6 +698,7 @@ function GenerateInvoice() {
                 setDialogTitle("Error");
                 setDialogMessage("Please enter a valid mobile number!");
                 setDialogOpen(true);
+                setLoading(false);
                 return;
             }
 
@@ -706,6 +711,7 @@ function GenerateInvoice() {
             ) {
                 setPopupMessage("Please fill the missing field");
                 setShowPopup(true);
+                setLoading(false);
                 return;
             }
 
@@ -717,6 +723,7 @@ function GenerateInvoice() {
                         "Please select 'Served By' for all selected services!"
                     );
                     setDialogOpen(true);
+                    setLoading(false);
                     return;
                 }
                 if (!service.inputFieldValue) {
@@ -725,12 +732,14 @@ function GenerateInvoice() {
                         "Please enter quantity for selected services!"
                     );
                     setDialogOpen(true);
+                    setLoading(false);
                     return;
                 }
                 if (!service.gst) {
                     setDialogTitle("Error");
                     setDialogMessage("Please select GST for all services!");
                     setDialogOpen(true);
+                    setLoading(false);
                     return;
                 }
             }
@@ -743,6 +752,7 @@ function GenerateInvoice() {
                         "Please enter quantity for selected products!"
                     );
                     setDialogOpen(true);
+                    setLoading(false);
                     return;
                 }
             }
@@ -766,6 +776,7 @@ function GenerateInvoice() {
                         "An error occurred while updating user details. Please try again."
                     );
                     setDialogOpen(true);
+                    setLoading(false);
                     return;
                 }
             } else if (!userExists) {
@@ -778,6 +789,7 @@ function GenerateInvoice() {
                         "An error occurred while adding user details. Please try again."
                     );
                     setDialogOpen(true);
+                    setLoading(false);
                     return;
                 }
             }
@@ -817,6 +829,8 @@ function GenerateInvoice() {
                 "An error occurred while generating the invoice. Please try again."
             );
             setDialogOpen(true);
+        } finally {
+            setLoading(false); // Stop loading after navigation
         }
     };
 
@@ -1360,7 +1374,7 @@ function GenerateInvoice() {
     // Rename the function to avoid conflicts with existing handleSubmit
     const handleInvoiceSubmit = (e) => {
         if (totalPayment === grandTotal) {
-            // Proceed with form submission or further processing
+            
             console.log("Form submitted");
         } else {
             e.preventDefault(); // Prevent form submission if totals don't match
@@ -1693,7 +1707,7 @@ function GenerateInvoice() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-wrap gap-0 lg:gap-12 ">
+                            <div className="flex flex-wrap gap-4 lg:gap-12 ">
                                 <div className="mb-4">
                                     <h3 className="text-xl font-bold flex mb-4">
                                         Select Services/Products:
@@ -2552,11 +2566,11 @@ function GenerateInvoice() {
                                                             e.target.value
                                                         )
                                                     }
-                                                    className="p-2 w-full border border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    className="p-2 w-full border font-bold text-blue-500  border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 >
                                                     <option
                                                         value="None"
-                                                        className="text-blue-500"
+                                                        className="text-black"
                                                         disabled={
                                                             selectMembership?.id ===
                                                             "None"
@@ -2810,14 +2824,14 @@ function GenerateInvoice() {
                                 </table>
                             )}
 
-                            <div>
+                            <div className="mt-4 md:mt-0">
                                 {/* Points Input Field */}
                                 {userExists &&
                                     (membershipType !== "None" ||
                                         hasCoupon) && (
                                         <div className="flex items-center space-x-6">
                                             {/* Membership Points Input */}
-                                            {membershipType !== "None" && (
+                                            {membershipType !== "None" && membershipType !== "" && (
                                                 <div className="flex flex-col">
                                                     <label
                                                         htmlFor="membershipPoints"
@@ -3017,8 +3031,8 @@ function GenerateInvoice() {
                                     }`}
                                     onClick={handleInvoiceSubmit}
                                 >
-                                    Create Invoice
-                                </button>
+            {loading ? <CircularProgress size={20} color="inherit" /> : "Create Invoice"}
+            </button>
                             </div>
                         </form>
                     </div>
