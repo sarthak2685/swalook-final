@@ -89,7 +89,7 @@ const Inquiries = () => {
     );
 
     return (
-        <div className="bg-gray-100 min-h-screen">
+        <div className="bg-gray-100 min-h-[200vh]">
             <Header />
             <VertNav />
             <div className="p-10 md:ml-72">

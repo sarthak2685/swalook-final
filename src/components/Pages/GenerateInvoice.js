@@ -1056,7 +1056,6 @@ function GenerateInvoice() {
                 const userDataArray = userDetailsResponse.data.data;
                 if (Array.isArray(userDataArray) && userDataArray.length > 0) {
                     const userData = userDataArray[0];
-                    console.log("check", appointment.customerName);
                     setCustomer_Name(
                         userData.name || appointment.customerName || ""
                     ); // Safely assign values
@@ -1064,8 +1063,10 @@ function GenerateInvoice() {
                     setCustomerData(userData);
                     setUserId(userData.id ?? ""); // Use nullish coalescing to prevent undefined values
                     setUserExists(true);
-                    setDateOfBirth(userData.d_o_b || appointment.d_o_b);
-                    setAnniversaryDate(userData.d_o_a || appointment.d_o_a);
+                    setDateOfBirth(userData.d_o_b || appointment.d_o_b || "");
+                    setAnniversaryDate(
+                        userData.d_o_a || appointment.d_o_a || ""
+                    );
                     setMembershipType(userData.membership);
                     setUserPoints(
                         userData.loyality_profile.current_customer_points || 0
@@ -1383,7 +1384,7 @@ function GenerateInvoice() {
     const location = useLocation();
     const { appointment } = location.state || {};
     // Set initial values from appointment data
-
+    console.log("Appointment", appointment);
     useEffect(() => {
         if (appointment) {
             setCustomer_Name(appointment.customerName || "");
@@ -1404,7 +1405,7 @@ function GenerateInvoice() {
             <div className="bg-gray-100">
                 <Header />
                 <VertNav />
-                <div className="bg-gray-100 flex-grow md:ml-72 p-10">
+                <div className="bg-gray-100 min-h-[150vh] md:ml-72 p-10">
                     {userExists ? (
                         <div className="bg-white shadow-md px-4 py-8 mb-10 rounded-lg  grid grid-cols-1 md:grid-cols-4 gap-4">
                             {customerId && (
