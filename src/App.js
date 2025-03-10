@@ -10,7 +10,7 @@ import OwnerLogin from "./components/Pages/OwnerLogin";
 import Login from "./components/Pages/Login";
 import AdminLogin from "./components/Pages/AdminLogin";
 import ServiceDetails from "./components/Pages/ServiceDetails";
-import AdminDashboard from "./components/Pages/AdminDashboard";
+import AdminDashboard from "./components/Pages/AdminDashboard/AdminDashboard.jsx";
 import Settings from "./components/Pages/Settings";
 import PersonalInformation from "./components/Pages/PersonalInformation";
 import Appointment from "./components/Pages/Appointment.jsx";

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import VertNav from "./VertNav";
 import config from "../../config";
+import axios from "axios";
 
 const Inquiries = () => {
     const sname = localStorage.getItem("sname");
@@ -10,6 +11,7 @@ const Inquiries = () => {
     const bid = localStorage.getItem("branch_id");
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
+    const [inquiry, setInquires] = useState([]);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedMonth, setSelectedMonth] = useState("");
@@ -17,7 +19,9 @@ const Inquiries = () => {
     const [inquiries, setInquiries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const itemsPerPage = 8;
+    const [showModal, setShowModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+    const itemsPerPage = 20;
 
     const fetchInquiries = async () => {
         setLoading(true);
@@ -50,6 +54,48 @@ const Inquiries = () => {
             setError("Failed to fetch inquiries. Please try again.");
         } finally {
             setLoading(false);
+        }
+    };
+    const handleDelete = async () => {
+        const token = localStorage.getItem("token");
+        if (!token || !deleteId) {
+            setError("Token or Invoice ID is missing");
+            setShowModal(false);
+            return;
+        }
+
+        // Optimistically update the UI
+        const updatedInquiry = inquiry.filter(
+            (inquiry) => inquiry.id !== deleteId
+        );
+        setInquires(updatedInquiry);
+
+        try {
+            const response = await axios.delete(
+                `${config.apiUrl}/api/swalook/enquery/?id=${deleteId}&branch_name=${bid}`,
+                {
+                    headers: {
+                        Authorization: `Token ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (response.status === 200) {
+                setShowModal(false); // Close the modal
+                setDeleteId(null); // Reset the delete ID
+                window.location.reload();
+            } else {
+                // Handle any unexpected responses
+                setError("Unexpected response from server");
+                // Revert UI update if necessary
+                setInquires(inquiry); // Restore the original state
+            }
+        } catch (err) {
+            console.error("Error deleting invoice:", err);
+            setError("Error deleting invoice");
+            // Revert UI update on error
+            setInquires(inquiry);
         }
     };
 
@@ -128,15 +174,28 @@ const Inquiries = () => {
                             No inquiries found.
                         </p>
                     ) : (
-                        <>
-                            <table className="w-full text-center bg-white border rounded-lg">
+                        <div className="overflow-auto">
+                            <table className="w-full text-center bg-white border rounded-lg ">
                                 <thead>
                                     <tr className="bg-gray-200">
-                                        <th className="p-2">S. No.</th>
-                                        <th className="p-2">Customer Name</th>
-                                        <th className="p-2">Phone Number</th>
-                                        <th className="p-2">Inquired For</th>
-                                        <th className="p-2">Notes</th>
+                                        <th className="p-2 border border-gray-300">
+                                            S. No.
+                                        </th>
+                                        <th className="p-2 border border-gray-300">
+                                            Customer Name
+                                        </th>
+                                        <th className="p-2 border border-gray-300">
+                                            Phone Number
+                                        </th>
+                                        <th className="p-2 border border-gray-300">
+                                            Inquired For
+                                        </th>
+                                        <th className="p-2 border border-gray-300">
+                                            Notes
+                                        </th>
+                                        <th className="p-2 border border-gray-300">
+                                            Actions
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -148,18 +207,29 @@ const Inquiries = () => {
                                                     index +
                                                     1}
                                             </td>
-                                            <td className="p-2">
+                                            <td className="p-2 border border-gray-300">
                                                 {item.customer_name || "N/A"}
                                             </td>
-                                            <td className="p-2">
+                                            <td className="p-2 border border-gray-300">
                                                 {item.mobile_no || "N/A"}
                                             </td>
-                                            <td className="p-2">
+                                            <td className="p-2 border border-gray-300">
                                                 {parseQueryFor(item.query_for)}
                                             </td>
 
-                                            <td className="p-2">
+                                            <td className="p-2 border border-gray-300">
                                                 {item.comment || "N/A"}
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setDeleteId(item.id);
+                                                        setShowModal(true);
+                                                    }}
+                                                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                                                >
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -199,7 +269,37 @@ const Inquiries = () => {
                                     &gt;
                                 </button>
                             </div>
-                        </>
+                            {/* Delete Confirmation Modal */}
+                            {showModal && (
+                                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                                        <h2 className="text-xl font-semibold mb-4">
+                                            Confirm Delete
+                                        </h2>
+                                        <p>
+                                            Are you sure you want to delete this
+                                            inquirey?
+                                        </p>
+                                        <div className="flex justify-end mt-4">
+                                            <button
+                                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 mr-2"
+                                                onClick={() =>
+                                                    setShowModal(false)
+                                                }
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                                                onClick={handleDelete}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
