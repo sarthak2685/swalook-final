@@ -21,16 +21,22 @@ function EditCustomerPopup({ customer, onClose }) {
   const branchName = localStorage.getItem('branch_name');
   const sname = localStorage.getItem('s-name');
   const [programTypes, setProgramTypes] = useState([]);
+  const [dateofanniversary,setDateofanniversary] = useState("")
+  const [dateofbirth,setDateOfbirth] = useState("")
+
 
   useEffect(() => {
     // Fetch customer data
+    console.log("customer",customer)
     if (customer) {
       setCustomerName(customer.name);
       setCustomerNumber(customer.mobile_no);
       setEmail(customer.email || ''); // Handle optional email
       setLoyaltyProgram(customer.membership || '');
-      setPoints(customer.loyality_profile.current_customer_points || 0);
+      setPoints(customer.loyality_profile?.current_customer_points || 0);
       setExpiryDays(customer.expiry_days || '');
+      setDateOfbirth(customer.d_o_b)
+      setDateofanniversary(customer.d_o_a)
     }
   }, [customer]);
 
@@ -73,6 +79,8 @@ function EditCustomerPopup({ customer, onClose }) {
           name: customerName,
           mobile_no: customerNumber,
           email: email,
+          d_o_b: dateofbirth,
+          d_o_a: dateofanniversary,
         }),
       });
 
@@ -143,6 +151,28 @@ function EditCustomerPopup({ customer, onClose }) {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+          <div className="ec_field">
+            <label htmlFor="DOB">DOB:</label>
+            <input
+              type="date"
+              id="DOB"
+              name="DOB"
+              placeholder="Date Of Birth"
+              value={dateofbirth}
+              onChange={(e) => setDateOfbirth(e.target.value)}
+            />
+          </div>
+          <div className="ec_field">
+            <label htmlFor="DOA">DOA:</label>
+            <input
+              type="date"
+              id="DOA"
+              name="DOA"
+              placeholder="Date Of Anniversary"
+              value={dateofanniversary}
+              onChange={(e) => setDateofanniversary(e.target.value)}
+            />
+          </div>
           <div className="ec_button_container">
             <button className="ec_save_button">
               {loading ? <CircularProgress size={20} color="inherit" /> : 'Save'}
@@ -150,7 +180,7 @@ function EditCustomerPopup({ customer, onClose }) {
           </div>
         </form>
       </div>
-      {showPopup && <Popup message={popupMessage} onClose={() => { setShowPopup(false); navigate(`/${sname}/${branchName}/clp`); }} />}
+      {showPopup && <Popup message={popupMessage} onClose={() => { setShowPopup(false); navigate(`/${sname}/${branchName}/customer-loyality`); }} />}
     </div>
   );
 }

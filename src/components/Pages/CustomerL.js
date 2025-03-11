@@ -11,7 +11,7 @@ import VertNav from './VertNav';
 import DeleteProductPopup from './DeleteProductPopup';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { FaSearch } from 'react-icons/fa'; // Import search icon
-
+//
 function CustomerL() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [customerData, setCustomerData] = useState([]);

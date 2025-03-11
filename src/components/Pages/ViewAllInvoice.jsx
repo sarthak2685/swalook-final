@@ -18,6 +18,8 @@ const ViewAllInvoices = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null); // ID of the invoice to delete
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userType = user.type;
 
   const itemsPerPage = 10;
 
@@ -176,10 +178,17 @@ const ViewAllInvoices = () => {
                   <td className="border px-4 py-2">
                     <button
                       onClick={() => {
-                        setDeleteId(invoice.id);
-                        setShowModal(true);
+                        if (userType !== "staff") {
+                          setDeleteId(invoice.id);
+                          setShowModal(true);
+                        }
                       }}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                      disabled={userType === "staff"}
+                      className={`px-4 py-2 rounded-lg ${
+                        userType === "staff"
+                          ? "bg-red-500 text-white hover:bg-red-600 cursor-not-allowed"
+                          : "bg-red-500 text-white hover:bg-red-600"
+                      }`}
                     >
                       Delete
                     </button>

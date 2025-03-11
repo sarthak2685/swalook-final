@@ -117,10 +117,7 @@ function App() {
                             path="/:salon_name/:branchName/settings/clpsetting"
                             element={<CLP_Setting />}
                         />
-                        <Route
-                            path="/:salon_name/:branchName/clp"
-                            element={<CustomerL />}
-                        />
+                      
                         <Route
                             path="/:salon_name/:branchName/attendance"
                             element={<StaffManagement />}

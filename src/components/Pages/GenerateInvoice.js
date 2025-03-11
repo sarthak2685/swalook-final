@@ -59,6 +59,7 @@ function GenerateInvoice() {
     const [selectedCategoryValues, setSelectedCategoryValues] = useState([]); // Initialize selectedList as an empty array
     const [selectedCategoryList, setSelectedCategoryList] = useState([]); // Initialize selectedList as an empty array
     const [selectedServiceValues, setSelectedServiceValues] = useState([]);
+    const [productList, setProductList] = useState([]);
 
     const [isServiceModalOpen, setServiceModalOpen] = useState(false);
     const [isProductModalOpen, setProductModalOpen] = useState(false);
@@ -478,7 +479,7 @@ function GenerateInvoice() {
         }
     };
     const toggleProductSelection = (product) => {
-        setSelectedList((prevSelected) => {
+        setProductList((prevSelected) => {
             const isAlreadySelected = prevSelected.some(
                 (p) => p.id === product.id
             );
@@ -513,7 +514,6 @@ function GenerateInvoice() {
 
         // After transformation, log the updated list
         setSelectedList(updatedServiceList);
-        console.log("Updated Service List:", updatedServiceList);
     };
 
     const handleProductSelect = (selectedList) => {
@@ -535,7 +535,7 @@ function GenerateInvoice() {
         setProductData(updatedProductData);
     };
 
-    console.log(productData);
+    console.log("product hu mai",productList);
 
     // const groupedOptions = serviceOptions.reduce((groups, option) => {
     //   if (!groups[option.category]) {
@@ -620,9 +620,9 @@ function GenerateInvoice() {
     // Handle served by (staff) selection
     const handleServedSelect = (selected, index) => {
         const updatedSelectedList = [...selectedList];
-        updatedSelectedList[index].staff = selected; // Update the staff for the selected service
-        setSelectedList(updatedSelectedList); // Update the selected list with the new staff
-        updateServicesTableData(updatedSelectedList); // Pass the updated list to the table data update function
+        updatedSelectedList[index].staff = selected; 
+        setSelectedList(updatedSelectedList); 
+        updateServicesTableData(updatedSelectedList);
         setIsModalOpen(false);
     };
 
@@ -701,19 +701,21 @@ function GenerateInvoice() {
                 setLoading(false);
                 return;
             }
-
             // Validate services table data and product data
             if (
-                servicesTableData.every(
-                    (service) => !service.inputFieldValue || !service.gst
-                ) &&
-                productData.every((product) => !product.quantity)
+                (!Array.isArray(servicesTableData) || servicesTableData.length === 0 || 
+                 servicesTableData.every(service => !service.inputFieldValue || !service.gst)) &&
+                (!Array.isArray(productList) || productList.length === 0 || 
+                 productList.every(productList => !productList.quantity))
             ) {
                 setPopupMessage("Please fill the missing field");
                 setShowPopup(true);
                 setLoading(false);
                 return;
             }
+            
+            
+            
 
             // Validate services table data
             for (const service of servicesTableData) {
@@ -794,7 +796,6 @@ function GenerateInvoice() {
                 }
             }
 
-            // Navigate to the invoice page with the required data
             await Promise.all([
                 submitResult, // Submit user details if needed
                 navigate(
@@ -812,7 +813,7 @@ function GenerateInvoice() {
                             gst_number,
                             comments,
                             InvoiceId: generatedInvoiceId,
-                            productData,
+                            productData: productList,
                             deductedPoints,
                             selectMembership,
                             paymentModes,
@@ -1073,20 +1074,20 @@ function GenerateInvoice() {
                     setCustomer_Name(
                         userData.name || appointment.customerName || ""
                     ); // Safely assign values
-                    setEmail(userData.email || appointment.email || "");
+                    setEmail(userData?.email || appointment?.email || "");
                     setCustomerData(userData);
-                    setUserId(userData.id ?? ""); // Use nullish coalescing to prevent undefined values
+                    setUserId(userData?.id ?? ""); // Use nullish coalescing to prevent undefined values
                     setUserExists(true);
-                    setDateOfBirth(userData.d_o_b || appointment.d_o_b || "");
+                    setDateOfBirth(userData?.d_o_b || appointment?.d_o_b || "");
                     setAnniversaryDate(
-                        userData.d_o_a || appointment.d_o_a || ""
+                        userData?.d_o_a || appointment?.d_o_a || ""
                     );
-                    setMembershipType(userData.membership);
+                    setMembershipType(userData?.membership);
                     setUserPoints(
-                        userData.loyality_profile.current_customer_points || 0
+                        userData?.loyality_profile?.current_customer_points || 0
                     );
                     if (
-                        Array.isArray(userData.coupon) &&
+                        Array.isArray(userData?.coupon) &&
                         userData.coupon.length > 0
                     ) {
                         const userCoupons = userData.coupon.map((coupon) => ({
@@ -1174,11 +1175,15 @@ function GenerateInvoice() {
             );
 
             setCustomerId(response.data);
+            
             console.log("Fetched data:", response.data);
         } catch (error) {
             console.error("Error fetching customer data:", error);
         }
     };
+
+    const combinedList = [...selectedList, ...productList];
+
 
     // Debounced effect
     useEffect(() => {
@@ -1362,22 +1367,24 @@ function GenerateInvoice() {
             (sum, service) =>
                 sum + (service.price || 0) * (service.quantity || 1),
             0
+        ) + productList.reduce(
+            (sum, product) =>
+                sum + (product.price || 0) * (product.quantity || 1),
+            0
         ) +
         membershipPrice +
         couponDiscount -
         deductedPoints -
-        valueDeductedPoints; // Adding membership price and subtracting coupon discount
+        valueDeductedPoints; 
 
     const formattedGrandTotal = isNaN(grandTotal) ? 0 : grandTotal;
 
     const grandTotalFormatted = formattedGrandTotal.toFixed(2);
-    // Rename the function to avoid conflicts with existing handleSubmit
     const handleInvoiceSubmit = (e) => {
         if (totalPayment === grandTotal) {
-            
-            console.log("Form submitted");
+         console.log("Form submitted");
         } else {
-            e.preventDefault(); // Prevent form submission if totals don't match
+            e.preventDefault(); 
             alert("Total payment does not match the grand total.");
         }
     };
@@ -1738,7 +1745,7 @@ function GenerateInvoice() {
                                         </button>
                                     </div>
                                     <div className="my-4" id="service-table">
-                                        {selectedList.length > 0 ? (
+                                        {combinedList.length > 0 ? (
                                             <table className="w-full border border-gray-200">
                                                 <thead>
                                                     <tr className="bg-gray-100">
@@ -1763,7 +1770,7 @@ function GenerateInvoice() {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="text-center">
-                                                    {selectedList.map(
+                                                    {combinedList.map(
                                                         (service, index) => (
                                                             <tr
                                                                 key={index}
@@ -1791,7 +1798,7 @@ function GenerateInvoice() {
                                                                                       1.18
                                                                                   ).toFixed(
                                                                                       2
-                                                                                  ) // Adjust price for GST-inclusive services
+                                                                                  ) 
                                                                                 : service.price ||
                                                                                   ""
                                                                         }
@@ -1869,37 +1876,17 @@ function GenerateInvoice() {
                                                                     }
                                                                 >
                                                                     <div
-                                                                        className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
-                                                                        onClick={() =>
-                                                                            openModal(
-                                                                                index
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        {service.staff &&
-                                                                        service
-                                                                            .staff
-                                                                            .length >
-                                                                            0 ? (
-                                                                            <span>
-                                                                                {service.staff
-                                                                                    .map(
-                                                                                        (
-                                                                                            staff
-                                                                                        ) =>
-                                                                                            staff.label
-                                                                                    )
-                                                                                    .join(
-                                                                                        ", "
-                                                                                    )}
-                                                                            </span>
-                                                                        ) : (
-                                                                            <span>
-                                                                                Select
-                                                                                Staff
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
+        className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
+        onClick={() => openModal(index)}
+    >
+        {service.staff && service.staff.length > 0 ? (
+            <span>{service.staff.map((staff) => staff.label).join(", ")}</span>
+        ) : selectedList.includes(service) ? ( // Check if service exists in serviceList
+            <span className="text-red-500">Select Staff *</span> // Required for services
+        ) : (
+            <span>Select Staff (Optional)</span> // Optional for products
+        )}
+    </div>
                                                                     {isModalOpen ===
                                                                         index && (
                                                                         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
@@ -1937,7 +1924,8 @@ function GenerateInvoice() {
                                                                                         service.staff ||
                                                                                         []
                                                                                     }
-                                                                                    required
+                                                                                    required={selectedList.includes(service)} 
+
                                                                                 />
                                                                                 <div className="flex justify-end mt-4">
                                                                                     <button
@@ -1978,7 +1966,7 @@ function GenerateInvoice() {
                                                         </td>
                                                         <td className="p-2 border text-center">
                                                             {/* Total Price Calculation */}
-                                                            {selectedList
+                                                            {combinedList
                                                                 .reduce(
                                                                     (
                                                                         sum,
@@ -1995,7 +1983,7 @@ function GenerateInvoice() {
                                                         </td>
                                                         <td className="p-2 border text-center">
                                                             {/* Total Quantity Calculation */}
-                                                            {selectedList.reduce(
+                                                            {combinedList.reduce(
                                                                 (
                                                                     sum,
                                                                     service
@@ -2009,7 +1997,7 @@ function GenerateInvoice() {
                                                         </td>
                                                         <td className="p-2 border text-center">
                                                             {/* Total GST Calculation */}
-                                                            {selectedList
+                                                            {combinedList
                                                                 .reduce(
                                                                     (
                                                                         sum,
@@ -2035,10 +2023,13 @@ function GenerateInvoice() {
                                     </div>
 
                                     <div className="my-4" id="product-tabel">
-                                        {product_value.length > 0 ? ( // Conditionally render the products table
+                                        {product_value.length > 0 ? ( 
                                             <table className="w-full border p-4 border-gray-200 mt-4">
                                                 <thead>
                                                     <tr className="bg-gray-100 p-4">
+                                                    <th className="border px-4 py-2">
+                                                            category
+                                                        </th>
                                                         <th className="border px-4 py-2">
                                                             Product Name
                                                         </th>
@@ -2054,12 +2045,17 @@ function GenerateInvoice() {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="text-center">
-                                                    {product_value.map(
+                                                    {productList.map(
                                                         (product, index) => (
                                                             <tr key={index}>
                                                                 <td>
                                                                     {
-                                                                        product.value
+                                                                        product.category
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    {
+                                                                        product.name
                                                                     }
                                                                 </td>
                                                                 <td>
@@ -2390,7 +2386,7 @@ function GenerateInvoice() {
                                                                                     <label className="flex flex-row items-center gap-3 cursor-pointer">
                                                                                         <input
                                                                                             type="checkbox"
-                                                                                            checked={selectedList.some(
+                                                                                            checked={productList.some(
                                                                                                 (
                                                                                                     p
                                                                                                 ) =>

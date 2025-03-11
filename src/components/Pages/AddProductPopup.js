@@ -20,7 +20,7 @@ function AddProductPopup({ onClose }) {
     const [loading, setLoading] = useState(false);
     const [category, setCategory] = useState(); 
     const [categories, setCategories] = useState([]);
-  
+    const [expiryDate, setExpiryDate] = useState("");
     const branchName = localStorage.getItem('branch_name');
     const sname = localStorage.getItem('s-name');
     const bid = localStorage.getItem("branch_id");
@@ -55,6 +55,36 @@ function AddProductPopup({ onClose }) {
           });
       }, [bid]);
     
+      const formatDate = (dateString) => {
+        let parts;
+        
+        // Detect delimiter and split
+        if (dateString.includes("/")) {
+            parts = dateString.split("/");
+        } else if (dateString.includes("-")) {
+            parts = dateString.split("-");
+        } else {
+            return "Invalid Date"; // Handle unexpected cases
+        }
+    
+        // Ensure three parts exist
+        if (parts.length !== 3) return "Invalid Date";
+    
+        let [part1, part2, year] = parts.map(num => parseInt(num, 10));
+    
+        // Determine format
+        if (part1 > 12) {
+            // If the first part is greater than 12, assume DD/MM/YYYY
+            return `${year}-${String(part2).padStart(2, '0')}-${String(part1).padStart(2, '0')}`;
+        } else {
+            // Otherwise, assume MM/DD/YYYY
+            return `${year}-${String(part1).padStart(2, '0')}-${String(part2).padStart(2, '0')}`;
+        }
+    };
+    
+    
+    // Example usage:
+    const expiryDates = formatDate(expiryDate);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -75,6 +105,7 @@ function AddProductPopup({ onClose }) {
             stocks_in_hand: parseInt(invent, 10),
             unit: unit,
             category: category,
+            expiry_date:expiryDate,
         };
 
         try {
@@ -124,7 +155,7 @@ function AddProductPopup({ onClose }) {
                     <div className="mb-4 flex gap-12">
             <label
               htmlFor="category"
-              className="block text-start text-sm font-medium text-gray-700 mb-2 ml-4"
+              className="block text-start text-sm font-medium text-gray-700 mb-2"
             >
               Category:
             </label>
@@ -134,7 +165,7 @@ function AddProductPopup({ onClose }) {
               value={category || ""} 
               onChange={(e) => setCategory(e.target.value)} 
               required
-              className="w-52 px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="text-leftw-52 ml-4 px-4 py-2 border text-gray-400 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="" disabled>
                 Select a Category
@@ -160,18 +191,22 @@ function AddProductPopup({ onClose }) {
                     </div>
                     <div className="adp4">
                         <label htmlFor="unit">Unit:</label>
-                        <select id="unit" className='status-dropdown' name="unit" value={unit} onChange={(e) => setUnit(e.target.value)}>
-                            <option value="">Select unit</option>
+                        <select id="unit" className='text-left text-gray-400' name="unit" value={unit} onChange={(e) => setUnit(e.target.value)}>
+                            <option value="">Select Unit</option>
                             <option value="ml">ml</option>
                             <option value="gm">gm</option>
                         </select>
+                    </div>
+                    <div className="adp4 text-gray-400">
+                        <label htmlFor="expiry">Expiry Date:</label>
+                        <input type="date" id="expiry" name="expiry" required onChange={(e) => setExpiryDate(e.target.value)} />
                     </div>
                     <div className="adp4">
                         <label htmlFor="description">Description:</label>
                         <input type="text" id="description" name="description" placeholder="Description" required onChange={(e) => setDescription(e.target.value)} />
                     </div>
                     <div className="ad_p_button_container">
-                        <button className="ad_p_save_button" type="submit">
+                        <button className="ad_p_save_button items-center" type="submit">
                             {loading ? <CircularProgress size={20} color="inherit" /> : 'Save'}
                         </button>
                     </div>
