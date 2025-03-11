@@ -7,6 +7,8 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import VertNav from "./VertNav"; 
 import config from "../../config";
+import { MdNotifications } from "react-icons/md"; // Notification icon
+
 
 function Header() {
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
@@ -19,11 +21,14 @@ function Header() {
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef();
   const navigate = useNavigate();
-
+  const [showNotifications, setShowNotifications] = useState(false);
   const userType = localStorage.getItem("type");
   const sname = localStorage.getItem("s-name");
   const branchName = localStorage.getItem("branch_name");
-  console.log("branchhh",sname)
+
+  const [notifications, setNotifications] = useState(["Loreal sampoo expire on 12-03-2024", "Sampoo stock is low"]); // Example notifications
+
+
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -52,7 +57,11 @@ function Header() {
   }, []);
 
 
-
+  const toggleNotifications = () => {
+    setShowNotifications((prev) => !prev);
+    setShowBranchDropdown(false);
+    setShowProfileDropdown(false);
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -150,6 +159,30 @@ function Header() {
         </div>
 
         <div className="flex items-center gap-4 mx-4">
+        {/* <div className="relative cursor-pointer" onClick={() => setShowNotifications(!showNotifications)}>
+            <MdNotifications className="text-3xl hover:text-blue-500 transition" />
+            {notifications.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                {notifications.length}
+              </span>
+            )}
+
+            {showNotifications && (
+              <div className="absolute right-0 mt-3 w-60 bg-white shadow-lg rounded-lg p-3 z-20">
+                <h4 className="font-semibold text-gray-700 mb-2">Notifications</h4>
+                {notifications.length > 0 ? (
+                  notifications.map((msg, index) => (
+                    <div key={index} className="text-gray-600 py-1 border-b last:border-none">
+                      {msg}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-gray-400 text-sm">No new notifications</div>
+                )}
+              </div>
+            )}
+          </div> */}
+
           <div className="relative" ref={dropdownRef}>
             <div
               className="cursor-pointer p-2 bg-gray-100 rounded-md flex items-center gap-2"

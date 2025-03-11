@@ -21,7 +21,8 @@ function Inventory() {
 
 
     const bid = localStorage.getItem('branch_id');
-
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userType = user.type;
     const AddtogglePopup = () => setIsAddPopupOpen(!isAddPopupOpen);
     const AddtogglePopup2 = () => setIsAddPopupOpen2((prev) => !prev);
 
@@ -122,6 +123,7 @@ function Inventory() {
                                         <th className="py-2 px-4 border">SKU</th>
                                         <th className="py-2 px-4 border">Quantity</th>
                                         <th className="py-2 px-4 border">Price</th>
+                                        <th className="py-2 px-4 border">Expiry Date</th>
                                         <th className="py-2 px-4 border">Edit</th>
                                         <th className="py-2 px-4 border">Delete</th>
                                     </tr>
@@ -134,12 +136,17 @@ function Inventory() {
                                             <td className="py-2 px-4 text-center border">{item.product_id}</td>
                                             <td className="py-2 px-4 text-center border ">{item.stocks_in_hand}</td>
                                             <td className="py-2 px-4 text-center border">₹{item.product_price}</td>
+                                            <td className="py-2 px-4 text-center border">{item.expiry_date}</td>
                                             <td className="py-2 px-4 text-center border">
                                                 <EditIcon onClick={() => EdittogglePopup(item)} className="text-blue-500 cursor-pointer" />
                                             </td>
-                                            <td className="py-2 px-4 border text-center">
-                                                <DeleteIcon onClick={() => handleDeleteClick(item)} className="text-red-500 cursor-pointer" />
-                                            </td>
+                                            <td className="py-2 px-4 text-center border">
+                {userType === "staff" ? (
+                  <DeleteIcon className="text-gray-400 opacity-50 cursor-not-allowed" />
+                ) : (
+                  <DeleteIcon onClick={() => handleDeleteClick(item)} className="text-red-500 cursor-pointer" />
+                )}
+              </td>
                                         </tr>
                                     ))}
                                 </tbody>

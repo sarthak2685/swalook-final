@@ -21,6 +21,8 @@ const AdminManagement = () => {
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [showEditStaff, setShowEditStaff] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userType = user.type;
 
   const getDaysInMonth = (month, year) => {
     const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -233,19 +235,34 @@ const AdminManagement = () => {
                 </buttons>
               </td>
               <td>
-                  <IconButton id='staff-mngmt-edit-button' onClick={() => handleEditStaff(staff)}>
-                    <Edit />
-                  </IconButton>
+              <IconButton
+  id="staff-mngmt-edit-button"
+  onClick={() => userType !== "staff" && handleEditStaff(staff)}
+  disabled={userType === "staff"}
+  sx={{
+    opacity: userType === "staff" ? 0.5 : 1,
+    cursor: userType === "staff" ? "not-allowed" : "pointer",
+  }}
+>
+  <Edit />
+</IconButton>
+
                 </td>
               <td>
               <IconButton
-                  id="staff-mgmt-delete-button"
-                  onClick={() => openDeleteConfirm(staff.id)}
-                  color="error"
-                  aria-label="delete"
-                >
-                  <Delete />
-                </IconButton>
+  id="staff-mgmt-delete-button"
+  onClick={() => userType !== "staff" && openDeleteConfirm(staff.id)}
+  color="error"
+  aria-label="delete"
+  disabled={userType === "staff"}
+  sx={{
+    opacity: userType === "staff" ? 0.5 : 1,
+    cursor: userType === "staff" ? "not-allowed" : "pointer",
+  }}
+>
+  <Delete />
+</IconButton>
+
               </td>
             </tr>
           ))}

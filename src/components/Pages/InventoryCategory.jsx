@@ -20,20 +20,17 @@ function InventoryCategory({ onClose }) {
   const handleAddCategory = (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-
+  
     if (!category) {
       setPopupMessage("Please enter a category.");
       setShowPopup(true);
       return;
     }
-
-    // API Call to create category
+  
     axios
       .post(
         `${config.apiUrl}/api/swalook/product_category/?branch_name=${bid}`,
-        {
-            product_category: category,
-        },
+        { product_category: category },
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -42,20 +39,15 @@ function InventoryCategory({ onClose }) {
         }
       )
       .then((response) => {
-        const newCategoryId = response.data.id; // Assuming the server returns the ID
-        console.log("New Category ID:", newCategoryId);
+        console.log("New Category ID:", response.data.id);
         setPopupMessage("Category added successfully!");
         setShowPopup(true);
-        onClose();
-        // window.location.reload();
- 
-    })
-    
-      .then(() => {
-        setPopupMessage("Category added successfully!");
-        setShowPopup(true);
-        onClose(); // Close the popup
-
+  
+        // Close modal after a short delay (e.g., 1 second)
+        setTimeout(() => {
+          setShowPopup(false);
+          onClose();
+        }, 1000);
       })
       .catch((err) => {
         console.error("Error adding category:", err);
@@ -63,6 +55,7 @@ function InventoryCategory({ onClose }) {
         setShowPopup(true);
       });
   };
+  
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">

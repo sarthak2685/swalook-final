@@ -31,6 +31,7 @@ function OwnerLogin() {
         localStorage.setItem('branch_name', btoa(response.data.data.branch_name));
         localStorage.setItem('s-name', salonName);
         localStorage.setItem('type', response.data.data.type);
+        localStorage.setItem("user", JSON.stringify(response.data.data));
 
         if (response.data.data.type === 'owner') {
           navigate(`/${salonName}`);

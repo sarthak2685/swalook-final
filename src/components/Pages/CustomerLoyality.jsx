@@ -6,6 +6,11 @@ import { FaInfoCircle } from "react-icons/fa";
 import AddCustomerPopup from "./AddCustomerPopup";
 import axios from "axios";
 import config from "../../config";
+import DeleteProductPopup from './DeleteProductPopup';
+import EditCustomerPopup from './EditCustomerPopup';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+
+
 
 function CustomerLoyality() {
     const [modalData, setModalData] = useState([]);
@@ -16,7 +21,14 @@ function CustomerLoyality() {
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem("token");
     const bid = localStorage.getItem("branch_id");
-
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null); 
+    const [showPopup, setShowPopup] = useState(false);
+    const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userType = user.type;
+    console.log("user",user.user)
+  
     const currentMonth = new Date().getMonth();
     const fetchCustomerData = async () => {
         try {
@@ -112,6 +124,48 @@ function CustomerLoyality() {
 
     const handleAddCustomerClick = () => setIsPopupOpen(true);
     const handleClosePopup = () => setIsPopupOpen(false);
+    const handleDelete = async () => {
+        try {
+            await axios.delete(`${config.apiUrl}/api/swalook/loyality_program/customer/?id=${selectedCustomerId}`, {
+                headers: {
+                    'Authorization': `Token ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const response = await axios.get(`${config.apiUrl}/api/swalook/loyality_program/customer/?branch_name=${localStorage.getItem('branch_id')}`, {
+                headers: {
+                    'Authorization': `Token ${localStorage.getItem('token')}`,
+                },
+            });
+
+            if (response.data.status) {
+                setCustomerData(response.data.data);
+            }
+
+            setShowPopup(false);
+            setSelectedCustomerId(null);
+        } catch (error) {
+            console.error('An error occurred while deleting customer data:', error);
+        }
+    };
+    const handleCancelDelete = () => {
+        setShowPopup(false);
+        setSelectedCustomerId(null);
+    };
+
+    const handleDeleteClick = (id) => {
+        setSelectedCustomerId(id);
+        setShowPopup(true);
+    };
+    const handleEditClick = (customer) => {
+        setSelectedCustomer(customer);
+        setIsEditPopupOpen(true);
+    };
+
+    const handleEditPopupClose = () => {
+        setIsEditPopupOpen(false);
+        setSelectedCustomer(null);
+    };
 
     return (
         <>
@@ -217,7 +271,7 @@ function CustomerLoyality() {
                                         <table className="w-full border-collapse">
                                             <thead>
                                                 <tr className="bg-gray-200 text-gray-700">
-                                                    <th className="px-4 py-2 text-left">
+                                                    <th className="px-4 py-2 text-left ">
                                                         Name
                                                     </th>
                                                     <th className="px-4 py-2 text-left">
@@ -319,22 +373,29 @@ function CustomerLoyality() {
                         <div className="overflow-x-auto">
                             <table className="table-auto w-full border-collapse text-lg leading-[3rem] mt-11">
                                 <thead>
-                                    <tr className="bg-gray-200 text-gray-700">
-                                        <th className="px-4 py-2 text-left">
+                                    <tr className="bg-gray-200 text-gray-700 border border-gray-300">
+                                        <th className="px-4 py-2 text-left border border-gray-300">
                                             Customer Name
                                         </th>
-                                        <th className="px-4 py-2 text-left">
+                                        <th className="px-4 py-2 text-left border border-gray-300">
                                             Phone Number
                                         </th>
-                                        <th className="px-4 py-2 text-left">
+                                        <th className="px-4 py-2 text-left border border-gray-300">
                                             Active Membership
                                         </th>
-                                        <th className="px-4 py-2 text-left">
+                                        <th className="px-4 py-2 text-left border border-gray-300">
                                             Active Coupons
                                         </th>
-                                        <th className="px-4 py-2 text-left">
+                                        <th className="px-4 py-2 text-left border border-gray-300">
                                             Status
                                         </th>
+                                        <th className="px-4 py-2 text-left border border-gray-300">
+                                        Edit
+                                        </th>
+                                        <th className="px-4 py-2 text-left border border-gray-300">
+                                        Delete
+                                        </th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -348,12 +409,12 @@ function CustomerLoyality() {
                                                         : "bg-white"
                                                 }`}
                                             >
-                                                <td className="px-4 py-2 relative group">
+                                                <td className="px-4 py-2 relative group border border-gray-300">
                                                     <span className="cursor-pointer text-black font-medium">
                                                         {customer.name}
                                                     </span>
                                                     {/* Hover Box */}
-                                                    <div className="absolute left-0 top-full mt-2 w-80 p-6 bg-gradient-to-r from-blue-50 to-blue-100 shadow-2xl rounded-2xl hidden group-hover:block z-10 border border-blue-300">
+                                                    <div className="absolute left-0 top-full mt-2 w-80 p-6 bg-gradient-to-r from-blue-50 to-blue-100 shadow-2xl rounded-2xl hidden group-hover:block z-50 border border-blue-300">
                                                         <h3 className="text-xl font-semibold text-blue-700">
                                                             {customer.name}
                                                         </h3>
@@ -389,14 +450,14 @@ function CustomerLoyality() {
                                                         </p>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-2">
+                                                <td className="px-4 py-2 border border-gray-300">
                                                     {customer.mobile_no}
                                                 </td>
-                                                <td className="px-4 py-2">
+                                                <td className="px-4 py-2 border border-gray-300">
                                                     {customer.membership ||
                                                         "None"}
                                                 </td>
-                                                <td className="px-4 py-2">
+                                                <td className="px-4 py-2 border border-gray-300">
                                                     {customer.coupon.length > 0
                                                         ? customer.coupon
                                                               .map(
@@ -408,14 +469,50 @@ function CustomerLoyality() {
                                                               .join(", ")
                                                         : "None"}
                                                 </td>
-                                                <td className="px-4 py-2">
+                                                <td className="px-4 py-2 border border-gray-300">
                                                     {customer.status || "-"}
                                                 </td>
+                                                <td className="px-4 py-2 border border-gray-300">
+  <EditIcon
+    style={{
+      cursor: userType === "staff" ? "not-allowed" : "pointer",
+      color: "blue",
+      opacity: userType === "staff" ? 0.5 : 1,
+    }}
+    onClick={() => userType !== "staff" && handleEditClick(customer)}
+  />
+</td>
+
+<td className="px-4 py-2 border border-gray-300">
+  <DeleteIcon
+    style={{
+      cursor: userType === "staff" ? "not-allowed" : "pointer",
+      color: "red",
+      opacity: userType === "staff" ? 0.5 : 1,
+    }}
+    onClick={() => userType !== "staff" && handleDeleteClick(customer.id)}
+  />
+</td>
+
                                             </tr>
                                         )
                                     )}
                                 </tbody>
                             </table>
+                            {showPopup && (
+                    <DeleteProductPopup
+                        title="Delete Customer"
+                        message="Are you sure you want to delete this customer?"
+                        onConfirm={handleDelete} 
+                        onCancel={handleCancelDelete} 
+                    />
+                )}
+                {isEditPopupOpen && (
+                    <EditCustomerPopup
+                        customer={selectedCustomer}
+                        onClose={handleEditPopupClose}
+                    />
+                )}
                         </div>
                     </div>
                 </div>

@@ -31,6 +31,8 @@ function Invoice() {
   const [popupMessage, setPopupMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const bid = localStorage.getItem("branch_id");
+  const user = JSON.parse(localStorage.getItem('user'));
+  
 
   const location = useLocation();
   const getCurrentDate = () => {
@@ -62,6 +64,8 @@ function Invoice() {
   const mobile_no = location.state.mobile_no;
   const email = location.state.email;
   const services = location.state.GBselectedServices;
+  const product = location.state.productData;
+  console.log("product ho tum", product)
   {
     services.map((service, index) =>
       console.log("services", service, service.name, service.category)
@@ -126,6 +130,9 @@ function Invoice() {
   const [producData, setProductData] = useState(
     location.state?.productData || []
   ); // Default to empty array if not set
+
+  const filteredProducts = product.map(({ staff, ...rest }) => rest);
+
 
   const staffNames = service_by
     .map(
@@ -555,35 +562,36 @@ function Invoice() {
         SGST: sgst[index],
         Total_amount: totalAmts[index],
       })),
-      ...productDetails.map((product, index) => {
-        const adjustedIndex = index + services.length;
-        console.log("producttttttttt", adjustedIndex);
+      // ...productDetails.map((product, index) => {
+      //   const adjustedIndex = index + services.length;
+      //   console.log("producttttttttt", product);
 
-        if (isGST) {
-          return {
-            Description: product.name,
-            Price: product.price,
-            Quantity: product.quantity,
-            Discount: 0,
-            Tax_amt: product.tax, // Return tax amount when GST is applied
-            CGST: product.cgst, // Return CGST when GST is applied
-            SGST: product.sgst, // Return SGST when GST is applied
-            Total_amount: product.total - product.cgst - product.sgst, // Total including taxes
-          };
-        } else {
-          // Return a different structure when GST is not applied
-          return {
-            Description: product.name,
-            Price: product.price,
-            Quantity: product.quantity,
-            Discount: 0,
-            Tax_amt: 0, // No tax applied
-            CGST: 0, // No CGST applied
-            SGST: 0, // No SGST applied
-            Total_amount: product.price * product.quantity,
-          };
-        }
-      }),
+      //   if (isGST) {
+      //     return {
+      //       Description: product.name,
+      //       Price: product.price,
+      //       Quantity: product.quantity,
+      //       Discount: 0,
+      //       Tax_amt: product.tax, // Return tax amount when GST is applied
+      //       CGST: product.cgst, // Return CGST when GST is applied
+      //       SGST: product.sgst, // Return SGST when GST is applied
+      //       Total_amount: product.total - product.cgst - product.sgst, // Total including taxes
+      //     };
+      //   } else {
+      //     // Return a different structure when GST is not applied
+      //     return {
+      //       Description: product.name,
+      //       Price: product.price,
+      //       Quantity: product.quantity,
+      //       Discount: 0,
+      //       Tax_amt: 0, // No tax applied
+      //       CGST: 0, // No CGST applied
+      //       SGST: 0, // No SGST applied
+      //       Total_amount: product.price * product.quantity,
+      //     };
+      //   }
+      // }),
+      
 
       // membership && {
       //   Description: membership,
@@ -596,12 +604,37 @@ function Invoice() {
       //   Total_amount: membershipTotal,
       // },
     ];
-
+    const productInvoice = productDetails.map((product) => {
+      if (isGST) {
+        return {
+          Description: product.name,
+          Price: product.price,
+          Quantity: product.quantity,
+          Discount: 0,
+          Tax_amt: product.tax,
+          CGST: product.cgst,
+          SGST: product.sgst,
+          Total_amount: product.total - product.cgst - product.sgst,
+        };
+      } else {
+        return {
+          Description: product.name,
+          Price: product.price,
+          Quantity: product.quantity,
+          Discount: 0,
+          Tax_amt: 0,
+          CGST: 0,
+          SGST: 0,
+          Total_amount: product.price * product.quantity,
+        };
+      }
+    });
+    
+    // Now, you have two separate arrays: serviceInvoice and productInvoice
+    console.log("Product Invoice:", productInvoice,productDetails);
     setInvoice(newInvoice);
 
-    const token = localStorage.getItem("token");
-    console.log("token", totalAmts);
-    console.log(final_price);
+   
 
     const data = {
       customer_name: customer_name,
@@ -620,7 +653,7 @@ function Invoice() {
       gst_number: gst_number,
       comment: comments,
       slno: invoiceId,
-      json_data: producData,
+      json_data: filteredProducts,
       loyalty_points_deducted: deductedPoint,
       coupon_points_deducted: coupon,
       membership: Memebrship,
@@ -770,80 +803,121 @@ function Invoice() {
 
   const handlePrint = async () => {
     const styles = StyleSheet.create({
-      invoiceContainer: { padding: 20, paddingHorizontal: 20 },
+      invoiceContainer: { 
+        padding: 20, 
+        borderWidth: 3,  // Full border
+        borderColor: "#222",  // Darker shade for professional look
+        borderRadius: 10,  // Smooth rounded edges
+        margin: 15,  
+        backgroundColor: "#fff",
+      },
+    
       section: {
         marginBottom: 20,
         flexDirection: "row",
-        justifyContent: "space-between", // Align header and customer sections
-
+        justifyContent: "space-between",
         alignItems: "flex-start",
       },
-      sectionColumn: { flex: 1, marginHorizontal: 10, gap: 5, fontSize: 14 },
+    
+      sectionColumn: { 
+        flex: 1, 
+        marginHorizontal: 10, 
+        gap: 5, 
+        fontSize: 14,
+        
+      },
+    
       invoiceHeader: {
         textAlign: "center",
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: "bold",
-        marginBottom: 15, // Add space after sname header
+        marginBottom: 20,
       },
-      table: { width: "100%", marginTop: 20 },
+    
+      table: { 
+        width: "100%", 
+        marginTop: 20,
+        borderWidth: 1,  // Border for the entire table
+        borderColor: "#ccc",
+        borderRadius: 5,
+      },
+    
       tableHeader: {
         flexDirection: "row",
-        backgroundColor: "#f0f0f0",
+        backgroundColor: "#ddd",
         borderBottomWidth: 1,
-        borderBottomColor: "#ccc",
-        fontSize: 10,
+        borderBottomColor: "#bbb",
+        fontSize: 11,
         fontWeight: "bold",
-        padding: 5,
+        paddingVertical: 8,
+        paddingHorizontal: 5,
       },
+    
       tableRow: {
         flexDirection: "row",
         borderBottomWidth: 1,
         borderBottomColor: "#eee",
-        fontSize: 10,
-        paddingVertical: 8,
+        fontSize: 11,
+        paddingVertical: 10,
       },
-      tableCell: { flex: 1, textAlign: "center", padding: 5 },
+    
+      tableCell: { 
+        flex: 1, 
+        textAlign: "center", 
+        padding: 6,
+        borderRightWidth: 1,  // Add borders to table cells for structure
+        borderRightColor: "#ddd",
+      },
+    
       totalRow: {
         flexDirection: "row",
         backgroundColor: "#eaeaea",
         borderTopWidth: 1,
         borderTopColor: "#ccc",
         fontWeight: "bold",
-        paddingVertical: 10,
-        fontSize: 9, // Smaller font size for the total row
+        paddingVertical: 12,
+        fontSize: 12,
+        marginTop: 10,
       },
+    
       footer: {
         marginTop: 20,
         paddingHorizontal: 10,
       },
+    
       footerRow: {
-        flexDirection: "column", // Arrange items in a column for line-by-line layout
+        flexDirection: "column",
       },
+    
       footerText: {
         fontWeight: "bold",
-        fontSize: 12,
+        fontSize: 13,
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 5, // Add spacing between lines
-      },
-      footerValue: {
-        fontWeight: "600",
-        textAlign: "right", // Align numbers to the right
-      },
-      paymentTitle: {
-        fontWeight: "bold",
-        fontSize: 14,
         marginBottom: 5,
       },
+    
+      footerValue: {
+        fontWeight: "600",
+        textAlign: "right",
+      },
+    
+      paymentTitle: {
+        fontWeight: "bold",
+        fontSize: 15,
+        marginBottom: 6,
+      },
+    
       paymentText: {
         fontSize: 12,
-        marginBottom: 2,
+        marginBottom: 3,
       },
+    
       bold: {
         fontWeight: "bold",
       },
-      
     });
+    
 
     const invoiceData = {
       sname,
@@ -879,6 +953,7 @@ function Invoice() {
       isMemGst,
       coupon,
       quantity,
+      user,
     };
 
     const InvoiceDocument = () => (
@@ -886,11 +961,11 @@ function Invoice() {
         <Page style={styles.invoiceContainer}>
           <Text style={styles.invoiceHeader}>{sname}</Text>
 
+
           {/* Header and Customer Section */}
           <View style={styles.section}>
             <View style={styles.sectionColumn}>
-              <Text style={styles.fieldName}>Invoice To:</Text>
-              <Text>{customer_name}</Text>
+              <Text style={styles.fieldName}>Invoice To: {customer_name}</Text>
               <Text>{address}</Text>
               <Text>{email}</Text>
               <Text>{mobile_no}</Text>
@@ -905,6 +980,8 @@ function Invoice() {
               <Text>Date of Invoice: {getCurrentDate()}</Text>
               <Text>Invoice Id: {getInvoiceId}</Text>
               {isGST && <Text>GST Number: {gst_number}</Text>}
+              <Text>Contact Number: {user.user}</Text>
+
             </View>
           </View>
 

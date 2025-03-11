@@ -19,6 +19,8 @@ function AllAppointment() {
     const [deleteId, setDeleteId] = useState(null); // ID of the invoice to delete
 
     const itemsPerPage = 10;
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userType = user.type;
 
     const fetchappointment = async (date) => {
         const token = localStorage.getItem("token");
@@ -192,15 +194,23 @@ function AllAppointment() {
                                     </td>
 
                                     <td className="border px-4 py-2">
-                                        <button
-                                            onClick={() => {
-                                                setDeleteId(appointment.id);
-                                                setShowModal(true);
-                                            }}
-                                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                        >
-                                            Delete
-                                        </button>
+                                    <button
+                                    onClick={() => {
+                                        if (userType !== "staff") {
+                                        setDeleteId(appointment.id);
+                                        setShowModal(true);
+                                        }
+                                    }}
+                                    disabled={userType === "staff"}
+                                    className={`px-4 py-2 rounded-lg ${
+                                        userType === "staff"
+                                            ? "bg-red-500 text-white hover:bg-red-600 cursor-not-allowed"
+                          : "bg-red-500 text-white hover:bg-red-600"
+                                    }`}
+                                    >
+                                    Delete
+                                    </button>
+
                                     </td>
                                 </tr>
                             ))}

@@ -121,7 +121,7 @@ const ExpensesManagement = () => {
                                     ))}
                                 </select>
                             </div>
-                            <button className="new-expense-btn" onClick={() => setShowModal(true)}>
+                            <button className="new-expense-btn mt-8" onClick={() => setShowModal(true)}>
                                 + New Expense
                             </button>
                         </div>
@@ -133,23 +133,26 @@ const ExpensesManagement = () => {
                         <div>Error: {error}</div>
                     ) : (
                         <div className="table-container">
-                            <table className="expenses-table">
+                            <table className="expenses-table border border-gray-300">
                                 <thead>
-                                    <tr>
-                                        <th>S. No.</th>
-                                        <th>Date</th>
-                                        <th>Expense Category</th>
-                                        <th>Expense Account</th>
-                                        <th>Expense Amount</th>
-                                        <th>Notes</th>
+                                    <tr className='border border-gray-300'>
+                                        <th className='border border-gray-300'>S. No.</th>
+                                        <th className='border border-gray-300'>Date</th>
+                                        <th className='border border-gray-300'>Expense Category</th>
+                                        <th className='border border-gray-300'>Expense Account</th>
+                                        <th className='border border-gray-300'>Total Amount</th>
+                                        <th className='border border-gray-300'>Amount Paid</th>
+                                        <th className='border border-gray-300'>Due Amount</th>
+                                        <th className='border border-gray-300'>Due Date</th>
+                                        <th className='border border-gray-300'>Notes</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {currentExpenses.map((expense, index) => (
-                                        <tr key={expense.id}>
-                                            <td>{indexOfFirstExpense + index + 1}</td>
-                                            <td>{expense.date.split('-').reverse().join('-')}</td>
-                                            <td>
+                                        <tr className='border border-gray-300' key={expense.id}>
+                                            <td className='border border-gray-300'>{indexOfFirstExpense + index + 1}</td>
+                                            <td className='border border-gray-300'>{expense.date.split('-').reverse().join('-')}</td>
+                                            <td className='border border-gray-300'>
                                                 {expense.expense_category && expense.expense_category.length > 0
                                                     ? expense.expense_category
                                                         .map((cat) => JSON.parse(cat.vendor_expense_type.replace(/'/g, '"')).join(", "))
@@ -157,9 +160,24 @@ const ExpensesManagement = () => {
                                                     : "N/A"}
                                             </td>
 
-                                            <td>{expense.expense_account}</td>
-                                            <td>{expense.expense_amount}</td>
-                                            <td>{expense.comment}</td>
+                                            <td className='border border-gray-300'>{expense.expense_account}</td>
+                                            <td className='border border-gray-300'>
+  {(() => {
+    try {
+      const inventory = JSON.parse(expense.inventory_item.replace(/'/g, '"')); 
+      const total = inventory.reduce((sum, item) => sum + (item.total || 0), 0); 
+      return total;
+    } catch (error) {
+      console.error("Error parsing inventory:", error);
+      return "-"; 
+    }
+  })()}
+</td>
+                                            <td className='border border-gray-300'>{expense.amount_paid ||  "-"}</td>
+                                            <td className='border border-gray-300'>{expense.due_amount ||  "-"}</td>
+                                            <td className='border border-gray-300'>{expense.due_date || "-"}</td>
+                                            <td className='border border-gray-300'>{expense.comment || "-"}</td>
+                                           
                                         </tr>
                                     ))}
                                 </tbody>
