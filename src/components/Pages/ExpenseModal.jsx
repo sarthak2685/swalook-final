@@ -61,6 +61,23 @@ const ExpenseModal = ({ onClose }) => {
       if (field === "dueDate") setDueDate(value);
     };
   
+    const handleExpenseChange = (e) => {
+        const { value } = e.target;
+        const totalAmount = product_value.reduce(
+          (acc, product) => acc + ((product.quantity || 0) * (product.rate || 0)), 0
+        );
+      
+        if (value && parseFloat(value) > totalAmount) {
+          setErrorMessage("Expense amount cannot be more than the total amount!");
+        } else if (value && parseFloat(value) < totalAmount) {
+          setErrorMessage("Expense amount cannot be less than the total amount!");
+        } else {
+          setErrorMessage(""); // Clear error when valid
+        }
+      
+        handleChange(e); // Keep updating formData
+      };
+      
 
     useEffect(() => {
         fetchStaffData();
@@ -543,18 +560,22 @@ const ExpenseModal = ({ onClose }) => {
                                 </option>
                             ))}
                         </select>
-                        <input
-                            type="text"
-                            id="expense-field"
-                            name="expenseAmount" // Ensure this matches the formData key
-                            placeholder="Expense Amount*"
-                            value={formData.expenseAmount}
-                            onChange={handleChange}
+                        <div className="flex flex-col">
 
-                            required
-                            style={{ color: "#9C9D9E" }}
-                        />
-                        <select
+                        <input
+      type="text"
+      id="expense-field"
+      name="expenseAmount"
+      placeholder="Expense Amount*"
+      value={formData.expenseAmount}
+      onChange={handleExpenseChange}
+      required
+      style={{ color: "#9C9D9E" }}
+    />
+  {errorMessage && <p className="text-red-500 text-sm mt-1">{errorMessage}</p>}
+  </div>
+
+  <select
                             id="expense-field"
                             name="expenseCategory"
                             value={formData.expenseCategory}

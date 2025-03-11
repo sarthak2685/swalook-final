@@ -162,17 +162,8 @@ const ExpensesManagement = () => {
 
                                             <td className='border border-gray-300'>{expense.expense_account}</td>
                                             <td className='border border-gray-300'>
-  {(() => {
-    try {
-      const inventory = JSON.parse(expense.inventory_item.replace(/'/g, '"')); 
-      const total = inventory.reduce((sum, item) => sum + (item.total || 0), 0); 
-      return total;
-    } catch (error) {
-      console.error("Error parsing inventory:", error);
-      return "-"; 
-    }
-  })()}
-</td>
+                                            {expense.expense_amount}
+                                            </td>
                                             <td className='border border-gray-300'>{expense.amount_paid ||  "-"}</td>
                                             <td className='border border-gray-300'>{expense.due_amount ||  "-"}</td>
                                             <td className='border border-gray-300'>{expense.due_date || "-"}</td>

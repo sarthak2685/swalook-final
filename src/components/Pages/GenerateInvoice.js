@@ -555,17 +555,42 @@ function GenerateInvoice() {
 
     // Handle input change for quantity and price
     const handleInputChange = (index, field, value) => {
-        const updatedSelectedList = [...selectedList];
-
-        if (field === "quantity") {
-            updatedSelectedList[index].quantity = value;
-        } else if (field === "price") {
-            updatedSelectedList[index].price = value;
+        if (value === "") {
+            // Allow empty value while typing
+            if (index < selectedList.length) {
+                const updatedSelectedList = [...selectedList];
+                updatedSelectedList[index][field] = "";
+                setSelectedList(updatedSelectedList);
+            } else {
+                const productIndex = index - selectedList.length;
+                if (productIndex < productList.length) {
+                    const updatedProductList = [...productList];
+                    updatedProductList[productIndex][field] = "";
+                    setProductList(updatedProductList);
+                }
+            }
+            return;
         }
-
-        setSelectedList(updatedSelectedList);
-        updateServicesTableData(updatedSelectedList);
+    
+        const newValue = parseInt(value, 10) || 1;
+    
+        if (index < selectedList.length) {
+            const updatedSelectedList = [...selectedList];
+            updatedSelectedList[index][field] = newValue;
+            setSelectedList(updatedSelectedList);
+            updateServicesTableData(updatedSelectedList);
+        } else {
+            const productIndex = index - selectedList.length;
+            if (productIndex < productList.length) {
+                const updatedProductList = [...productList];
+                updatedProductList[productIndex][field] = newValue;
+                setProductList(updatedProductList);
+            }
+        }
     };
+    
+    
+
 
     // Update service table data
     const updateServicesTableData = (updatedValues) => {
@@ -1771,18 +1796,18 @@ function GenerateInvoice() {
                                                 </thead>
                                                 <tbody className="text-center">
                                                     {combinedList.map(
-                                                        (service, index) => (
+                                                        (combine, index) => (
                                                             <tr
                                                                 key={index}
                                                                 className="border"
                                                             >
                                                                 <td className="p-2 border">
-                                                                    {service.category ||
+                                                                    {combine.category ||
                                                                         "Uncategorized"}
                                                                 </td>
                                                                 <td className="p-2 border">
-                                                                    {service.name ||
-                                                                        service.Description}
+                                                                    {combine.name ||
+                                                                        combine.Description}
                                                                 </td>
                                                                 <td className="p-2 border">
                                                                     <input
@@ -1791,15 +1816,15 @@ function GenerateInvoice() {
                                                                         placeholder="Price"
                                                                         min="0"
                                                                         value={
-                                                                            service.gst ===
+                                                                            combine.gst ===
                                                                             "Inclusive"
                                                                                 ? (
-                                                                                      service.price /
+                                                                                    combine.price /
                                                                                       1.18
                                                                                   ).toFixed(
                                                                                       2
                                                                                   ) 
-                                                                                : service.price ||
+                                                                                : combine.price ||
                                                                                   ""
                                                                         }
                                                                         onChange={(
@@ -1817,34 +1842,24 @@ function GenerateInvoice() {
                                                                 </td>
 
                                                                 <td className="p-2 border">
-                                                                    <input
-                                                                        type="number"
-                                                                        className="border w-20 px-2 py-1 text-center"
-                                                                        placeholder="Qty"
-                                                                        min="1"
-                                                                        value={
-                                                                            service.quantity ||
-                                                                            "1"
-                                                                        }
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            handleInputChange(
-                                                                                index,
-                                                                                "quantity",
-                                                                                e
-                                                                                    .target
-                                                                                    .value
-                                                                            )
-                                                                        }
-                                                                    />
+                                                                <input
+    type="number"
+    className="border w-20 px-2 py-1 text-center"
+    placeholder="Qty"
+    min="1"
+    value={combine.quantity !== undefined ? combine.quantity : 1}
+    onChange={(e) =>
+        handleInputChange(index, "quantity", e.target.value)
+    }
+/>
+
                                                                 </td>
 
                                                                 <td className="p-2 border">
                                                                     <select
                                                                         className="border px-2 py-1"
                                                                         value={
-                                                                            service.gst ||
+                                                                            combine.gst ||
                                                                             "No GST"
                                                                         }
                                                                         onChange={(
@@ -1879,9 +1894,9 @@ function GenerateInvoice() {
         className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
         onClick={() => openModal(index)}
     >
-        {service.staff && service.staff.length > 0 ? (
-            <span>{service.staff.map((staff) => staff.label).join(", ")}</span>
-        ) : selectedList.includes(service) ? ( // Check if service exists in serviceList
+        {combine.staff && combine.staff.length > 0 ? (
+            <span>{combine.staff.map((staff) => staff.label).join(", ")}</span>
+        ) : selectedList.includes(combine) ? ( // Check if service exists in serviceList
             <span className="text-red-500">Select Staff *</span> // Required for services
         ) : (
             <span>Select Staff (Optional)</span> // Optional for products
@@ -1921,10 +1936,10 @@ function GenerateInvoice() {
                                                                                     displayValue="label"
                                                                                     placeholder="Select Served By"
                                                                                     selectedValues={
-                                                                                        service.staff ||
+                                                                                        combine.staff ||
                                                                                         []
                                                                                     }
-                                                                                    required={selectedList.includes(service)} 
+                                                                                    required={selectedList.includes(combine)} 
 
                                                                                 />
                                                                                 <div className="flex justify-end mt-4">

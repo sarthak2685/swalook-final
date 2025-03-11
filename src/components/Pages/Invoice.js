@@ -805,9 +805,6 @@ function Invoice() {
     const styles = StyleSheet.create({
       invoiceContainer: { 
         padding: 20, 
-        borderWidth: 3,  // Full border
-        borderColor: "#222",  // Darker shade for professional look
-        borderRadius: 10,  // Smooth rounded edges
         margin: 15,  
         backgroundColor: "#fff",
       },
