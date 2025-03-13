@@ -25,9 +25,33 @@ function Header() {
   const userType = localStorage.getItem("type");
   const sname = localStorage.getItem("s-name");
   const branchName = localStorage.getItem("branch_name");
+  const bid = localStorage.getItem("branch_id");
 
-  const [notifications, setNotifications] = useState(["Loreal sampoo expire on 12-03-2024", "Sampoo stock is low"]); // Example notifications
+  const [notifications, setNotifications] = useState([]);
 
+  const fetchInventory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${config.apiUrl}/api/swalook/inventory/expiring-products/?branch_name=${bid}`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+      const expiringProducts = res.data.expiring_products || [];
+
+ const productNotifications = expiringProducts.map((product) => {
+
+        return `${product.product_name} is expiring on the ${product.expiry_date}.`;
+      });
+      setNotifications(productNotifications);
+    } catch (err) {
+      console.error("Error fetching inventory data:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
 
 
   useEffect(() => {
@@ -159,7 +183,7 @@ function Header() {
         </div>
 
         <div className="flex items-center gap-4 mx-4">
-        {/* <div className="relative cursor-pointer" onClick={() => setShowNotifications(!showNotifications)}>
+        <div className="relative cursor-pointer" onClick={() => setShowNotifications(!showNotifications)}>
             <MdNotifications className="text-3xl hover:text-blue-500 transition" />
             {notifications.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
@@ -167,21 +191,22 @@ function Header() {
               </span>
             )}
 
-            {showNotifications && (
-              <div className="absolute right-0 mt-3 w-60 bg-white shadow-lg rounded-lg p-3 z-20">
-                <h4 className="font-semibold text-gray-700 mb-2">Notifications</h4>
-                {notifications.length > 0 ? (
-                  notifications.map((msg, index) => (
-                    <div key={index} className="text-gray-600 py-1 border-b last:border-none">
-                      {msg}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-gray-400 text-sm">No new notifications</div>
-                )}
-              </div>
-            )}
-          </div> */}
+{showNotifications && (
+            <div className="absolute right-0 mt-3 w-60 bg-white shadow-lg rounded-lg p-3 z-20">
+              <h4 className="font-semibold text-gray-700 mb-2">Inventory Notifications</h4>
+              {notifications.length > 0 ? (
+  notifications.map((item, index) => (
+    <div key={index} className="text-gray-600 py-1 border-b last:border-none">
+      {item} 
+    </div>
+  ))
+) : (
+  <div className="text-gray-400 text-sm">No new notifications</div>
+)}
+
+            </div>
+          )}
+          </div>
 
           <div className="relative" ref={dropdownRef}>
             <div
