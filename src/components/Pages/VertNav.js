@@ -245,7 +245,7 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
                 <NavItem
                     to={`/${sname}/${branchName}/expense`}
                     icon={AccountBalanceWallet}
-                    label="Expense"
+                    label="Expense and Purchasing"
                     isActive={activeLink === "expense"}
                     onClick={() =>
                         handleLinkClick(

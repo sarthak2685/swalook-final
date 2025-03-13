@@ -28,6 +28,7 @@ function CustomerLoyality() {
     const user = JSON.parse(localStorage.getItem('user'));
     const userType = user.type;
     console.log("user",user.user)
+    const [data,setData] = useState("")
   
     const currentMonth = new Date().getMonth();
     const fetchCustomerData = async () => {
@@ -53,41 +54,58 @@ function CustomerLoyality() {
     useEffect(() => {
         fetchCustomerData();
     }, []);
-    const openModal = (type) => {
+
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const response = await fetch(`${config.apiUrl}/api/swalook/vendor-customers/stats/?branch_name=${bid}`,
+                {
+                    headers: { Authorization: `Token ${token}` },
+
+                }
+            );
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            const result = await response.json();
+            setData(result);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        };
+    
+        if (bid) {
+          fetchData();
+        }
+      }, [bid]);
+
+      const openModal = (type) => {
         setModalTitle(type === "birthdays" ? "Birthdays" : "Anniversaries");
         setIsModalOpen(true);
-
+      
         // Fetch data when modal is opened
-        if (type === "birthdays") {
-            axios
-                .get(
-                    `${config.apiUrl}/api/swalook/loyality_program/birthdays/`,
-                    {
-                        headers: { Authorization: `Token ${token}` },
-                    }
-                )
-                .then((response) => {
-                    setModalData(response.data); // Assuming API returns an array of customer objects
-                })
-                .catch((error) => {
-                    console.error("Error fetching birthdays:", error);
-                    setModalData([]);
-                });
-        } else if (type === "anniversaries") {
-            // Fetch anniversaries if needed
-            axios
-                .get(
-                    `${config.apiUrl}/api/swalook/loyality_program/anniversaries/`
-                )
-                .then((response) => {
-                    setModalData(response.data); // Assuming API returns an array of customer objects
-                })
-                .catch((error) => {
-                    console.error("Error fetching anniversaries:", error);
-                    setModalData([]);
-                });
-        }
-    };
+        axios
+          .get(`${config.apiUrl}/api/swalook/vendor-customers/stats/?branch_name=${bid}`, {
+            headers: { Authorization: `Token ${token}` },
+          })
+          .then((response) => {
+            const data = response.data;
+      
+            // Check if birthdays or anniversaries array is empty
+            if (type === "birthdays" && data.birthdays.length === 0) {
+              setModalData([]);
+            } else if (type === "anniversaries" && data.anniversaries.length === 0) {
+              setModalData([]);
+            } else {
+              setModalData(data[type]); // Set data if not empty
+            }
+          })
+          .catch((error) => {
+            console.error(`Error fetching ${type}:`, error);
+            setModalData([]);
+          });
+      };
+      
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -193,19 +211,19 @@ function CustomerLoyality() {
                                     <h2 className="text-sm font-semibold text-gray-500">
                                         New Customers
                                     </h2>
-                                    <p className="text-lg font-bold">0</p>
+                                    <p className="text-lg font-bold">{data.new_customers}</p>
                                 </div>
                                 <div>
                                     <h2 className="text-sm font-semibold text-gray-500">
                                         Active Memberships
                                     </h2>
-                                    <p className="text-lg font-bold">0</p>
+                                    <p className="text-lg font-bold">{data.active_memberships}</p>
                                 </div>
                                 <div>
                                     <h2 className="text-sm font-semibold text-gray-500">
                                         Active Coupons
                                     </h2>
-                                    <p className="text-lg font-bold">0</p>
+                                    <p className="text-lg font-bold">{data.active_coupons}</p>
                                 </div>
                             </div>
                         </div>
@@ -236,7 +254,7 @@ function CustomerLoyality() {
                                         </button>
                                     </div>
                                     <p className="text-lg font-bold">
-                                        {modalData.length}
+                                        {data.birthday_count}
                                     </p>
                                 </div>
                                 <div>
@@ -254,7 +272,7 @@ function CustomerLoyality() {
                                         </button>
                                     </div>
                                     <p className="text-lg font-bold">
-                                        {modalData.length}
+                                        {data.anniversaries_count}
                                     </p>
                                 </div>
                             </div>
