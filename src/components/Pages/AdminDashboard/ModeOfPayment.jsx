@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaCalendar } from "react-icons/fa";
 import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 import config from "../../../config";
 
 const ModeOfPayment = () => {
@@ -11,42 +12,48 @@ const ModeOfPayment = () => {
     const [paymentData, setPaymentData] = useState([]);
     const [calendarVisible, setCalendarVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [dateRange, setDateRange] = useState([new Date(), new Date()]);
 
-    // Define a color scheme for payment modes
     const paymentModeColors = {
-        cash: "#328cd2", // Blue
-        upi: "#01e296", // Green
-        card: "#ffb01a", // Orange
-        wallet: "#ff5a5a", // Red
-        netbanking: "#9147ff", // Purple
-        unknown: "#666666", // Gray for unknown modes
+        cash: "#328cd2",
+        upi: "#01e296",
+        card: "#ffb01a",
+        netbanking: "#9147ff",
+        unknown: "#666666",
     };
 
-    const fetchPaymentData = async (
-        selectedPeriod = "Day",
-        date = selectedDate
-    ) => {
+    // Default payment modes
+    const defaultPaymentModes = [
+        { payment_mode: "cash", total_revenue: "" },
+        { payment_mode: "upi", total_revenue: "" },
+        { payment_mode: "card", total_revenue: "" },
+        { payment_mode: "netbanking", total_revenue: "" },
+    ];
+
+    // Helper function to format date as YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
+    const fetchPaymentData = async () => {
         try {
-            setPaymentPeriod(selectedPeriod);
-
             let apiUrl = `${config.apiUrl}/api/swalook/mode-of-payment-analysis/?branch_name=${bid}`;
-            const dateObj = new Date(date);
-            const formattedDate = dateObj.toISOString().split("T")[0]; // YYYY-MM-DD format
 
-            if (selectedPeriod.toLowerCase() === "day") {
-                apiUrl += `&filter=day&date=${formattedDate}`;
-            } else if (selectedPeriod.toLowerCase() === "week") {
-                apiUrl += `&filter=week&week=${Math.ceil(
-                    dateObj.getDate() / 7
-                )}&month=${
-                    dateObj.getMonth() + 1
-                }&year=${dateObj.getFullYear()}`;
-            } else if (selectedPeriod.toLowerCase() === "month") {
+            if (paymentPeriod === "Day") {
+                apiUrl += `&filter=day&date=${formatDate(selectedDate)}`;
+            } else if (paymentPeriod === "Week") {
+                apiUrl += `&filter=week&start_date=${formatDate(
+                    dateRange[0]
+                )}&end_date=${formatDate(dateRange[1])}`;
+            } else if (paymentPeriod === "Month") {
                 apiUrl += `&filter=month&month=${
-                    dateObj.getMonth() + 1
-                }&year=${dateObj.getFullYear()}`;
-            } else if (selectedPeriod.toLowerCase() === "year") {
-                apiUrl += `&filter=year&year=${dateObj.getFullYear()}`;
+                    selectedDate.getMonth() + 1
+                }&year=${selectedDate.getFullYear()}`;
+            } else if (paymentPeriod === "Year") {
+                apiUrl += `&filter=year&year=${selectedDate.getFullYear()}`;
             }
 
             const response = await fetch(apiUrl, {
@@ -62,13 +69,11 @@ const ModeOfPayment = () => {
             }
 
             const data = await response.json();
-
-            // Process the API response
             const processedData = [];
+
             if (data.data_of_mode_of_payment) {
                 data.data_of_mode_of_payment.forEach((item) => {
                     if (item.payment_mode) {
-                        // Ignore null or empty payment modes
                         processedData.push({
                             payment_mode: item.payment_mode,
                             total_revenue: item.total_revenue,
@@ -81,7 +86,6 @@ const ModeOfPayment = () => {
                 data.data_of_new_mode.forEach((item) => {
                     item.payment_mode.forEach((mode) => {
                         if (mode.mode) {
-                            // Ignore null or empty payment modes
                             processedData.push({
                                 payment_mode: mode.mode,
                                 total_revenue: parseFloat(mode.amount),
@@ -91,23 +95,17 @@ const ModeOfPayment = () => {
                 });
             }
 
-            // Aggregate total revenue for each payment mode
             const aggregatedData = processedData.reduce((acc, curr) => {
-                if (!acc[curr.payment_mode]) {
-                    acc[curr.payment_mode] = 0;
-                }
-                acc[curr.payment_mode] += curr.total_revenue;
+                acc[curr.payment_mode] =
+                    (acc[curr.payment_mode] || 0) + curr.total_revenue;
                 return acc;
             }, {});
 
-            // Convert aggregated data into an array for rendering
-            const finalData = Object.keys(aggregatedData).map((mode) => ({
-                payment_mode: mode,
-                total_revenue: aggregatedData[mode],
+            // Merge default payment modes with fetched data
+            const finalData = defaultPaymentModes.map((mode) => ({
+                payment_mode: mode.payment_mode,
+                total_revenue: aggregatedData[mode.payment_mode] || "",
             }));
-
-            // Sort the data in decreasing order of total revenue
-            finalData.sort((a, b) => b.total_revenue - a.total_revenue);
 
             setPaymentData(finalData);
         } catch (error) {
@@ -117,123 +115,136 @@ const ModeOfPayment = () => {
 
     useEffect(() => {
         fetchPaymentData();
-    }, []);
+    }, [paymentPeriod, selectedDate, dateRange]);
 
-    // Function to get the color for a payment mode
-    const getPaymentModeColor = (paymentMode) => {
-        return (
-            paymentModeColors[paymentMode.toLowerCase()] ||
-            paymentModeColors.unknown
-        );
+    const handleDateChange = (date) => {
+        if (paymentPeriod === "Week") {
+            setDateRange(date);
+        } else {
+            setSelectedDate(date);
+        }
+        setCalendarVisible(false);
     };
 
-    // Calculate the grand total of all payment modes
+    const handleActiveDateChange = ({ activeStartDate }) => {
+        if (paymentPeriod === "Month") {
+            setSelectedDate(
+                new Date(
+                    activeStartDate.getFullYear(),
+                    activeStartDate.getMonth(),
+                    1
+                )
+            );
+        } else if (paymentPeriod === "Year") {
+            setSelectedDate(new Date(activeStartDate.getFullYear(), 0, 1));
+        }
+        setCalendarVisible(false);
+    };
+
     const grandTotal = paymentData.reduce(
-        (total, mode) => total + mode.total_revenue,
+        (total, mode) => total + (mode.total_revenue || 0),
         0
     );
 
     return (
         <div className="bg-white shadow-md p-6 rounded-lg">
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-700">
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-800">
                     Mode of Payment
                 </h3>
                 <div className="flex items-center space-x-4 relative">
                     <select
                         value={paymentPeriod}
-                        onChange={(e) => fetchPaymentData(e.target.value)}
-                        className="border border-gray-300 text-gray-700 rounded-lg p-1 text-sm"
+                        onChange={(e) => setPaymentPeriod(e.target.value)}
+                        className="border border-gray-300 text-gray-700 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="Day">Daily</option>
                         <option value="Week">Weekly</option>
                         <option value="Month">Monthly</option>
-                        <option value="Year">Year-to-date</option>
+                        <option value="Year">Yearly</option>
                     </select>
                     <div className="relative">
                         <FaCalendar
-                            className="cursor-pointer text-gray-600"
+                            className="cursor-pointer text-gray-600 hover:text-blue-500 transition-colors"
                             onClick={() => setCalendarVisible(!calendarVisible)}
                         />
                         {calendarVisible && (
                             <div className="absolute top-10 right-0 bg-white shadow-lg rounded-lg z-20">
                                 <Calendar
-                                    onChange={(date) => {
-                                        setSelectedDate(date);
-                                        fetchPaymentData(paymentPeriod, date);
-                                    }}
-                                    value={selectedDate}
+                                    onChange={handleDateChange}
+                                    value={
+                                        paymentPeriod === "Week"
+                                            ? dateRange
+                                            : selectedDate
+                                    }
+                                    selectRange={paymentPeriod === "Week"}
+                                    view={
+                                        paymentPeriod === "Year"
+                                            ? "decade"
+                                            : paymentPeriod === "Month"
+                                            ? "year"
+                                            : "month"
+                                    }
+                                    onActiveStartDateChange={
+                                        handleActiveDateChange
+                                    }
                                 />
                             </div>
                         )}
                     </div>
                 </div>
             </div>
-            <div className="rounded-lg mt-4">
-                <table className="min-w-full  bg-white">
+
+            <div className="rounded-lg mt-4 overflow-hidden ">
+                <table className="min-w-full bg-white">
                     <thead>
-                        <tr>
-                            <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
+                            <th className="py-3 px-4 border-b border-gray-200 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 Payment Mode
                             </th>
-                            <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th className="py-3 px-4 border-b border-gray-200 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 Total Revenue
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {paymentData.length > 0 ? (
-                            paymentData.map((mode, index) => (
-                                <tr key={index}>
-                                    <td
-                                        className="py-2 px-4 border-b border-gray-200 text-center uppercase"
-                                        style={{
-                                            color: getPaymentModeColor(
-                                                mode.payment_mode
-                                            ),
-                                            fontWeight: "bold",
-                                        }}
-                                    >
-                                        {mode.payment_mode}
-                                    </td>
-                                    <td
-                                        className="py-2 px-4 border-b border-gray-200 text-center"
-                                        style={{
-                                            fontWeight: "bold",
-                                            color: "#4a5568", // A neutral color for amounts
-                                        }}
-                                    >
-                                        ₹{mode.total_revenue.toLocaleString()}
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
+                        {paymentData.map((mode, index) => (
+                            <tr
+                                key={index}
+                                className="hover:bg-gray-50 transition-colors"
+                            >
                                 <td
-                                    colSpan="2"
-                                    className="py-2 px-4 border-b border-gray-200 text-center"
+                                    className="py-3 px-4 border-b border-gray-200 text-center uppercase font-bold"
+                                    style={{
+                                        color:
+                                            paymentModeColors[
+                                                mode.payment_mode.toLowerCase()
+                                            ] || paymentModeColors.unknown,
+                                    }}
                                 >
-                                    No data available
+                                    {mode.payment_mode}
+                                </td>
+                                <td
+                                    className="py-3 px-4 border-b border-gray-200 text-center font-bold text-gray-700"
+                                    style={{
+                                        color:
+                                            paymentModeColors[
+                                                mode.payment_mode.toLowerCase()
+                                            ] || paymentModeColors.unknown,
+                                    }}
+                                >
+                                    {mode.total_revenue === ""
+                                        ? "__" // Display __ for blank values
+                                        : `₹ ${mode.total_revenue.toLocaleString()}/-`}
                                 </td>
                             </tr>
-                        )}
-                        {/* Grand Total Row */}
-                        <tr>
-                            <td
-                                className="py-2 px-4 border-b bg-gray-50 border-gray-200 text-center uppercase font-semibold"
-                                style={{
-                                    color: "#000000", // Black color for grand total
-                                }}
-                            >
+                        ))}
+                        <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
+                            <td className="py-3 px-4 border-b border-gray-200 text-center uppercase font-semibold">
                                 Grand Total
                             </td>
-                            <td
-                                className="py-2 px-4 border-b bg-gray-50 border-gray-200 text-center font-semibold"
-                                style={{
-                                    color: "#000000", // Black color for grand total
-                                }}
-                            >
-                                ₹{grandTotal.toLocaleString()}
+                            <td className="py-3 px-4 border-b border-gray-200 text-center font-semibold">
+                                ₹ {grandTotal.toLocaleString()}/-
                             </td>
                         </tr>
                     </tbody>
