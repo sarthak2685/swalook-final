@@ -13,7 +13,7 @@ import ServiceDetails from "./components/Pages/ServiceDetails";
 import AdminDashboard from "./components/Pages/AdminDashboard/AdminDashboard.jsx";
 import Settings from "./components/Pages/Settings";
 import PersonalInformation from "./components/Pages/PersonalInformation";
-import Appointment from "./components/Pages/Appointment.jsx";
+import Appointment from "./components/Pages/Appointement/Appointment.jsx";
 import GenerateInvoice from "./components/Pages/GenerateInvoice";
 import Invoice from "./components/Pages/Invoice";
 import ForgetPassword from "./components/Pages/ForgetPassword";
@@ -38,9 +38,11 @@ import ExpenseSetting from "./components/Pages/ExpenseSetting";
 import Damo from "./components/Pages/Damo";
 import CustomerLoyality from "./components/Pages/CustomerLoyality";
 import ViewAllInvoices from "./components/Pages/ViewAllInvoice";
-import AllAppointment from "./components/Pages/AllAppointment";
-import Inquiries from "./components/Pages/Inquires.jsx";
-import NewInquiry from "./components/Pages/NewInquiry.jsx";
+import AllAppointment from "./components/Pages/Appointement/AllAppointment";
+import Inquiries from "./components/Pages/Inquery/Inquires.jsx";
+import NewInquiry from "./components/Pages/Inquery/NewInquiry.jsx";
+import CompanyTarget from "./components/Pages/CompanyTarget.jsx";
+import InvenotrySetting from "./components/Pages/InvenotrySetting.jsx";
 function App() {
     const isLoggedIn = Cookies.get("loggedIn") === "true";
     const salonName = Cookies.get("salonName");
@@ -114,10 +116,14 @@ function App() {
                             element={<Inventory />}
                         />
                         <Route
+                            path="/:salon_name/:branchName/invetorysetting"
+                            element={<InvenotrySetting />}
+                        />
+                        <Route
                             path="/:salon_name/:branchName/settings/clpsetting"
                             element={<CLP_Setting />}
                         />
-                      
+
                         <Route
                             path="/:salon_name/:branchName/attendance"
                             element={<StaffManagement />}
@@ -157,6 +163,10 @@ function App() {
                         <Route
                             path="/:salon_name/:branchName/new-inquiry"
                             element={<NewInquiry />}
+                        />
+                        <Route
+                            path="/:salon_name/:branchName/targetsetting"
+                            element={<CompanyTarget />}
                         />
                     </Route>
 
