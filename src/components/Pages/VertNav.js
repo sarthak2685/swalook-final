@@ -124,12 +124,12 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
         <div
             className={` ${
                 sidebarOpen ? "open" : ""
-            } h-[75rem] top-0 left-0 flex flex-col justify-start bg-white absolute p-5 z-50 shadow-lg gap-0 transition-all duration-300 lg:block md:w-[298px] lg:w-[300px]  ${
+            }  top-0 left-0 flex flex-col justify-start bg-white min-h-screen p-2 z-50 shadow-lg gap-0 transition-all duration-300 fixed lg:block md:w-[298px] lg:w-[300px]  ${
                 sidebarOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
             <img src={Logo} alt="Swalook Logo" className="w-40 h-40 mb-5" />
-            <div className="nav-items flex flex-col gap-6 mt-2 mb-5 overflow-y-auto mx-8 ">
+            <div className=" flex flex-col gap-3 m-4 overflow-y-auto mx-8 ">
                 <NavItem
                     to={`/${sname}/${branchName}/dashboard`}
                     icon={GridViewRoundedIcon}
