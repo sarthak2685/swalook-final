@@ -8,30 +8,37 @@ const SalesByStaff = () => {
     const token = localStorage.getItem("token");
     const bid = localStorage.getItem("branch_id");
 
+    const getCurrentWeekRange = () => {
+        const now = new Date();
+        const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+        const diffToMonday = day === 0 ? -6 : 1 - day; // If Sunday, go back 6 days
+        const monday = new Date(now);
+        monday.setDate(now.getDate() + diffToMonday);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        return [monday, sunday];
+    };
+
     const [staffPeriod, setStaffPeriod] = useState("Day");
     const [staffData, setStaffData] = useState([]);
     const [staffCalendar, setStaffCalendar] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [dateRange, setDateRange] = useState([new Date(), new Date()]);
+    const [dateRange, setDateRange] = useState(getCurrentWeekRange());
 
-    // Predefined color palette for staff profiles
     const profileColors = [
-        "#42a0fc", // Blue
-        "#ff6b6b", // Red
-        "#4cd964", // Green
-        "#ffd166", // Yellow
-        "#9b59b6", // Purple
-        "#ff9f43", // Orange
-        "#00cec9", // Teal
-        "#e84393", // Pink
+        "#42a0fc",
+        "#ff6b6b",
+        "#4cd964",
+        "#ffd166",
+        "#9b59b6",
+        "#ff9f43",
+        "#00cec9",
+        "#e84393",
     ];
 
-    // Function to get a unique color for each staff member
-    const getProfileColor = (index) => {
-        return profileColors[index % profileColors.length];
-    };
+    const getProfileColor = (index) =>
+        profileColors[index % profileColors.length];
 
-    // Helper function to format date as YYYY-MM-DD
     const formatDate = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -71,25 +78,24 @@ const SalesByStaff = () => {
 
             const data = await response.json();
 
-            if (!Array.isArray(data)) {
+            if (!Array.isArray(data))
                 throw new Error("Invalid API response format");
-            }
 
-            const processedStaffData = data.flatMap((entry) =>
+            const processed = data.flatMap((entry) =>
                 entry.staff_data.map((staff) => ({
                     staffName: staff.staff_name || "Unknown",
                     totalInvoices: staff.total_invoices || 0,
                     totalSales: staff.total_sales || 0,
                     services:
-                        staff.services?.map((service) => ({
-                            name: service.service_name || "Unknown Service",
-                            totalSales: service.total_sales || 0,
-                            totalCount: service.total_services || 0,
+                        staff.services?.map((s) => ({
+                            name: s.service_name || "Unknown Service",
+                            totalSales: s.total_sales || 0,
+                            totalCount: s.total_services || 0,
                         })) || [],
                 }))
             );
 
-            setStaffData(processedStaffData || []);
+            setStaffData(processed);
         } catch (error) {
             console.error("Error fetching staff data:", error);
         }
@@ -98,6 +104,14 @@ const SalesByStaff = () => {
     useEffect(() => {
         fetchStaffData();
     }, [staffPeriod, selectedDate, dateRange]);
+
+    useEffect(() => {
+        if (staffPeriod === "Week") {
+            setDateRange(getCurrentWeekRange());
+        } else if (staffPeriod === "Day") {
+            setSelectedDate(new Date());
+        }
+    }, [staffPeriod]);
 
     const handleDateChange = (date) => {
         if (staffPeriod === "Week") {
@@ -190,14 +204,12 @@ const SalesByStaff = () => {
                                 (staff.totalSales / revenueThreshold) * 100,
                                 100
                             );
-
-                            // Get a unique color for the staff profile
                             const profileColor = getProfileColor(index);
 
                             return (
                                 <div
                                     key={index}
-                                    className="p-2 bg-white rounded-[2.5rem]  transition-shadow"
+                                    className="p-2 bg-white rounded-[2.5rem] transition-shadow"
                                 >
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center space-x-2">

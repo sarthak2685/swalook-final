@@ -22,7 +22,6 @@ const ModeOfPayment = () => {
         unknown: "#666666",
     };
 
-    // Default payment modes
     const defaultPaymentModes = [
         { payment_mode: "cash", total_revenue: "" },
         { payment_mode: "upi", total_revenue: "" },
@@ -30,7 +29,6 @@ const ModeOfPayment = () => {
         { payment_mode: "netbanking", total_revenue: "" },
     ];
 
-    // Helper function to format date as YYYY-MM-DD
     const formatDate = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -38,82 +36,104 @@ const ModeOfPayment = () => {
         return `${year}-${month}-${day}`;
     };
 
-    const fetchPaymentData = async () => {
-        try {
-            let apiUrl = `${config.apiUrl}/api/swalook/mode-of-payment-analysis/?branch_name=${bid}`;
+    const getCurrentWeekRange = () => {
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
+        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        const sundayOffset = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
 
-            if (paymentPeriod === "Day") {
-                apiUrl += `&filter=day&date=${formatDate(selectedDate)}`;
-            } else if (paymentPeriod === "Week") {
-                apiUrl += `&filter=week&start_date=${formatDate(
-                    dateRange[0]
-                )}&end_date=${formatDate(dateRange[1])}`;
-            } else if (paymentPeriod === "Month") {
-                apiUrl += `&filter=month&month=${
-                    selectedDate.getMonth() + 1
-                }&year=${selectedDate.getFullYear()}`;
-            } else if (paymentPeriod === "Year") {
-                apiUrl += `&filter=year&year=${selectedDate.getFullYear()}`;
-            }
+        const monday = new Date(today);
+        monday.setDate(today.getDate() + mondayOffset);
 
-            const response = await fetch(apiUrl, {
-                method: "GET",
-                headers: {
-                    Authorization: `Token ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
+        const sunday = new Date(today);
+        sunday.setDate(today.getDate() + sundayOffset);
 
-            if (!response.ok) {
-                throw new Error(`Failed to fetch data: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            const processedData = [];
-
-            if (data.data_of_mode_of_payment) {
-                data.data_of_mode_of_payment.forEach((item) => {
-                    if (item.payment_mode) {
-                        processedData.push({
-                            payment_mode: item.payment_mode,
-                            total_revenue: item.total_revenue,
-                        });
-                    }
-                });
-            }
-
-            if (data.data_of_new_mode) {
-                data.data_of_new_mode.forEach((item) => {
-                    item.payment_mode.forEach((mode) => {
-                        if (mode.mode) {
-                            processedData.push({
-                                payment_mode: mode.mode,
-                                total_revenue: parseFloat(mode.amount),
-                            });
-                        }
-                    });
-                });
-            }
-
-            const aggregatedData = processedData.reduce((acc, curr) => {
-                acc[curr.payment_mode] =
-                    (acc[curr.payment_mode] || 0) + curr.total_revenue;
-                return acc;
-            }, {});
-
-            // Merge default payment modes with fetched data
-            const finalData = defaultPaymentModes.map((mode) => ({
-                payment_mode: mode.payment_mode,
-                total_revenue: aggregatedData[mode.payment_mode] || "",
-            }));
-
-            setPaymentData(finalData);
-        } catch (error) {
-            console.error("Error fetching payment data:", error);
-        }
+        return [monday, sunday];
     };
 
     useEffect(() => {
+        if (paymentPeriod === "Week") {
+            setDateRange(getCurrentWeekRange());
+        }
+    }, [paymentPeriod]);
+
+    useEffect(() => {
+        const fetchPaymentData = async () => {
+            try {
+                let apiUrl = `${config.apiUrl}/api/swalook/mode-of-payment-analysis/?branch_name=${bid}`;
+
+                if (paymentPeriod === "Day") {
+                    apiUrl += `&filter=day&date=${formatDate(selectedDate)}`;
+                } else if (paymentPeriod === "Week") {
+                    apiUrl += `&filter=week&start_date=${formatDate(
+                        dateRange[0]
+                    )}&end_date=${formatDate(dateRange[1])}`;
+                } else if (paymentPeriod === "Month") {
+                    apiUrl += `&filter=month&month=${
+                        selectedDate.getMonth() + 1
+                    }&year=${selectedDate.getFullYear()}`;
+                } else if (paymentPeriod === "Year") {
+                    apiUrl += `&filter=year&year=${selectedDate.getFullYear()}`;
+                }
+
+                const response = await fetch(apiUrl, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Token ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Failed to fetch data: ${response.statusText}`
+                    );
+                }
+
+                const data = await response.json();
+                const processedData = [];
+
+                if (data.data_of_mode_of_payment) {
+                    data.data_of_mode_of_payment.forEach((item) => {
+                        if (item.payment_mode) {
+                            processedData.push({
+                                payment_mode: item.payment_mode,
+                                total_revenue: item.total_revenue,
+                            });
+                        }
+                    });
+                }
+
+                if (data.data_of_new_mode) {
+                    data.data_of_new_mode.forEach((item) => {
+                        item.payment_mode.forEach((mode) => {
+                            if (mode.mode) {
+                                processedData.push({
+                                    payment_mode: mode.mode,
+                                    total_revenue: parseFloat(mode.amount),
+                                });
+                            }
+                        });
+                    });
+                }
+
+                const aggregatedData = processedData.reduce((acc, curr) => {
+                    acc[curr.payment_mode] =
+                        (acc[curr.payment_mode] || 0) + curr.total_revenue;
+                    return acc;
+                }, {});
+
+                const finalData = defaultPaymentModes.map((mode) => ({
+                    payment_mode: mode.payment_mode,
+                    total_revenue: aggregatedData[mode.payment_mode] || "",
+                }));
+
+                setPaymentData(finalData);
+            } catch (error) {
+                console.error("Error fetching payment data:", error);
+            }
+        };
+
         fetchPaymentData();
     }, [paymentPeriod, selectedDate, dateRange]);
 
@@ -195,7 +215,7 @@ const ModeOfPayment = () => {
                 </div>
             </div>
 
-            <div className="rounded-[2.5rem] mt-4 overflow-hidden ">
+            <div className="rounded-[2.5rem] mt-4 overflow-hidden">
                 <table className="min-w-full bg-white">
                     <thead>
                         <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -234,7 +254,7 @@ const ModeOfPayment = () => {
                                     }}
                                 >
                                     {mode.total_revenue === ""
-                                        ? "__" // Display __ for blank values
+                                        ? "__"
                                         : `₹ ${mode.total_revenue.toLocaleString()}/-`}
                                 </td>
                             </tr>
