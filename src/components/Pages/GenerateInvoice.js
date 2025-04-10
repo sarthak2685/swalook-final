@@ -640,12 +640,31 @@ function GenerateInvoice() {
     };
     // Handle served by (staff) selection
     const handleServedSelect = (selected, index) => {
-        const updatedSelectedList = [...selectedList];
-        updatedSelectedList[index].staff = selected;
-        setSelectedList(updatedSelectedList);
-        updateServicesTableData(updatedSelectedList);
+        const isService = index < selectedList.length;
+    
+        if (isService) {
+            const updatedSelectedList = [...selectedList];
+            if (!updatedSelectedList[index].hasOwnProperty("staff")) {
+                updatedSelectedList[index].staff = [];
+            }
+            updatedSelectedList[index].staff = selected;
+            setSelectedList(updatedSelectedList);
+            updateServicesTableData(updatedSelectedList);
+        } else {
+            const productIndex = index - selectedList.length;
+            const updatedProductList = [...productList];
+            if (!updatedProductList[productIndex].hasOwnProperty("staff")) {
+                updatedProductList[productIndex].staff = [];
+            }
+            updatedProductList[productIndex].staff = selected;
+            setProductList(updatedProductList); // Add this if you’re managing state for productList
+        }
+    
         setIsModalOpen(false);
     };
+    
+    
+    
 
     const handleService_Select = () => {
         // Logic to handle service select
@@ -1205,6 +1224,7 @@ function GenerateInvoice() {
     };
 
     const combinedList = [...selectedList, ...productList];
+    console.log("combinedList", combinedList);
 
     // Debounced effect
     useEffect(() => {
@@ -1899,47 +1919,28 @@ function GenerateInvoice() {
                                                                         fetchStaffData
                                                                     }
                                                                 >
-                                                                    <div
-                                                                        className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
-                                                                        onClick={() =>
-                                                                            openModal(
-                                                                                index
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        {combine.staff &&
-                                                                        combine
-                                                                            .staff
-                                                                            .length >
-                                                                            0 ? (
-                                                                            <span>
-                                                                                {combine.staff
-                                                                                    .map(
-                                                                                        (
-                                                                                            staff
-                                                                                        ) =>
-                                                                                            staff.label
-                                                                                    )
-                                                                                    .join(
-                                                                                        ", "
-                                                                                    )}
-                                                                            </span>
-                                                                        ) : selectedList.includes(
-                                                                              combine
-                                                                          ) ? ( // Check if service exists in serviceList
-                                                                            <span className="text-red-500">
-                                                                                Select
-                                                                                Staff
-                                                                                *
-                                                                            </span> // Required for services
-                                                                        ) : (
-                                                                            <span>
-                                                                                Select
-                                                                                Staff
-                                                                                (Optional)
-                                                                            </span> // Optional for products
-                                                                        )}
-                                                                    </div>
+    <div
+    className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
+    onClick={() => openModal(index)}
+>
+    {combine && combine.staff && combine.staff.length > 0 ? (
+        <span>
+            {combine.staff
+                .map((staff) => staff.label)
+                .join(", ")}
+        </span>
+    ) : selectedList.includes(combine) ? ( // Check if service exists in selectedList
+        <span className="text-red-500">
+            Select Staff *
+        </span> // Required for services
+    ) : (
+        <span>
+            Select Staff (Optional)
+        </span> // Optional for products
+    )}
+</div>
+
+
                                                                     {isModalOpen ===
                                                                         index && (
                                                                         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
