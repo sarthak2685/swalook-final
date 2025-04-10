@@ -18,7 +18,6 @@ import CustomDialog from "./CustomDialog";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-
 function getCurrentDate() {
     const currentDate = new Date();
     const day = currentDate.getDate();
@@ -535,7 +534,7 @@ function GenerateInvoice() {
         setProductData(updatedProductData);
     };
 
-    console.log("product hu mai",productList);
+    console.log("product hu mai", productList);
 
     // const groupedOptions = serviceOptions.reduce((groups, option) => {
     //   if (!groups[option.category]) {
@@ -571,9 +570,9 @@ function GenerateInvoice() {
             }
             return;
         }
-    
+
         const newValue = parseInt(value, 10) || 1;
-    
+
         if (index < selectedList.length) {
             const updatedSelectedList = [...selectedList];
             updatedSelectedList[index][field] = newValue;
@@ -588,9 +587,6 @@ function GenerateInvoice() {
             }
         }
     };
-    
-    
-
 
     // Update service table data
     const updateServicesTableData = (updatedValues) => {
@@ -645,8 +641,8 @@ function GenerateInvoice() {
     // Handle served by (staff) selection
     const handleServedSelect = (selected, index) => {
         const updatedSelectedList = [...selectedList];
-        updatedSelectedList[index].staff = selected; 
-        setSelectedList(updatedSelectedList); 
+        updatedSelectedList[index].staff = selected;
+        setSelectedList(updatedSelectedList);
         updateServicesTableData(updatedSelectedList);
         setIsModalOpen(false);
     };
@@ -728,19 +724,20 @@ function GenerateInvoice() {
             }
             // Validate services table data and product data
             if (
-                (!Array.isArray(servicesTableData) || servicesTableData.length === 0 || 
-                 servicesTableData.every(service => !service.inputFieldValue || !service.gst)) &&
-                (!Array.isArray(productList) || productList.length === 0 || 
-                 productList.every(productList => !productList.quantity))
+                (!Array.isArray(servicesTableData) ||
+                    servicesTableData.length === 0 ||
+                    servicesTableData.every(
+                        (service) => !service.inputFieldValue || !service.gst
+                    )) &&
+                (!Array.isArray(productList) ||
+                    productList.length === 0 ||
+                    productList.every((productList) => !productList.quantity))
             ) {
                 setPopupMessage("Please fill the missing field");
                 setShowPopup(true);
                 setLoading(false);
                 return;
             }
-            
-            
-            
 
             // Validate services table data
             for (const service of servicesTableData) {
@@ -1200,7 +1197,7 @@ function GenerateInvoice() {
             );
 
             setCustomerId(response.data);
-            
+
             console.log("Fetched data:", response.data);
         } catch (error) {
             console.error("Error fetching customer data:", error);
@@ -1208,7 +1205,6 @@ function GenerateInvoice() {
     };
 
     const combinedList = [...selectedList, ...productList];
-
 
     // Debounced effect
     useEffect(() => {
@@ -1392,7 +1388,8 @@ function GenerateInvoice() {
             (sum, service) =>
                 sum + (service.price || 0) * (service.quantity || 1),
             0
-        ) + productList.reduce(
+        ) +
+        productList.reduce(
             (sum, product) =>
                 sum + (product.price || 0) * (product.quantity || 1),
             0
@@ -1400,16 +1397,16 @@ function GenerateInvoice() {
         membershipPrice +
         couponDiscount -
         deductedPoints -
-        valueDeductedPoints; 
+        valueDeductedPoints;
 
     const formattedGrandTotal = isNaN(grandTotal) ? 0 : grandTotal;
 
     const grandTotalFormatted = formattedGrandTotal.toFixed(2);
     const handleInvoiceSubmit = (e) => {
         if (totalPayment === grandTotal) {
-         console.log("Form submitted");
+            console.log("Form submitted");
         } else {
-            e.preventDefault(); 
+            e.preventDefault();
             alert("Total payment does not match the grand total.");
         }
     };
@@ -1453,7 +1450,7 @@ function GenerateInvoice() {
                 <VertNav />
                 <div className="bg-gray-100 min-h-[150vh] md:ml-72 p-10">
                     {userExists ? (
-                        <div className="bg-white shadow-md px-4 py-8 mb-10 rounded-lg  grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-white shadow-md px-4 py-8 mb-10 rounded-[2.5rem] grid grid-cols-1 md:grid-cols-4 gap-4">
                             {customerId && (
                                 <>
                                     {/* Business Section */}
@@ -1502,7 +1499,7 @@ function GenerateInvoice() {
 
                     {isPopupVisible && (
                         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-                            <div className="bg-white rounded-lg shadow-lg p-6 w-4/5 md:w-1/2">
+                            <div className="bg-white rounded-[2.5rem] shadow-lg p-6 w-4/5 md:w-1/2">
                                 <button
                                     onClick={handleClosePopup}
                                     className="absolute top-2 right-2 bg-red-500 text-white border-0 py-1 px-3 rounded-full cursor-pointer"
@@ -1634,8 +1631,8 @@ function GenerateInvoice() {
 
                     {/* Invoice Form Section */}
 
-                    <div className="bg-white shadow-md p-10 rounded-lg mb-10">
-                        <div className="flex flex-row justify-between mb-10">
+                    <div className="bg-white max-h-full shadow-md p-12 mt-10 rounded-[2.5rem] ">
+                        <div className="flex flex-row justify-between mb-14">
                             <h2 className="section-titles text-3xl font-bold">
                                 New Invoice
                             </h2>
@@ -1657,7 +1654,7 @@ function GenerateInvoice() {
                                     <div className="grid sm:grid-cols-2 md:grid-cols-3  mt-4">
                                         <input
                                             type="number"
-                                            className="border border-[#CFD3D4] rounded-lg m-2 p-3 col-span-1 font-semibold placeholder-gray-400"
+                                            className="border border-[#CFD3D4] rounded-full m-2 p-3 col-span-1 font-semibold placeholder-gray-400"
                                             placeholder="Phone Number"
                                             value={mobile_no}
                                             required
@@ -1673,7 +1670,7 @@ function GenerateInvoice() {
 
                                         <input
                                             type="text"
-                                            className="border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                                            className="border border-[#CFD3D4] rounded-full m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                                             placeholder="Full Name"
                                             value={customer_name}
                                             required
@@ -1683,7 +1680,7 @@ function GenerateInvoice() {
                                         />
                                         <input
                                             type="email"
-                                            className="border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                                            className="border border-[#CFD3D4] rounded-full m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                                             placeholder="Email Address"
                                             value={email}
                                             onChange={(e) =>
@@ -1693,13 +1690,13 @@ function GenerateInvoice() {
                                     </div>
                                     <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-4">
                                         <div className="flex flex-col">
-                                            <span className="font-semibold items-start flex mb-4">
+                                            <span className="font-semibold items-start mx-4 flex mb-4">
                                                 Date Of Birth
                                             </span>
                                             <input
                                                 type="date"
                                                 id="date_input_field"
-                                                className="text-black col-span-1 font-semibold placeholder-gray-400"
+                                                className="text-black rounded-full col-span-1 font-semibold placeholder-gray-400"
                                                 max={
                                                     new Date()
                                                         .toISOString()
@@ -1715,13 +1712,13 @@ function GenerateInvoice() {
                                             />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="font-semibold items-start flex mb-4">
+                                            <span className="font-semibold items-start mx-4 flex mb-4">
                                                 Date Of Anniversary
                                             </span>
                                             <input
                                                 type="date"
                                                 id="date_input_field"
-                                                className="text-black col-span-1 font-semibold placeholder-gray-400"
+                                                className="text-black rounded-full col-span-1 font-semibold placeholder-gray-400"
                                                 max={
                                                     new Date()
                                                         .toISOString()
@@ -1739,15 +1736,15 @@ function GenerateInvoice() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-wrap gap-4 lg:gap-12 ">
-                                <div className="mb-4">
-                                    <h3 className="text-xl font-bold flex mb-4">
+                            <div className="flex flex-wrap gap-4 lg:gap-12 mt-12">
+                                <div>
+                                    <h3 className="text-xl font-bold flex mb-8">
                                         Select Services/Products:
                                     </h3>
                                     <div className="flex space-x-6">
                                         <button
                                             type="button"
-                                            className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
+                                            className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-full hover:bg-blue-500 hover:text-white transition duration-300"
                                             onClick={() => {
                                                 setServiceModalOpen(true); // Open the modal
                                                 fetchServiceCategoryData(); // Fetch category data
@@ -1759,7 +1756,7 @@ function GenerateInvoice() {
 
                                         <button
                                             type="button"
-                                            className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
+                                            className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-full hover:bg-blue-500 hover:text-white transition duration-300"
                                             onClick={async () => {
                                                 await fetchData(); // Wait for data to load
                                                 setProductModalOpen(true); // Open modal AFTER data is fetched
@@ -1819,11 +1816,11 @@ function GenerateInvoice() {
                                                                             combine.gst ===
                                                                             "Inclusive"
                                                                                 ? (
-                                                                                    combine.price /
+                                                                                      combine.price /
                                                                                       1.18
                                                                                   ).toFixed(
                                                                                       2
-                                                                                  ) 
+                                                                                  )
                                                                                 : combine.price ||
                                                                                   ""
                                                                         }
@@ -1842,17 +1839,29 @@ function GenerateInvoice() {
                                                                 </td>
 
                                                                 <td className="p-2 border">
-                                                                <input
-    type="number"
-    className="border w-20 px-2 py-1 text-center"
-    placeholder="Qty"
-    min="1"
-    value={combine.quantity !== undefined ? combine.quantity : 1}
-    onChange={(e) =>
-        handleInputChange(index, "quantity", e.target.value)
-    }
-/>
-
+                                                                    <input
+                                                                        type="number"
+                                                                        className="border w-20 px-2 py-1 text-center"
+                                                                        placeholder="Qty"
+                                                                        min="1"
+                                                                        value={
+                                                                            combine.quantity !==
+                                                                            undefined
+                                                                                ? combine.quantity
+                                                                                : 1
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            handleInputChange(
+                                                                                index,
+                                                                                "quantity",
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                    />
                                                                 </td>
 
                                                                 <td className="p-2 border">
@@ -1891,61 +1900,94 @@ function GenerateInvoice() {
                                                                     }
                                                                 >
                                                                     <div
-        className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
-        onClick={() => openModal(index)}
-    >
-        {combine.staff && combine.staff.length > 0 ? (
-            <span>{combine.staff.map((staff) => staff.label).join(", ")}</span>
-        ) : selectedList.includes(combine) ? ( // Check if service exists in serviceList
-            <span className="text-red-500">Select Staff *</span> // Required for services
-        ) : (
-            <span>Select Staff (Optional)</span> // Optional for products
-        )}
-    </div>
+                                                                        className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
+                                                                        onClick={() =>
+                                                                            openModal(
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {combine.staff &&
+                                                                        combine
+                                                                            .staff
+                                                                            .length >
+                                                                            0 ? (
+                                                                            <span>
+                                                                                {combine.staff
+                                                                                    .map(
+                                                                                        (
+                                                                                            staff
+                                                                                        ) =>
+                                                                                            staff.label
+                                                                                    )
+                                                                                    .join(
+                                                                                        ", "
+                                                                                    )}
+                                                                            </span>
+                                                                        ) : selectedList.includes(
+                                                                              combine
+                                                                          ) ? ( // Check if service exists in serviceList
+                                                                            <span className="text-red-500">
+                                                                                Select
+                                                                                Staff
+                                                                                *
+                                                                            </span> // Required for services
+                                                                        ) : (
+                                                                            <span>
+                                                                                Select
+                                                                                Staff
+                                                                                (Optional)
+                                                                            </span> // Optional for products
+                                                                        )}
+                                                                    </div>
                                                                     {isModalOpen ===
                                                                         index && (
                                                                         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-                                                                            <div className="bg-white w-96 p-4 rounded shadow-lg">
+                                                                            <div className="bg-white w-96 p-4 rounded-[2.5rem] shadow-lg">
                                                                                 <h3 className="text-lg font-bold mb-4">
                                                                                     Select
                                                                                     Staff
                                                                                 </h3>
-                                                                                <Multiselect
+                                                                                <Select
+                                                                                    isMulti
+                                                                                    isSearchable={
+                                                                                        false
+                                                                                    }
                                                                                     options={
                                                                                         staffData
                                                                                     }
-                                                                                    showSearch={
-                                                                                        true
-                                                                                    }
-                                                                                    onSelect={(
-                                                                                        selected
-                                                                                    ) =>
-                                                                                        handleServedSelect(
-                                                                                            selected,
-                                                                                            index
-                                                                                        )
-                                                                                    }
-                                                                                    onRemove={(
-                                                                                        selected
-                                                                                    ) =>
-                                                                                        handleServedSelect(
-                                                                                            selected,
-                                                                                            index
-                                                                                        )
-                                                                                    }
-                                                                                    displayValue="label"
                                                                                     placeholder="Select Served By"
-                                                                                    selectedValues={
+                                                                                    className="rounded-[2.5rem] font-semibold"
+                                                                                    value={
                                                                                         combine.staff ||
                                                                                         []
                                                                                     }
-                                                                                    required={selectedList.includes(combine)} 
-
+                                                                                    onChange={(
+                                                                                        selected
+                                                                                    ) =>
+                                                                                        handleServedSelect(
+                                                                                            selected,
+                                                                                            index
+                                                                                        )
+                                                                                    }
+                                                                                    styles={{
+                                                                                        control:
+                                                                                            (
+                                                                                                base
+                                                                                            ) => ({
+                                                                                                ...base,
+                                                                                                borderRadius:
+                                                                                                    "2.5rem",
+                                                                                                padding:
+                                                                                                    "2px",
+                                                                                            }),
+                                                                                    }}
                                                                                 />
+
                                                                                 <div className="flex justify-end mt-4">
                                                                                     <button
                                                                                         type="button"
-                                                                                        className="px-4 py-2 bg-gray-300 text-black rounded mr-2"
+                                                                                        className="px-4 py-2 bg-gray-300 text-black rounded-[2.5rem] mr-2"
                                                                                         onClick={
                                                                                             closeModal
                                                                                         }
@@ -1954,7 +1996,7 @@ function GenerateInvoice() {
                                                                                     </button>
                                                                                     <button
                                                                                         type="button"
-                                                                                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                                                                                        className="px-4 py-2 bg-blue-500 text-white rounded-[2.5rem]"
                                                                                         onClick={
                                                                                             closeModal
                                                                                         }
@@ -2038,11 +2080,11 @@ function GenerateInvoice() {
                                     </div>
 
                                     <div className="my-4" id="product-tabel">
-                                        {product_value.length > 0 ? ( 
+                                        {product_value.length > 0 ? (
                                             <table className="w-full border p-4 border-gray-200 mt-4">
                                                 <thead>
                                                     <tr className="bg-gray-100 p-4">
-                                                    <th className="border px-4 py-2">
+                                                        <th className="border px-4 py-2">
                                                             category
                                                         </th>
                                                         <th className="border px-4 py-2">
@@ -2122,7 +2164,7 @@ function GenerateInvoice() {
 
                                     {isServiceModalOpen && (
                                         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                                            <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
+                                            <div className="bg-white rounded-[2.5rem] p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
                                                 {/* Close Button */}
                                                 <div className="flex justify-between items-center mb-4">
                                                     <span></span>
@@ -2146,7 +2188,7 @@ function GenerateInvoice() {
                                                     <input
                                                         type="text"
                                                         placeholder="Search services or categories..."
-                                                        className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/3"
+                                                        className="border border-gray-300 rounded-[2.5rem] px-4 py-2 w-full md:w-1/3"
                                                         value={searchQuery}
                                                         onChange={(e) =>
                                                             setSearchQuery(
@@ -2197,7 +2239,7 @@ function GenerateInvoice() {
                                                                 key={
                                                                     category.key
                                                                 }
-                                                                className="bg-gray-100 p-4 rounded-lg border"
+                                                                className="bg-gray-100 p-4 rounded-[2.5rem] border"
                                                             >
                                                                 <h4 className="text-lg font-semibold mb-4">
                                                                     {
@@ -2330,7 +2372,7 @@ function GenerateInvoice() {
                                     {/* Product Modal */}
                                     {isProductModalOpen && (
                                         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                                            <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
+                                            <div className="bg-white rounded-[2.5rem] p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
                                                 {/* Close Button */}
                                                 <div className="flex justify-between items-center mb-4">
                                                     <span></span>
@@ -2353,7 +2395,7 @@ function GenerateInvoice() {
                                                     <input
                                                         type="text"
                                                         placeholder="Search products or categories..."
-                                                        className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/3"
+                                                        className="border border-gray-300 rounded-[2.5rem] px-4 py-2 w-full md:w-1/3"
                                                         value={searchQuery}
                                                         onChange={(e) =>
                                                             setSearchQuery(
@@ -2380,7 +2422,7 @@ function GenerateInvoice() {
                                                                     key={
                                                                         category.key
                                                                     }
-                                                                    className="bg-gray-100 p-4 rounded-lg border"
+                                                                    className="bg-gray-100 p-4 rounded-[2.5rem] border"
                                                                 >
                                                                     <h4 className="text-lg font-semibold mb-4">
                                                                         {
@@ -2452,7 +2494,7 @@ function GenerateInvoice() {
                                                         </p>
                                                         <button
                                                             type="button"
-                                                            className="bg-blue-500 text-white px-6 py-2 rounded-lg"
+                                                            className="bg-blue-500 text-white px-6 py-2 rounded-[2.5rem]"
                                                             onClick={() => {
                                                                 finalizeSelection(
                                                                     selectedList
@@ -2474,7 +2516,7 @@ function GenerateInvoice() {
                                 {userExists && (hasMembership || hasCoupon) ? (
                                     <>
                                         <div className="flex justify-center mt-0 lg:mt-24 mb-8">
-                                            <table className="w-3/5 border border-gray-200 shadow-md rounded-lg overflow-hidden">
+                                            <table className="w-3/5 border border-gray-200 shadow-md rounded-[2.5rem] overflow-hidden">
                                                 <thead>
                                                     <tr className="bg-gray-100 text-black">
                                                         <th className="py-3 px-6 text-left">
@@ -2538,7 +2580,7 @@ function GenerateInvoice() {
                                                             e.target.value
                                                         )
                                                     }
-                                                    className="p-2 w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    className="p-2 w-full border border-gray-300 rounded-[2.5rem] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 >
                                                     <option value="None">
                                                         Select a Coupon
@@ -2577,7 +2619,7 @@ function GenerateInvoice() {
                                                             e.target.value
                                                         )
                                                     }
-                                                    className="p-2 w-full border font-bold text-blue-500  border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    className="p-2 w-full border font-bold text-blue-500  border-blue-500 rounded-[2.5rem] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 >
                                                     <option
                                                         value="None"
@@ -2636,7 +2678,7 @@ function GenerateInvoice() {
                                                             e.target.value
                                                         )
                                                     }
-                                                    className="p-2 w-full border border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    className="p-2 w-full border border-blue-500 rounded-[2.5rem] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 >
                                                     <option
                                                         value="None"
@@ -2692,7 +2734,7 @@ function GenerateInvoice() {
                                                             e.target.value
                                                         )
                                                     }
-                                                    className="p-2 w-full border border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    className="p-2 w-full border border-blue-500 rounded-[2.5rem] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 >
                                                     <option
                                                         value="None"
@@ -2842,27 +2884,29 @@ function GenerateInvoice() {
                                         hasCoupon) && (
                                         <div className="flex items-center space-x-6">
                                             {/* Membership Points Input */}
-                                            {membershipType !== "None" && membershipType !== "" && (
-                                                <div className="flex flex-col">
-                                                    <label
-                                                        htmlFor="membershipPoints"
-                                                        className="font-semibold text-lg text-black"
-                                                    >
-                                                        Membership Points:
-                                                    </label>
-                                                    <input
-                                                        type="number"
-                                                        id="membershipPoints"
-                                                        placeholder="Enter Points"
-                                                        onChange={(e) =>
-                                                            setDeductedPoints(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className="w-32 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    />
-                                                </div>
-                                            )}
+                                            {membershipType !== "None" &&
+                                                membershipType !== "" && (
+                                                    <div className="flex flex-col">
+                                                        <label
+                                                            htmlFor="membershipPoints"
+                                                            className="font-semibold text-lg text-black"
+                                                        >
+                                                            Membership Points:
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            id="membershipPoints"
+                                                            placeholder="Enter Points"
+                                                            onChange={(e) =>
+                                                                setDeductedPoints(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="w-32 px-3 py-2 text-sm border border-gray-300 rounded-[2.5rem] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        />
+                                                    </div>
+                                                )}
 
                                             {/* Coupon Points Input */}
                                             {hasCoupon && (
@@ -2882,22 +2926,23 @@ function GenerateInvoice() {
                                                                 e.target.value
                                                             )
                                                         }
-                                                        className="w-32 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        className="w-32 px-3 py-2 text-sm border border-gray-300 rounded-[2.5rem] focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
                                             )}
                                         </div>
                                     )}
 
-                                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-4">
+                                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
                                     <div className="flex flex-col">
                                         <span className="font-semibold items-start flex mb-4">
                                             Mode of Payment
                                         </span>
                                         <Select
                                             isMulti
+                                            isSearchable={false}
                                             options={options}
-                                            className=" col-span-1 p-1 rounded-lg font-semibold placeholder-gray-400 z-0"
+                                            className="col-span-1 p-1 rounded-full font-semibold placeholder-gray-400 z-0"
                                             onChange={handleSelectChange}
                                             placeholder="Select Payment Mode"
                                             required
@@ -2915,7 +2960,7 @@ function GenerateInvoice() {
                                         </span>
                                         <input
                                             type="text"
-                                            className="text-black p-2 rounded-lg  border border-gray-300 col-span-1 font-semibold placeholder-gray-400"
+                                            className="text-black p-3 rounded-[2.5rem]  border border-gray-300 col-span-1 font-semibold placeholder-gray-400"
                                             placeholder="Enter Comments"
                                         />
                                     </div>
@@ -2963,7 +3008,7 @@ function GenerateInvoice() {
                                                                                 0
                                                                         )
                                                                     }
-                                                                    className="w-full border border-gray-300 rounded-lg p-2"
+                                                                    className="w-full border border-gray-300 rounded-[2.5rem] p-2"
                                                                 />
                                                             </td>
                                                         </tr>
@@ -3016,13 +3061,13 @@ function GenerateInvoice() {
                             )}
                             {showPopup && (
                                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                    <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
+                                    <div className="bg-white rounded-[2.5rem] shadow-lg p-6 w-11/12 max-w-md">
                                         <p className="text-gray-800 text-lg font-medium mb-4">
                                             {popupMessage}
                                         </p>
                                         <button
                                             onClick={() => setShowPopup(false)}
-                                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300"
+                                            className="px-4 py-2 bg-blue-500 text-white rounded-[2.5rem] hover:bg-blue-600 transition duration-300"
                                         >
                                             Close
                                         </button>
@@ -3031,19 +3076,26 @@ function GenerateInvoice() {
                             )}
 
                             {/* Generate Invoice Button */}
-                            <div className="button-row">
+                            <div className="flex items-center justify-center m-12 mt-24 ">
                                 <button
                                     type="submit"
                                     disabled={totalPayment !== grandTotal} // Disable if totals don't match
-                                    className={`mt-4 p-2 bg-blue-500 text-white rounded ${
+                                    className={`py-2 px-12 bg-blue-500 text-xl text-white font-semibold rounded-[2.5rem] ${
                                         totalPayment !== grandTotal
                                             ? "opacity-50 cursor-not-allowed"
                                             : ""
                                     }`}
                                     onClick={handleInvoiceSubmit}
                                 >
-            {loading ? <CircularProgress size={20} color="inherit" /> : "Create Invoice"}
-            </button>
+                                    {loading ? (
+                                        <CircularProgress
+                                            size={20}
+                                            color="inherit"
+                                        />
+                                    ) : (
+                                        "Create Invoice"
+                                    )}
+                                </button>
                             </div>
                         </form>
                     </div>

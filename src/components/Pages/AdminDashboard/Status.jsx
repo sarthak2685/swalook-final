@@ -40,8 +40,7 @@ const Status = () => {
     }, []);
 
     return (
-        <div className="bg-white shadow-md p-4 rounded-lg mb-10">
-            <BiBarChartSquare className="text-4xl text-gray-500 bg-[#FFCC9129] mb-4 mr-10" />
+        <div className="bg-white shadow-md px-4 py-12 rounded-[2.5rem] my-10">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Today's Revenue */}
                 <div className="text-center">

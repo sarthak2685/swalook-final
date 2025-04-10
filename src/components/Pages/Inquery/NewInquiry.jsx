@@ -336,7 +336,7 @@ const NewInquiry = () => {
             <ToastContainer />
             <div className="min-h-[150vh] md:ml-72 p-10">
                 <form onSubmit={handleSubmit}>
-                    <div className="bg-white shadow-lg rounded-lg p-6 w-full">
+                    <div className="bg-white shadow-lg rounded-[2.5rem] p-6 w-full">
                         <h2 className="text-2xl font-bold mb-4">New Inquiry</h2>
 
                         <div className="mb-4">
@@ -347,7 +347,7 @@ const NewInquiry = () => {
                                 <input
                                     type="text"
                                     placeholder="Phone Number*"
-                                    className="border p-2 rounded-lg col-span-1"
+                                    className="border p-2 rounded-full col-span-1"
                                     value={mobileNo}
                                     onChange={(e) =>
                                         setMobileNo(e.target.value)
@@ -357,7 +357,7 @@ const NewInquiry = () => {
                                 <input
                                     type="text"
                                     placeholder="Name"
-                                    className="border p-2 rounded-lg col-span-1"
+                                    className="border p-2 rounded-full col-span-1"
                                     value={customerName}
                                     onChange={(e) =>
                                         setCustomerName(e.target.value)
@@ -374,7 +374,7 @@ const NewInquiry = () => {
                             <div className="flex-wrap space-x-2">
                                 <button
                                     type="button" // Ensure this is type="button"
-                                    className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
+                                    className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-full hover:bg-blue-500 hover:text-white transition duration-300"
                                     onClick={() => {
                                         setServiceModalOpen(true);
                                         fetchServiceCategoryData();
@@ -384,7 +384,7 @@ const NewInquiry = () => {
                                 </button>
                                 <button
                                     type="button" // Ensure this is type="button"
-                                    className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
+                                    className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-full hover:bg-blue-500 hover:text-white transition duration-300"
                                     onClick={async () => {
                                         await fetchData();
                                         setProductModalOpen(true);
@@ -397,7 +397,7 @@ const NewInquiry = () => {
 
                         {isServiceModalOpen && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                                <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
+                                <div className="bg-white rounded-[2.5rem] p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
                                     <div className="flex justify-between items-center mb-4">
                                         <span></span>
                                         <FaTimes
@@ -416,7 +416,7 @@ const NewInquiry = () => {
                                         <input
                                             type="text"
                                             placeholder="Search services or categories..."
-                                            className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/3"
+                                            className="border border-gray-300 rounded-full px-4 py-2 w-full md:w-1/3"
                                             value={searchQuery}
                                             onChange={(e) =>
                                                 setSearchQuery(e.target.value)
@@ -450,7 +450,7 @@ const NewInquiry = () => {
                                         {filteredCategories.map((category) => (
                                             <div
                                                 key={category.key}
-                                                className="bg-gray-100 p-4 rounded-lg border"
+                                                className="bg-gray-100 p-4 rounded-2xl border"
                                             >
                                                 <h4 className="text-lg font-semibold mb-4">
                                                     {category.value}
@@ -556,7 +556,7 @@ const NewInquiry = () => {
 
                         {isProductModalOpen && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                                <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
+                                <div className="bg-white rounded-[2.5rem] p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
                                     <div className="flex justify-between items-center mb-4">
                                         <span></span>
                                         <FaTimes
@@ -575,7 +575,7 @@ const NewInquiry = () => {
                                         <input
                                             type="text"
                                             placeholder="Search products or categories..."
-                                            className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/3"
+                                            className="border border-gray-300 rounded-full px-4 py-2 w-full md:w-1/3"
                                             value={searchQuery}
                                             onChange={(e) =>
                                                 setSearchQuery(e.target.value)
@@ -591,7 +591,7 @@ const NewInquiry = () => {
                                             {filteredproduct.map((category) => (
                                                 <div
                                                     key={category.key}
-                                                    className="bg-gray-100 p-4 rounded-lg border"
+                                                    className="bg-gray-100 p-4 rounded-full border"
                                                 >
                                                     <h4 className="text-lg font-semibold mb-4">
                                                         {category.value}
@@ -652,7 +652,7 @@ const NewInquiry = () => {
                                             </p>
                                             <button
                                                 type="button" // Ensure this is type="button"
-                                                className="bg-blue-500 text-white px-6 py-2 rounded-lg"
+                                                className="bg-blue-500 text-white px-6 py-2 rounded-full"
                                                 onClick={() => {
                                                     finalizeSelection(
                                                         selectedList2
@@ -674,7 +674,7 @@ const NewInquiry = () => {
                             </h3>
                             <textarea
                                 placeholder="Comments"
-                                className="border p-2 rounded-lg w-full h-20"
+                                className="border p-4 rounded-2xl w-full h-20"
                                 value={comments}
                                 onChange={(e) => setComments(e.target.value)}
                             />
@@ -683,7 +683,7 @@ const NewInquiry = () => {
                         <div className="flex justify-center">
                             <button
                                 type="submit" // Ensure this is type="submit"
-                                className="bg-blue-600 text-white px-6 py-2 rounded-lg"
+                                className="bg-blue-600 text-white px-6 py-2 rounded-full"
                             >
                                 Create Inquiry
                             </button>

@@ -230,16 +230,16 @@ const Scheduler = () => {
     );
 
     return (
-        <div className="bg-white shadow-md p-6 rounded-lg mx-auto mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="bg-white shadow-md p-6 rounded-[2.5rem] mx-auto mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Appointment Details Section */}
-            <div className="col-span-1 sm:col-span-2 md:col-span-1 bg-gray-50 p-4 rounded-lg">
+            <div className="col-span-1 sm:col-span-2 md:col-span-1 bg-gray-50 p-4 rounded-[2.5rem]">
                 <h2 className="text-xl font-semibold text-gray-700 mb-4">
                     Appointment
                 </h2>
                 {selectedAppointment ? (
                     <div className="flex flex-col items-center">
                         <div
-                            className={`mt-4 p-6 rounded-xl shadow-md w-full ${
+                            className={`mt-4 p-6 rounded-[2.5rem] shadow-md w-full ${
                                 selectedAppointment.color || "bg-orange-200"
                             }`}
                         >
@@ -314,14 +314,14 @@ const Scheduler = () => {
             </div>
 
             {/* Schedule Section */}
-            <div className="col-span-1 sm:col-span-2 md:col-span-3 bg-white p-4 rounded-lg">
+            <div className="col-span-1 sm:col-span-2 md:col-span-3 bg-white p-4 rounded-[2.5rem]">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold text-gray-600">
                         {selectedStaff || "staff"}'s Schedule
                     </h3>
                     <div className="flex flex-row gap-4">
                         <select
-                            className="p-2 border rounded"
+                            className="p-2 border rounded-[2.5rem]"
                             value={view}
                             onChange={(e) => setView(e.target.value)}
                         >
@@ -415,7 +415,7 @@ const Scheduler = () => {
                             {weekDates.map((dayObj, dayIndex) => (
                                 <div
                                     key={dayIndex}
-                                    className="min-h-[100px] py-2 px-4 border-orange-100 border rounded-lg min-w-[120px] md:min-w-[150px] flex flex-col"
+                                    className="min-h-[100px] py-2 px-4 border-orange-100 border rounded-[2.5rem] min-w-[120px] md:min-w-[150px] flex flex-col"
                                 >
                                     {filteredAppointments
                                         .filter((appointment) => {
@@ -475,7 +475,7 @@ const Scheduler = () => {
             </div>
 
             {/* Staff Selection Section */}
-            <div className="col-span-1 sm:col-span-2 md:col-span-1 bg-gray-50 p-4 rounded-lg">
+            <div className="col-span-1 sm:col-span-2 md:col-span-1 bg-gray-50 p-4 rounded-[2.5rem]">
                 <h3 className="text-md font-semibold text-gray-600 mb-2">
                     Select Staff
                 </h3>

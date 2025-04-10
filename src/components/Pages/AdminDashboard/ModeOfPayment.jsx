@@ -147,7 +147,7 @@ const ModeOfPayment = () => {
     );
 
     return (
-        <div className="bg-white shadow-md p-6 rounded-lg">
+        <div className="bg-white shadow-md p-6 rounded-[2.5rem]">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-800">
                     Mode of Payment
@@ -156,7 +156,7 @@ const ModeOfPayment = () => {
                     <select
                         value={paymentPeriod}
                         onChange={(e) => setPaymentPeriod(e.target.value)}
-                        className="border border-gray-300 text-gray-700 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="border border-gray-300 text-gray-700 rounded-[2.5rem] p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="Day">Daily</option>
                         <option value="Week">Weekly</option>
@@ -169,7 +169,7 @@ const ModeOfPayment = () => {
                             onClick={() => setCalendarVisible(!calendarVisible)}
                         />
                         {calendarVisible && (
-                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-lg z-20">
+                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-[2.5rem] z-20">
                                 <Calendar
                                     onChange={handleDateChange}
                                     value={
@@ -195,7 +195,7 @@ const ModeOfPayment = () => {
                 </div>
             </div>
 
-            <div className="rounded-lg mt-4 overflow-hidden ">
+            <div className="rounded-[2.5rem] mt-4 overflow-hidden ">
                 <table className="min-w-full bg-white">
                     <thead>
                         <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
