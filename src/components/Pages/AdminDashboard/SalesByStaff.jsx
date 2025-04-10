@@ -124,7 +124,7 @@ const SalesByStaff = () => {
     };
 
     return (
-        <div className="bg-white shadow-md p-6 rounded-lg">
+        <div className="bg-white shadow-md p-6 rounded-[2.5rem]">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-800">
                     Sales by Staff
@@ -133,7 +133,7 @@ const SalesByStaff = () => {
                     <select
                         value={staffPeriod}
                         onChange={(e) => setStaffPeriod(e.target.value)}
-                        className="border border-gray-300 text-gray-700 rounded-lg p-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="border border-gray-300 text-gray-700 rounded-[2.5rem] p-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="Day">Daily</option>
                         <option value="Week">Weekly</option>
@@ -147,7 +147,7 @@ const SalesByStaff = () => {
                             onClick={() => setStaffCalendar(!staffCalendar)}
                         />
                         {staffCalendar && (
-                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-lg z-20">
+                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-[2.5rem] z-20">
                                 <Calendar
                                     onChange={handleDateChange}
                                     value={
@@ -197,7 +197,7 @@ const SalesByStaff = () => {
                             return (
                                 <div
                                     key={index}
-                                    className="p-2 bg-white rounded-lg  transition-shadow"
+                                    className="p-2 bg-white rounded-[2.5rem]  transition-shadow"
                                 >
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center space-x-2">
@@ -236,7 +236,7 @@ const SalesByStaff = () => {
                             );
                         })
                 ) : (
-                    <div className="p-2 bg-red-50 rounded-lg">
+                    <div className="p-2 bg-red-50 rounded-[2.5rem]">
                         <p className="text-xs text-red-600">
                             *No data available for the selected period.
                         </p>

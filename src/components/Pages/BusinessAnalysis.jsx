@@ -5,6 +5,7 @@ import VertNav from "./VertNav";
 import config from "../../config";
 import { FaCalendar } from "react-icons/fa";
 import Calendar from "react-calendar";
+import SalesByStaff from "./AdminDashboard/SalesByStaff";
 
 function BusinessAnalysis() {
     const token = localStorage.getItem("token");
@@ -839,6 +840,101 @@ function BusinessAnalysis() {
         };
     }, [productData]); // Recalculate when productData changes
 
+    // const [selectedDate1, setSelectedDate1] = useState(new Date());
+
+    // const currentDate = new Date(selectedDate1);
+    // const currentWeek = Math.ceil(
+    //     (currentDate.getDate() - currentDate.getDay() + 1) / 7
+    // );
+    // const currentMonth = currentDate.getMonth() + 1;
+    // const currentYear = currentDate.getFullYear();
+
+    const [topServices, setTopServices] = useState([]);
+    const [period, setPeriod] = useState("Month");
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(
+                    `${config.apiUrl}/api/swalook/business-analysis/service/?branch_name=${bid}&week=${currentWeek}&month=${currentMonth}&year=${currentYear}`,
+                    {
+                        headers: {
+                            Authorization: `Token ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+                const data = await response.json();
+
+                if (data?.data?.services_list) {
+                    const servicesList = data.data.services_list;
+
+                    // Process services to include both revenue and occurrences
+                    const servicesWithDetails = Object.entries(
+                        servicesList
+                    ).map(([name, { occurrences, revenue }]) => ({
+                        name,
+                        occurrences,
+                        revenue,
+                    }));
+
+                    // Sort services by revenue in descending order and slice the top 5
+                    const sortedServices = servicesWithDetails
+                        .sort((a, b) => b.revenue - a.revenue)
+                        .slice(0, 5);
+
+                    setTopServices(sortedServices);
+                } else {
+                    console.error("Invalid response structure:", data);
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, [token, config.apiUrl, currentWeek, currentMonth, currentYear]);
+
+    const [topCustomers, setTopCustomers] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(
+                    `${config.apiUrl}/api/swalook/business-analysis/month-customer/?branch_name=${bid}&month=${currentMonth}&year=${currentYear}`,
+                    {
+                        headers: {
+                            Authorization: `Token ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+                const data = await response.json();
+
+                if (Array.isArray(data.data)) {
+                    const sortedCustomers = data.data
+                        .sort((a, b) => b.weekly_total - a.weekly_total)
+                        .slice(0, 5);
+
+                    const formattedCustomers = sortedCustomers.map(
+                        (customer, index) => ({
+                            name: customer.customer_name,
+                            revenue: customer.weekly_total,
+                        })
+                    );
+
+                    setTopCustomers(formattedCustomers);
+                } else {
+                    console.error("Invalid response structure:", data);
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, [token, config.apiUrl]);
+
     return (
         <>
             <div className="bg-gray-100">
@@ -848,13 +944,13 @@ function BusinessAnalysis() {
                     <h1 className="text-2xl md:text-3xl lg:text-3xl font-bold mb-6 md:mb-8 lg:mb-8 text-gray-800">
                         Business Analysis
                     </h1>
-                    <div className="bg-white shadow-md p-4 rounded-lg mb-4">
+                    <div className="bg-white shadow-md p-4 rounded-[2.5rem] mb-4">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                             <div className="font-bold text-gray-800 text-xl mb-2 md:mb-0">
                                 Net Revenue
                             </div>
                             <select
-                                className="border border-gray-300 text-gray-700 rounded-lg p-1 text-sm"
+                                className="border border-gray-300 text-gray-700 rounded-xl p-1 text-sm"
                                 value={revenuePeriod}
                                 onChange={handlePeriodChange}
                             >
@@ -907,7 +1003,7 @@ function BusinessAnalysis() {
 
                     {/* First Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-lg shadow relative">
+                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-[2.5rem] shadow relative">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                                 <h2 className="text-xl font-semibold mb-4">
                                     Sales Per Service
@@ -918,7 +1014,7 @@ function BusinessAnalysis() {
                                         onChange={(e) =>
                                             setSelectedPeriod(e.target.value)
                                         }
-                                        className="p-2 border border-gray-300 rounded-lg mb-4"
+                                        className="p-2 border border-gray-300 rounded-xl mb-4"
                                     >
                                         <option value="Weekly">Weekly</option>
                                         <option value="Monthly">Monthly</option>
@@ -932,7 +1028,7 @@ function BusinessAnalysis() {
                                             }
                                         />
                                         {showCalendar && (
-                                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-lg z-20">
+                                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-xl z-20">
                                                 <Calendar
                                                     onChange={(date) =>
                                                         setSelectedDate(date)
@@ -952,7 +1048,7 @@ function BusinessAnalysis() {
                             />
                         </div>
 
-                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-lg shadow relative">
+                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-[2.5rem] shadow relative">
                             <div className="flex justify-between items-center">
                                 <h2 className="text-xl font-semibold mb-4">
                                     Sales Per Product
@@ -962,7 +1058,7 @@ function BusinessAnalysis() {
                                     onChange={(e) =>
                                         setProductTimePeriod(e.target.value)
                                     }
-                                    className="p-2 border border-gray-300 rounded-lg mb-4"
+                                    className="p-2 border border-gray-300 rounded-xl mb-4"
                                 >
                                     <option value="daily">Daily</option>
                                     <option value="monthly">Monthly</option>
@@ -977,7 +1073,7 @@ function BusinessAnalysis() {
                             />
                         </div>
 
-                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-lg shadow relative">
+                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-[2.5rem] shadow relative">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                                 <h2 className="text-xl font-semibold mb-4">
                                     Overall Sales
@@ -988,7 +1084,7 @@ function BusinessAnalysis() {
                                         onChange={(e) =>
                                             setOverallTimePeriod(e.target.value)
                                         }
-                                        className="border px-3 py-1 rounded-md"
+                                        className="border px-3 py-1 rounded-xl"
                                     >
                                         <option value="Weekly">Weekly</option>
                                         <option value="Monthly">Monthly</option>
@@ -1004,7 +1100,7 @@ function BusinessAnalysis() {
                                             }
                                         />
                                         {showCalendar2 && (
-                                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-lg z-20">
+                                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-xl z-20">
                                                 <Calendar
                                                     onChange={(date) =>
                                                         setSelectedDate2(date)
@@ -1023,7 +1119,7 @@ function BusinessAnalysis() {
                                 height={350}
                             />
                         </div>
-                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-lg shadow relative hidden md:block lg:hidden">
+                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-[2.5rem] shadow relative hidden md:block lg:hidden">
                             <div className="flex justify-between items-center">
                                 <h2 className="text-xl font-semibold mb-4">
                                     Sales Per Day
@@ -1033,7 +1129,7 @@ function BusinessAnalysis() {
                                     onChange={(e) =>
                                         setSalesPerDayView(e.target.value)
                                     }
-                                    className="p-2 border border-gray-300 rounded-lg mb-4"
+                                    className="p-2 border border-gray-300 rounded-xl mb-4"
                                 >
                                     <option value="perEmployee">
                                         Per Employee
@@ -1054,7 +1150,7 @@ function BusinessAnalysis() {
 
                     {/* Second Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-4 ">
-                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-lg shadow relative col-span-1 md:col-span-2 lg:col-span-2">
+                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-[2.5rem] shadow relative col-span-1 md:col-span-2 lg:col-span-2">
                             <div className="flex justify-between items-center">
                                 <h2 className="text-xl font-semibold mb-4">
                                     Sales Per Customer
@@ -1064,7 +1160,7 @@ function BusinessAnalysis() {
                                     onChange={(e) =>
                                         setCustomerTimePeriod(e.target.value)
                                     }
-                                    className="p-2 border border-gray-300 rounded-lg mb-4"
+                                    className="p-2 border border-gray-300 rounded-xl mb-4"
                                 >
                                     <option value="Daily">Daily</option>
                                     <option value="Weekly">Weekly</option>
@@ -1079,7 +1175,7 @@ function BusinessAnalysis() {
                             />
                         </div>
 
-                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-lg shadow relative md:hidden lg:block">
+                        <div className="bg-white p-4 md:p-6 lg:p-6 rounded-[2.5rem] shadow relative md:hidden lg:block">
                             <div className="flex justify-between items-center">
                                 <h2 className="text-xl font-semibold mb-4">
                                     Sales Per Day
@@ -1089,7 +1185,7 @@ function BusinessAnalysis() {
                                     onChange={(e) =>
                                         setSalesPerDayView(e.target.value)
                                     }
-                                    className="p-2 border border-gray-300 rounded-lg mb-4"
+                                    className="p-2 border border-gray-300 rounded-xl mb-4"
                                 >
                                     <option value="perEmployee">
                                         Per Employee
@@ -1105,6 +1201,123 @@ function BusinessAnalysis() {
                                 type="bar"
                                 width="100%"
                             />
+                        </div>
+                    </div>
+                    {/* Row 3: Sales by Staff, Top 5 Customers, Top 5 Services */}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-4 ">
+                        <SalesByStaff />
+                        {/* Top 5 Customers */}
+                        <div className="bg-white shadow-md p-6 rounded-[2.5rem]">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                                    Top 5 Customers
+                                </h3>
+                                <select
+                                    value={period}
+                                    onChange={(e) => setPeriod(e.target.value)}
+                                    className="border border-gray-300 text-gray-700 rounded-xl p-1 text-sm"
+                                >
+                                    <option value="Month">Month-to-date</option>
+                                </select>
+                            </div>
+                            {topCustomers.length > 0 ? (
+                                <ul>
+                                    {topCustomers.map((customer, index) => (
+                                        <li
+                                            key={index}
+                                            className="flex justify-between py-2 text-gray-700 border-b last:border-b-0"
+                                        >
+                                            <span>
+                                                {index + 1}. {customer.name}
+                                            </span>
+                                            <span>
+                                                Rs.
+                                                {customer.revenue.toLocaleString()}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div>
+                                    {/* Red warning message */}
+                                    <p className="text-red-600 font-light mb-2">
+                                        *No data available for the selected
+                                        period.
+                                    </p>
+                                    {/* Placeholder rows */}
+                                    <ul>
+                                        {[1, 2, 3, 4, 5].map((_, index) => (
+                                            <li
+                                                key={index}
+                                                className="flex justify-between py-2 text-gray-400 border-b last:border-b-0 italic"
+                                            >
+                                                <span>
+                                                    {index + 1}. Customer
+                                                </span>
+                                                <span>Rs.__</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Top 5 Services */}
+                        <div className="bg-white shadow-md p-6 rounded-[2.5rem]">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                                    Top 5 Services
+                                </h3>
+                                <select
+                                    value={period}
+                                    onChange={(e) => setPeriod(e.target.value)}
+                                    className="border border-gray-300 text-gray-700 rounded-xl p-1 text-sm"
+                                >
+                                    <option value="Month">Month-to-date</option>
+                                </select>
+                            </div>
+                            {topServices.length > 0 ? (
+                                <ul>
+                                    {topServices.map((service, index) => (
+                                        <li
+                                            key={index}
+                                            className="flex justify-between py-2 text-gray-700 border-b last:border-b-0"
+                                        >
+                                            <span>
+                                                {index + 1}. {service.name}
+                                            </span>
+                                            {/* <span>Occured: {service.occurrences.toLocaleString()}</span> */}
+                                            <span>
+                                                Rs.
+                                                {service.revenue.toLocaleString()}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div>
+                                    {/* Red warning message */}
+                                    <p className="text-red-600 font-light mb-2">
+                                        *No data available for the selected
+                                        period.
+                                    </p>
+                                    {/* Placeholder rows */}
+                                    <ul>
+                                        {[1, 2, 3, 4, 5].map((_, index) => (
+                                            <li
+                                                key={index}
+                                                className="flex justify-between py-2 text-gray-400 border-b last:border-b-0 italic"
+                                            >
+                                                <span>
+                                                    {index + 1}. Service
+                                                </span>
+                                                <span>Rs.__</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

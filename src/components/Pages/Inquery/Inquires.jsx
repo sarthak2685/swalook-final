@@ -145,19 +145,19 @@ const Inquiries = () => {
             <Header />
             <VertNav />
             <div className="p-10 md:ml-72">
-                <div className="bg-white shadow-lg rounded-lg p-10">
+                <div className="bg-white shadow-lg rounded-[2.5rem] p-10">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-bold">Inquiries</h2>
                         <div className="flex space-x-2">
                             <input
                                 type="text"
                                 placeholder="Search (Number/Name)"
-                                className="border p-2 rounded-lg text-sm"
+                                className="border p-2 rounded-xl text-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                             <button
-                                className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                                className="bg-blue-600 text-white px-4 py-2 rounded-xl"
                                 onClick={handleNewInquiry}
                             >
                                 + New Inquiry
@@ -175,7 +175,7 @@ const Inquiries = () => {
                         </p>
                     ) : (
                         <div className="overflow-auto">
-                            <table className="w-full text-center bg-white border rounded-lg ">
+                            <table className="w-full text-center bg-white border rounded-xl ">
                                 <thead>
                                     <tr className="bg-gray-200">
                                         <th className="p-2 border border-gray-300">
@@ -238,7 +238,7 @@ const Inquiries = () => {
 
                             <div className="flex justify-end space-x-2 mt-4">
                                 <button
-                                    className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
+                                    className="px-3 py-1 bg-gray-300 rounded-xl disabled:opacity-50"
                                     onClick={() =>
                                         setCurrentPage(currentPage - 1)
                                     }
@@ -249,7 +249,7 @@ const Inquiries = () => {
                                 {[...Array(totalPages)].map((_, i) => (
                                     <button
                                         key={i}
-                                        className={`px-3 py-1 rounded-lg ${
+                                        className={`px-3 py-1 rounded-xl ${
                                             currentPage === i + 1
                                                 ? "bg-blue-600 text-white"
                                                 : "bg-gray-300"
@@ -260,7 +260,7 @@ const Inquiries = () => {
                                     </button>
                                 ))}
                                 <button
-                                    className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
+                                    className="px-3 py-1 bg-gray-300 rounded-xl disabled:opacity-50"
                                     onClick={() =>
                                         setCurrentPage(currentPage + 1)
                                     }
@@ -272,7 +272,7 @@ const Inquiries = () => {
                             {/* Delete Confirmation Modal */}
                             {showModal && (
                                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                                    <div className="bg-white p-6 rounded-[2.5rem] shadow-lg w-96">
                                         <h2 className="text-xl font-semibold mb-4">
                                             Confirm Delete
                                         </h2>
@@ -282,7 +282,7 @@ const Inquiries = () => {
                                         </p>
                                         <div className="flex justify-end mt-4">
                                             <button
-                                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 mr-2"
+                                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 mr-2"
                                                 onClick={() =>
                                                     setShowModal(false)
                                                 }
@@ -290,7 +290,7 @@ const Inquiries = () => {
                                                 Cancel
                                             </button>
                                             <button
-                                                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                                                className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600"
                                                 onClick={handleDelete}
                                             >
                                                 Delete

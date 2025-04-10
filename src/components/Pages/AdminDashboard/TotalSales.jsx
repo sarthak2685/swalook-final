@@ -272,7 +272,7 @@ const TotalSales = () => {
     };
 
     return (
-        <div className="col-span-2 bg-white shadow-md p-6 rounded-lg relative">
+        <div className="col-span-2 bg-white shadow-md p-6 rounded-[2.5rem] relative">
             <div className="flex justify-between mb-4">
                 <div className="text-lg font-semibold text-gray-700">
                     Total Sales
@@ -281,7 +281,7 @@ const TotalSales = () => {
                     <select
                         value={selectedPeriod}
                         onChange={(e) => setSelectedPeriod(e.target.value)}
-                        className="border px-3 py-1 rounded-md"
+                        className="border px-3 py-1 rounded-[2.5rem]"
                     >
                         <option value="Weekly">Weekly</option>
                         <option value="Monthly">Monthly</option>
@@ -295,7 +295,7 @@ const TotalSales = () => {
                             onClick={() => setShowCalendar(!showCalendar)}
                         />
                         {showCalendar && (
-                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-lg z-20">
+                            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-xl z-20">
                                 <Calendar
                                     onChange={handleDateChange}
                                     value={
@@ -335,7 +335,7 @@ const TotalSales = () => {
             </div>
 
             {/* ApexChart Component */}
-            <div className="rounded-lg">
+            <div className="rounded-xl">
                 <ApexCharts
                     options={options}
                     series={series}

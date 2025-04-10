@@ -6,6 +6,8 @@ import config from "../../config";
 const CompanyTarget = () => {
     const token = localStorage.getItem("token");
     const bid = localStorage.getItem("branch_id");
+    const userType = "none";
+
     const [staffList, setStaffList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -15,6 +17,12 @@ const CompanyTarget = () => {
     const [membershipCouponTarget, setMembershipCouponTarget] = useState("");
     const [overallTarget, setOverallTarget] = useState("");
     const [staffTargets, setStaffTargets] = useState([]);
+
+    // Month state
+    const [selectedMonth, setSelectedMonth] = useState(() => {
+        const today = new Date();
+        return today.toISOString().slice(0, 7); // format: YYYY-MM
+    });
 
     // Fetch staff data
     const fetchStaffData = async () => {
@@ -58,22 +66,18 @@ const CompanyTarget = () => {
         if (!staffTargetsStr || typeof staffTargetsStr !== "string") return [];
 
         try {
-            // First, fix the malformed JSON string
             let fixedStr = staffTargetsStr
-                .replace(/'/g, '"') // Replace single quotes
-                .replace(/([a-zA-Z0-9_]+):/g, '"$1":') // Add quotes around keys
-                .replace(/"s\s*taff"/g, '"staff"') // Fix truncated keys
+                .replace(/'/g, '"')
+                .replace(/([a-zA-Z0-9_]+):/g, '"$1":')
+                .replace(/"s\s*taff"/g, '"staff"')
                 .replace(/"commis\s*sion_cap"/g, '"commission_cap"');
 
-            // If the string is truncated, try to complete it
             if (!fixedStr.endsWith("]")) {
-                // Find the last complete object
                 const lastCompleteIndex = fixedStr.lastIndexOf("}");
                 if (lastCompleteIndex > 0) {
                     fixedStr =
                         fixedStr.substring(0, lastCompleteIndex + 1) + "]";
                 } else {
-                    // If no complete object found, return empty array
                     return [];
                 }
             }
@@ -84,12 +88,17 @@ const CompanyTarget = () => {
             return [];
         }
     };
+    const [date, setDate] = useState(new Date());
 
-    // Fetch existing sales targets
+    const formatMonth = (date) => String(date.getMonth() + 1).padStart(2, "0");
+    const formatYear = (date) => date.getFullYear();
+    const year = formatYear(date);
+    const month = formatMonth(date);
+
     const fetchSalesTargets = async () => {
         try {
             const response = await fetch(
-                `${config.apiUrl}/api/swalook/sales-targets/?branch_name=${bid}`,
+                `${config.apiUrl}/api/swalook/sales-targets/?branch_name=${bid}&type=${userType}&year=${year}&month=${month}`,
                 {
                     method: "GET",
                     headers: {
@@ -125,14 +134,11 @@ const CompanyTarget = () => {
         const initializeData = async () => {
             setIsLoading(true);
 
-            // Fetch staff data first
             const staffData = await fetchStaffData();
             setStaffList(staffData);
 
-            // Then fetch existing targets
             const targetsData = await fetchSalesTargets();
 
-            // Create a map of existing targets for quick lookup
             const targetsMap = {};
             if (targetsData?.staff_targets?.length) {
                 targetsData.staff_targets.forEach((target) => {
@@ -145,7 +151,6 @@ const CompanyTarget = () => {
                 });
             }
 
-            // Initialize targets for ALL staff members
             const updatedStaffTargets = staffData.map((staff) => ({
                 id: staff.id,
                 staff: staff.id,
@@ -155,7 +160,6 @@ const CompanyTarget = () => {
 
             setStaffTargets(updatedStaffTargets);
 
-            // Set other targets if they exist
             if (targetsData) {
                 setServiceTarget(targetsData.service_target || "");
                 setProductTarget(targetsData.product_target || "");
@@ -171,7 +175,6 @@ const CompanyTarget = () => {
         initializeData();
     }, [bid, token]);
 
-    // Calculate overall target
     useEffect(() => {
         const total =
             Number(serviceTarget || 0) +
@@ -180,18 +183,18 @@ const CompanyTarget = () => {
         setOverallTarget(total);
     }, [serviceTarget, productTarget, membershipCouponTarget]);
 
-    // Handle staff target changes
     const handleStaffTargetChange = (index, field, value) => {
         const updatedStaffTargets = [...staffTargets];
         updatedStaffTargets[index][field] = value;
         setStaffTargets(updatedStaffTargets);
     };
 
-    // Save all targets
     const handleSave = async (e) => {
         e.preventDefault();
 
         const payload = {
+            year: Number(selectedMonth.split("-")[0]),
+            month: Number(selectedMonth.split("-")[1]),
             service_target: serviceTarget || null,
             product_target: productTarget || null,
             membership_coupon_target: membershipCouponTarget || null,
@@ -245,11 +248,25 @@ const CompanyTarget = () => {
             <VertNav />
             <div className="max-h-screen mx-auto p-6 bg-gray-50 md:ml-72">
                 <form onSubmit={handleSave}>
-                    <h2 className="text-2xl font-bold text-gray-800 text-left mb-6">
-                        Sales Target Settings
-                    </h2>
-
-                    <div className="bg-white shadow-sm rounded-lg">
+                    <div className="bg-white shadow-sm rounded-[2.5rem] p-10">
+                        <div className="flex justify-between p-4">
+                            <h2 className="text-2xl font-bold text-gray-800 text-left mb-6">
+                                Sales Target Settings
+                            </h2>
+                            <div className="flex justify-end mb-4">
+                                <label className="text-gray-700 font-medium mr-2 self-center">
+                                    Set Target For:
+                                </label>
+                                <input
+                                    type="month"
+                                    value={selectedMonth}
+                                    onChange={(e) =>
+                                        setSelectedMonth(e.target.value)
+                                    }
+                                    className="border border-gray-300 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
                         {/* Main Targets */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-center">
                             {/* Service Target */}
@@ -260,7 +277,7 @@ const CompanyTarget = () => {
                                 </h3>
                                 <input
                                     type="number"
-                                    className="border border-gray-300 rounded-lg p-2 w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                    className="border border-gray-300 rounded-full p-2 w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                     value={serviceTarget}
                                     onChange={(e) =>
                                         setServiceTarget(e.target.value)
@@ -277,7 +294,7 @@ const CompanyTarget = () => {
                                 </h3>
                                 <input
                                     type="number"
-                                    className="border border-gray-300 rounded-lg p-2 w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                    className="border border-gray-300 rounded-full p-2 w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                     value={productTarget}
                                     onChange={(e) =>
                                         setProductTarget(e.target.value)
@@ -293,7 +310,7 @@ const CompanyTarget = () => {
                                 </h3>
                                 <input
                                     type="number"
-                                    className="border border-gray-300 rounded-lg p-2 w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                    className="border border-gray-300 rounded-full p-2 w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                     value={membershipCouponTarget}
                                     onChange={(e) =>
                                         setMembershipCouponTarget(
@@ -312,7 +329,7 @@ const CompanyTarget = () => {
                             </h3>
                             <input
                                 type="number"
-                                className="border border-gray-300 rounded-lg p-2 w-full md:w-1/3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                className="border border-gray-300 rounded-full p-2 w-full md:w-1/3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                 value={overallTarget}
                                 readOnly
                             />
@@ -354,7 +371,7 @@ const CompanyTarget = () => {
                                                 <td className="border px-4 py-2">
                                                     <input
                                                         type="number"
-                                                        className="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                                        className="border border-gray-300 rounded-full p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                                         value={
                                                             staffTarget.target
                                                         }
@@ -372,7 +389,7 @@ const CompanyTarget = () => {
                                                 <td className="border px-4 py-2">
                                                     <input
                                                         type="number"
-                                                        className="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                                        className="border border-gray-300 rounded-full p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                                         value={
                                                             staffTarget.commissionCap
                                                         }
@@ -399,7 +416,7 @@ const CompanyTarget = () => {
                     <div className="text-center mt-8">
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white py-2 px-8 rounded hover:bg-blue-700 transition duration-200"
+                            className="bg-blue-600 text-white py-2 px-8 rounded-full hover:bg-blue-700 transition duration-200"
                         >
                             Save Settings
                         </button>

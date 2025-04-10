@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Multiselect from "multiselect-react-dropdown";
 import Header from "../Header";
 import VertNav from "../VertNav";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaTrash } from "react-icons/fa";
 import AdminPanelSettingsIcon from "@mui/icons-material/PeopleOutlined";
 import Popup from "../Popup";
 import { Helmet } from "react-helmet";
@@ -529,7 +529,7 @@ function Appointment() {
                 <VertNav />
                 <div className=" bg-gray-100 min-h-[150vh] md:ml-72 p-10">
                     {userExists ? (
-                        <div className="bg-white shadow-md px-4 py-8 mb-10 rounded-lg  grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-white shadow-md px-4 py-8 mb-10 rounded-[2.5rem]  grid grid-cols-1 md:grid-cols-4 gap-4">
                             {customerId && (
                                 <>
                                     <div className="text-center">
@@ -572,7 +572,7 @@ function Appointment() {
 
                     {isPopupVisible && (
                         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-                            <div className="bg-white rounded-lg shadow-lg p-6 w-4/5 md:w-1/2">
+                            <div className="bg-white rounded-[2.5rem] shadow-lg p-6 w-4/5 md:w-1/2">
                                 <div className="flex flex-row justify-between mb-4">
                                     <h2 className="text-2xl font-bold">
                                         Customer Appointment Data
@@ -701,7 +701,7 @@ function Appointment() {
 
                     {/* Appointment Form Section */}
 
-                    <div className=" bg-white rounded-lg shadow-md p-10 mb-10">
+                    <div className=" bg-white rounded-[2.5rem] shadow-md p-10 mb-10">
                         <div className="flex flex-row justify-between">
                             <h2 className="appnt-heading font-bold text-2xl">
                                 Appointment
@@ -725,7 +725,7 @@ function Appointment() {
                                     <div className="grid sm:grid-cols-2 md:grid-cols-3  mt-4">
                                         <input
                                             type="number"
-                                            className="text-black border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                                            className="text-black border border-[#CFD3D4] rounded-full m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                                             placeholder="Phone Number"
                                             required
                                             // onBlur={handlePhoneBlur}
@@ -740,7 +740,7 @@ function Appointment() {
                                         />
                                         <input
                                             type="text"
-                                            className="text-black border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                                            className="text-black border border-[#CFD3D4] rounded-full m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                                             placeholder="Full Name"
                                             value={customerName}
                                             required
@@ -750,7 +750,7 @@ function Appointment() {
                                         />
                                         <input
                                             type="email"
-                                            className="text-black border border-[#CFD3D4] rounded-lg m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                                            className="text-black border border-[#CFD3D4] rounded-full m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
                                             placeholder="Email Address"
                                             value={email}
                                             readOnly={userExists} // Read-only for existing user
@@ -761,13 +761,13 @@ function Appointment() {
                                     </div>
                                     <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-4">
                                         <div className="flex flex-col">
-                                            <span className="font-semibold items-start flex mb-4">
+                                            <span className="font-semibold items-start flex mx-4 mb-4">
                                                 Date Of Birth
                                             </span>
                                             <input
                                                 type="date"
                                                 id="date_input_field"
-                                                className="text-black col-span-1 font-semibold placeholder-gray-400"
+                                                className="text-black rounded-full col-span-1 font-semibold placeholder-gray-400"
                                                 max={
                                                     new Date()
                                                         .toISOString()
@@ -784,13 +784,13 @@ function Appointment() {
                                             />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="font-semibold items-start flex mb-4">
+                                            <span className="font-semibold items-start flex mx-4 mb-4">
                                                 Date Of Anniversary
                                             </span>
                                             <input
                                                 type="date"
                                                 id="date_input_field"
-                                                className="text-black col-span-1 font-semibold placeholder-gray-400"
+                                                className="text-black rounded-full col-span-1 font-semibold placeholder-gray-400"
                                                 max={
                                                     new Date()
                                                         .toISOString()
@@ -810,25 +810,96 @@ function Appointment() {
                                 </div>
                             </div>
 
-                            <div className="mb-4">
-                                <h3 className="text-xl font-bold flex mb-4">
-                                    Select Services:
-                                </h3>
-                                <button
-                                    type="button"
-                                    className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition duration-300"
-                                    onClick={() => {
-                                        setServiceModalOpen(true); // Open the modal
-                                        fetchServiceCategoryData(); // Fetch category data
-                                    }}
-                                    required
-                                >
-                                    Add Services
-                                </button>
+                            <div className="flex flex-col">
+                                <div className="mb-4">
+                                    <h3 className="text-xl font-bold flex mb-4">
+                                        Select Services:
+                                    </h3>
+                                    <button
+                                        type="button"
+                                        className="px-6 py-2 border-2 border-blue-500 text-blue-500 font-semibold rounded-full hover:bg-blue-500 hover:text-white transition duration-300"
+                                        onClick={() => {
+                                            setServiceModalOpen(true); // Open the modal
+                                            fetchServiceCategoryData(); // Fetch category data
+                                        }}
+                                        required
+                                    >
+                                        Add Services
+                                    </button>
+                                </div>
+                                {selectedList.length > 0 && (
+                                    <div className=" w-1/2   my-6">
+                                        <h3 className="text-xl font-bold mb-4">
+                                            Selected Services
+                                        </h3>
+                                        <div className="overflow-x-auto p-6 ">
+                                            <table className="w-full border border-gray-300 rounded-[2.5rem]">
+                                                <thead className="rounded-[2.5rem]">
+                                                    <tr className="bg-gray-200 text-left rounded-[2.5rem]">
+                                                        <th className="px-4 py-2">
+                                                            S.No
+                                                        </th>
+                                                        <th className="px-4 py-2">
+                                                            Service Name
+                                                        </th>
+                                                        <th className="px-4 py-2">
+                                                            Price
+                                                        </th>
+                                                        <th className="px-4 py-2">
+                                                            Actions
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="rounded-[2.5rem]">
+                                                    {selectedList.map(
+                                                        (service, index) => (
+                                                            <tr
+                                                                key={service.id}
+                                                                className="border-b"
+                                                            >
+                                                                <td className="px-4 py-2">
+                                                                    {index + 1}
+                                                                </td>
+                                                                <td className="px-4 py-2">
+                                                                    {
+                                                                        service.name
+                                                                    }
+                                                                </td>
+                                                                <td className="px-4 py-2 font-semibold">
+                                                                    ₹
+                                                                    {
+                                                                        service.price
+                                                                    }
+                                                                </td>
+                                                                <td className="px-4 py-2">
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            toggleServiceSelection(
+                                                                                service
+                                                                            )
+                                                                        }
+                                                                        className="text-red-500 hover:text-red-700"
+                                                                    >
+                                                                        <FaTrash
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                        />
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
+
                             {isServiceModalOpen && (
                                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                                    <div className="bg-white rounded-xl p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
+                                    <div className="bg-white rounded-[2.5rem] p-6 w-4/5 max-w-4xl overflow-y-auto max-h-[90vh]">
                                         {/* Close Button */}
                                         <div className="flex justify-between items-center mb-4">
                                             <span></span>
@@ -850,7 +921,7 @@ function Appointment() {
                                             <input
                                                 type="text"
                                                 placeholder="Search services or categories..."
-                                                className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/3"
+                                                className="border border-gray-300 rounded-full px-4 py-2 w-full md:w-1/3"
                                                 value={searchQuery}
                                                 onChange={(e) =>
                                                     setSearchQuery(
@@ -894,7 +965,7 @@ function Appointment() {
                                                 (category) => (
                                                     <div
                                                         key={category.key}
-                                                        className="bg-gray-100 p-4 rounded-lg border"
+                                                        className="bg-gray-100 p-4 rounded-[2.5rem] border"
                                                     >
                                                         <h4 className="text-lg font-semibold mb-4">
                                                             {category.value}
@@ -1000,7 +1071,7 @@ function Appointment() {
                                                 </p>
                                                 <button
                                                     type="button"
-                                                    className="bg-blue-500 text-white px-6 py-2 rounded-lg"
+                                                    className="bg-blue-500 text-white px-6 py-2 rounded-full"
                                                     onClick={() => {
                                                         finalizeSelection(
                                                             selectedList
@@ -1019,7 +1090,7 @@ function Appointment() {
                             )}
 
                             <div>
-                                <label className="text-lg text-start font-bold text-gray-800 mb-4 block">
+                                <label className="text-lg text-start font-bold text-gray-800 my-4 block">
                                     To be Served by:
                                 </label>
                                 <select
@@ -1027,7 +1098,7 @@ function Appointment() {
                                     onChange={(e) =>
                                         setServiceBy(e.target.value)
                                     }
-                                    className="sm:w-full md:w-1/4 p-2 border border-gray-300 rounded-lg"
+                                    className="sm:w-full md:w-1/4 p-2 border border-gray-300 rounded-full"
                                 >
                                     <option value="" disabled selected>
                                         Select Served By
@@ -1043,7 +1114,7 @@ function Appointment() {
                             </div>
 
                             <div>
-                                <label className="text-lg text-start font-bold text-gray-800 mb-4 block">
+                                <label className="text-lg text-start font-bold text-gray-800 my-4 block">
                                     Schedule:
                                 </label>
                                 <div className="flex flex-wrap gap-4">
@@ -1053,7 +1124,7 @@ function Appointment() {
                                         onChange={(e) =>
                                             setBookingDate(e.target.value)
                                         }
-                                        className="p-2 border border-gray-300 rounded-lg"
+                                        className="p-2 border border-gray-300 rounded-full"
                                         min={
                                             new Date()
                                                 .toISOString()
@@ -1064,7 +1135,7 @@ function Appointment() {
                                         id="hours"
                                         onChange={handleTimeChange}
                                         value={selectedHour}
-                                        className="p-2 border border-gray-300 rounded-lg"
+                                        className="p-2 border border-gray-300 rounded-full"
                                     >
                                         <option value="" disabled>
                                             Select Hour
@@ -1082,7 +1153,7 @@ function Appointment() {
                                         id="minutes"
                                         onChange={handleTimeChange}
                                         value={selectedMinute}
-                                        className="p-2 border border-gray-300 rounded-lg"
+                                        className="p-2 border border-gray-300 rounded-full"
                                     >
                                         <option value="" disabled>
                                             Select Minutes
@@ -1102,7 +1173,7 @@ function Appointment() {
                                         id="am_pm"
                                         onChange={handleTimeChange}
                                         value={selectedAMPM}
-                                        className="p-2 border border-gray-300 rounded-lg"
+                                        className="p-2 border border-gray-300 rounded-full"
                                     >
                                         <option value="" disabled>
                                             Select AM/PM
@@ -1117,7 +1188,7 @@ function Appointment() {
                             </div>
 
                             <div>
-                                <label className="text-lg text-start font-bold text-gray-800 mb-4 block">
+                                <label className="text-lg text-start font-bold text-gray-800 my-4 block">
                                     Comments:
                                 </label>
                                 <input
@@ -1126,14 +1197,14 @@ function Appointment() {
                                     onChange={(e) =>
                                         setComments(e.target.value)
                                     }
-                                    className="sm:w-full md:w-1/4 h-10 p-3 border border-gray-300 rounded-lg"
+                                    className="sm:w-full md:w-1/4 h-10 p-3 border border-gray-300 rounded-full"
                                 />
                             </div>
 
-                            <div className="flex justify-center">
+                            <div className="flex items-center justify-center m-12 mt-24 ">
                                 <button
                                     type="submit"
-                                    className="px-6 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
+                                    className="px-6 py-2 text-white bg-blue-500 rounded-[2.5rem] hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
                                     disabled={bookAppointment}
                                 >
                                     {bookAppointment ? (
