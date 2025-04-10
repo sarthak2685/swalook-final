@@ -1666,109 +1666,82 @@ function Invoice() {
         </tr>
       );
     })}
-                  {productDetails.length > 0 && (
-                    <>
-                      <tr
-                        style={{
-                          border: "1px solid #787871",
-                          padding: "3px",
-                          backgroundColor: "#fff",
-                        }}
-                      >
-                        <td scope="col" style={{ textAlign: "center" }}>
-                          3
-                        </td>
-                        <td
-                          scope="col"
-                          className="text-center"
-                          style={{ textAlign: "center" }}
-                        >
-                          {productDetails[0].name}
-                        </td>
-                        <td
-                          scope="col"
-                          className="text-center"
-                          style={{ textAlign: "center" }}
-                        >
-                          <input
-                            type="number"
-                            className="editable-field"
-                            value={productDetails[0].price}
-                            readOnly
-                          />
-                        </td>
-                        <td
-                          scope="col"
-                          className="text-center"
-                          style={{ textAlign: "center" }}
-                        >
-                          {productDetails[0].quantity}
-                        </td>
-                        <td
-                          scope="col"
-                          className="text-center"
-                          style={{ textAlign: "center" }}
-                        >
-                          0
-                        </td>
-                        {isGST || isMemGst || isCouponGst ? (
-                          <>
-                            <td
-                              scope="col"
-                              className="text-center"
-                              style={{ textAlign: "center" }}
-                            >
-                              {productDetails[0].tax}
-                            </td>
-                            <td
-                              scope="col"
-                              className="text-center"
-                              style={{ textAlign: "center" }}
-                            >
-                              {productDetails[0].cgst}
-                            </td>
-                            <td
-                              scope="col"
-                              className="text-center"
-                              style={{ textAlign: "center" }}
-                            >
-                              {productDetails[0].sgst}
-                            </td>
-                          </>
-                        ) : null}
-                        {isGST || membergst ? (
-                          <td
-                            scope="col"
-                            style={{
-                              width: "20%",
-                              color: "black",
-                              textAlign: "center",
-                            }}
-                          >
-                            {(
-                              productDetails[0].total -
-                              productDetails[0].cgst -
-                              productDetails[0].sgst
-                            ).toFixed(2)}
-                          </td>
-                        ) : (
-                          <td
-                            scope="col"
-                            style={{
-                              width: "20%",
-                              color: "black",
-                              textAlign: "center",
-                            }}
-                          >
-                            {productDetails[0].total -
-                              productDetails[0].tax -
-                              productDetails[0].cgst -
-                              productDetails[0].sgst}
-                          </td>
-                        )}
-                      </tr>
-                    </>
-                  )}
+                 {productDetails.length > 0 &&
+  productDetails.map((product, index) => (
+    <tr
+      key={index}
+      style={{
+        border: "1px solid #787871",
+        padding: "3px",
+        backgroundColor: "#fff",
+      }}
+    >
+      <td style={{ textAlign: "center" }}>{index + 1}</td>
+
+      <td className="text-center" style={{ textAlign: "center" }}>
+        {product.name}
+      </td>
+
+      <td className="text-center" style={{ textAlign: "center" }}>
+        <input
+          type="number"
+          className="editable-field"
+          value={product.price}
+          readOnly
+        />
+      </td>
+
+      <td className="text-center" style={{ textAlign: "center" }}>
+        {product.quantity}
+      </td>
+
+      <td className="text-center" style={{ textAlign: "center" }}>
+        0
+      </td>
+
+      {isGST || isMemGst || isCouponGst ? (
+        <>
+          <td className="text-center" style={{ textAlign: "center" }}>
+            {product.tax}
+          </td>
+          <td className="text-center" style={{ textAlign: "center" }}>
+            {product.cgst}
+          </td>
+          <td className="text-center" style={{ textAlign: "center" }}>
+            {product.sgst}
+          </td>
+        </>
+      ) : null}
+
+      {(isGST || membergst) ? (
+        <td
+          style={{
+            width: "20%",
+            color: "black",
+            textAlign: "center",
+          }}
+        >
+          {(product.total - product.cgst - product.sgst).toFixed(2)}
+        </td>
+      ) : (
+        <td
+          style={{
+            width: "20%",
+            color: "black",
+            textAlign: "center",
+          }}
+        >
+          {(
+            product.total -
+            product.tax -
+            product.cgst -
+            product.sgst
+          ).toFixed(2)}
+        </td>
+      )}
+    </tr>
+))}
+
 
                   {/* Total Row */}
                   <tr
