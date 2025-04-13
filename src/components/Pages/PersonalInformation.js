@@ -17,6 +17,10 @@ function PersonalInformation() {
   const no = atob(localStorage.getItem('number'));
   const bid = localStorage.getItem('branch_id');
 
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(P.profile_pic || "");
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -26,7 +30,10 @@ function PersonalInformation() {
             Authorization: `Token ${token}`
           }
         });
-        setPI(response.data.current_user_data);
+        const userData = response.data.current_user_data;
+        setPI(userData);
+        localStorage.setItem("profile_pic", userData.profile_pic);
+        localStorage.setItem("mobile_no", userData.mobile_no);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -46,27 +53,36 @@ function PersonalInformation() {
 
   const handleUpdate = async () => {
     try {
+      const formData = new FormData();
+      formData.append("owner_name", on);
+      formData.append("email", e);
+      formData.append("gst_number", gn);
+      formData.append("pan_number", pn);
+      formData.append("pincode", p);
+      if (logoFile) {
+        formData.append("profile_pic", logoFile); // ✅ append file properly
+      }
+  
+      console.log("Updating profile...", logoFile);
+  
       await axios.put(
         `${config.apiUrl}/api/swalook/edit/profile/?id=${no}`,
-        {
-          owner_name: on,
-          email: e,
-          gst_number: gn,
-          pan_number: pn,
-          pincode: p
-        },
+        formData,
         {
           headers: {
-            Authorization: `Token ${localStorage.getItem('token')}`
-          }
+            Authorization: `Token ${localStorage.getItem("token")}`,
+            // ❌ DO NOT set Content-Type manually when using FormData
+          },
         }
       );
-      alert('Profile updated successfully');
+  
+      alert("Profile updated successfully");
     } catch (err) {
-      console.error(err);
-      alert('Failed to update profile');
+      console.error(err.response?.data || err);
+      alert("Failed to update profile");
     }
   };
+  
 
   return (
     <>
@@ -109,6 +125,29 @@ function PersonalInformation() {
               <label htmlFor="pincode">Pincode:</label>
               <input type="number" value={p} id="pincode" onChange={(e) => setP(e.target.value)} />
             </div>
+            <div className="pi_input_container">
+  <label htmlFor="logoUpload">Salon Logo:</label>
+  <input
+    type="file"
+    accept="image/*"
+    id="logoUpload"
+    onChange={(e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setLogoFile(file);
+        setLogoPreview(URL.createObjectURL(file));
+      }
+    }}
+  />
+  {logoPreview && (
+    <img
+      src={logoPreview}
+      alt="Logo Preview"
+      className="mt-2 rounded border w-24 h-24 object-cover"
+    />
+  )}
+</div>
+
             <div className='pi_up_container'>
               <button className="pi_update_button" onClick={handleUpdate}>Update</button>
             </div>

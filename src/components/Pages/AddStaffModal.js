@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import '../Styles/AddStaffModal.css';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import config from '../../config';
@@ -19,7 +18,6 @@ const AddStaffModal = ({ onClose, onAddStaff }) => {
   const [staffMobile, setStaffMobile] = useState('');
 
   const handleAddStaff = async () => {
-    // Validate required fields
     if (!staffName || !staffRole || !staffSalary || !base || !staffMobile || !joiningDate) {
       toast.error('Please fill in all mandatory fields.');
       return;
@@ -55,180 +53,80 @@ const AddStaffModal = ({ onClose, onAddStaff }) => {
         }
       );
 
-      console.log("Staff added successfully", response.data);
       toast.success("Staff added successfully");
       onAddStaff(newStaff);
       onClose();
     } catch (error) {
-      console.error("Error adding staff", error);
       const errorMessage = error.response?.data?.message || 'Failed to add staff';
       toast.error(errorMessage);
     }
   };
 
+  const Label = ({ children, required }) => (
+    <div className="flex items-center mb-1 text-sm font-medium text-gray-700">
+      {children} {required && <span className="text-black font-bold ml-1">*</span>}
+    </div>
+  );
+
   return (
-    <div className="add-staff-modal-overlay">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
       <Toaster />
-      <div className="add-staff-modal-container">
-        <h2 className="add-staff-modal-title">Add Staff</h2>
-        <form className="add-staff-form">
+      <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto p-6 shadow-lg flex flex-col justify-between">
+        <h2 className="text-2xl font-bold text-center mb-6">Add Staff</h2>
+        <form className="flex flex-col gap-4 flex-grow">
           <label>
-            <div className="label-with-asterisk">
-              Name 
-              <span className="required-asterisk">*</span>
-            </div>
-            <input
-              type="text"
-              value={staffName}
-              onChange={(e) => setStaffName(e.target.value)}
-              required
-              className="full-width-input"
-            />
+            <Label required>Name</Label>
+            <input type="text" value={staffName} onChange={(e) => setStaffName(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md mt-1 focus:outline-none focus:border-blue-500" />
           </label>
           <label>
-            <div className="label-with-asterisk">
-              Role 
-              <span className="required-asterisk">*</span>
-            </div>
-            <input
-              type="text"
-              value={staffRole}
-              onChange={(e) => setStaffRole(e.target.value)}
-              required
-              className="full-width-input"
-            />
+            <Label required>Role</Label>
+            <input type="text" value={staffRole} onChange={(e) => setStaffRole(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md mt-1 focus:outline-none focus:border-blue-500" />
           </label>
           <label>
-            <div className="label-with-asterisk">
-              Mobile No. 
-              <span className="required-asterisk">*</span>
-            </div>
-            <input
-              type="number"
-              value={staffMobile}
-              onChange={(e) => setStaffMobile(e.target.value)}
-              required
-              className="full-width-input"
-            />
+            <Label required>Mobile No.</Label>
+            <input type="number" value={staffMobile} onChange={(e) => setStaffMobile(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md mt-1 focus:outline-none focus:border-blue-500" />
           </label>
           <label>
-            <div className="label-with-asterisk">
-              Salary 
-              <span className="required-asterisk">*</span>
-            </div>
-            <input
-              type="number"
-              value={staffSalary}
-              onChange={(e) => setStaffSalary(e.target.value)}
-              required
-              className="full-width-input"
-            />
+            <Label required>Salary</Label>
+            <input type="number" value={staffSalary} onChange={(e) => setStaffSalary(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md mt-1 focus:outline-none focus:border-blue-500" />
           </label>
 
-          <h3 className="section-title">Earnings</h3>
+          <h3 className="text-lg font-semibold mt-4 text-gray-700">Earnings</h3>
           <label>
-            <div className="label-with-asterisk">
-              Basic Salary (%) 
-              <span className="required-asterisk">*</span>
-            </div>
-            <input
-              type="number"
-              value={base}
-              onChange={(e) => setBase(e.target.value)}
-              required
-              className="full-width-input"
-            />
+            <Label required>Basic Salary (%)</Label>
+            <input type="number" value={base} onChange={(e) => setBase(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md mt-1 focus:outline-none focus:border-blue-500" />
           </label>
           <label>
-            <div className="label-with-asterisk">
-              House Rent Allowance (HRA) (%) 
-            </div>
-            <input
-              type="number"
-              value={houseRentAllowance}
-              onChange={(e) => setHouseRentAllowance(e.target.value)}
-              className="full-width-input"
-            />
+            <Label>House Rent Allowance (HRA) (%)</Label>
+            <input type="number" value={houseRentAllowance} onChange={(e) => setHouseRentAllowance(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md mt-1" />
           </label>
           <label>
-            <div className="label-with-asterisk">
-              Incentive Pay (%) 
-            </div>
-            <input
-              type="number"
-              value={incentivePay}
-              onChange={(e) => setIncentivePay(e.target.value)}
-              className="full-width-input"
-            />
+            <Label>Incentive Pay (%)</Label>
+            <input type="number" value={incentivePay} onChange={(e) => setIncentivePay(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md mt-1" />
           </label>
           <label>
-            <div className="label-with-asterisk">
-              Meal Allowance (Decimal) 
-            </div>
-            <input
-              type="number"
-              step="0.01"
-              value={mealAllowance}
-              onChange={(e) => setMealAllowance(e.target.value)}
-              className="full-width-input"
-            />
+            <Label>Meal Allowance (Decimal)</Label>
+            <input type="number" step="0.01" value={mealAllowance} onChange={(e) => setMealAllowance(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md mt-1" />
           </label>
 
-          <h3 className="section-title">Deductions</h3>
+          <h3 className="text-lg font-semibold mt-4 text-gray-700">Deductions</h3>
           <label>
-            <div className="label-with-asterisk">
-              Provident Fund (Decimal) 
-            </div>
-            <input
-              type="number"
-              step="0.01"
-              value={providentFund}
-              onChange={(e) => setProvidentFund(e.target.value)}
-              className="full-width-input"
-            />
+            <Label>Provident Fund (Decimal)</Label>
+            <input type="number" step="0.01" value={providentFund} onChange={(e) => setProvidentFund(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md mt-1" />
           </label>
           <label>
-            <div className="label-with-asterisk">
-              Professional Tax (Decimal) 
-            </div>
-            <input
-              type="number"
-              step="0.01"
-              value={professionalTax}
-              onChange={(e) => setProfessionalTax(e.target.value)}
-              className="full-width-input"
-            />
+            <Label>Professional Tax (Decimal)</Label>
+            <input type="number" step="0.01" value={professionalTax} onChange={(e) => setProfessionalTax(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md mt-1" />
           </label>
 
           <label>
-            <div className="label-with-asterisk">
-              Joining Date 
-              <span className="required-asterisk">*</span>
-            </div>
-            <input
-              type="date"
-              value={joiningDate}
-              onChange={(e) => setJoiningDate(e.target.value)}
-              required
-              className="full-width-input"
-            />
+            <Label required>Joining Date</Label>
+            <input type="date" value={joiningDate} onChange={(e) => setJoiningDate(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-md mt-1 focus:outline-none focus:border-blue-500" />
           </label>
 
-          <div className="add-staff-button-group">
-            <button
-              type="button"
-              className="add-staff-submit-button"
-              onClick={handleAddStaff}
-            >
-              Add Staff
-            </button>
-            <button
-              type="button"
-              className="add-staff-cancel-button"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
+          <div className="flex justify-between mt-6">
+            <button type="button" onClick={handleAddStaff} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-[48%]">Add Staff</button>
+            <button type="button" onClick={onClose} className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 w-[48%]">Cancel</button>
           </div>
         </form>
       </div>

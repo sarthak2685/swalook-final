@@ -1169,7 +1169,6 @@ const [productDiscounts, setProductDiscounts] = useState([]);
   );
 })};
 
-            {/* Product Rows */}
             {productDetails.map((product, index) => (
               <View style={styles.tableRow} key={index}>
                 <Text style={[styles.tableCell, { width: "10%" }]}>
