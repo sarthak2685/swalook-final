@@ -66,15 +66,11 @@ function Invoice() {
   const services = location.state.GBselectedServices;
   const product = location.state.productData;
   console.log("product ho tum", product)
-  {
-    services.map((service, index) =>
-      console.log("services", service, service.name, service.category)
-    );
-  }
-  console.log("anaf",services)
+  
+  // console.log("anaf",services)
   const isGST = services.length > 0 && services[0].gst === "Exclusive";
 
-  console.log("servicessdklfjjka", isGST)
+  // console.log("servicessdklfjjka", isGST)
 
   const address = location.state.address;
   const service_by = location.state.GBselectedServices;
@@ -85,7 +81,7 @@ function Invoice() {
   const payment_mode = location.state.paymentModes;
   const membership_points = location.state.deductedPoints || 0;
   const coupon_points = location.state.valueDeductedPoints || 0;
-  console.log("payment mode", membership_points,coupon_points);
+  // console.log("payment mode", membership_points,coupon_points);
   const sname = localStorage.getItem("s-name");
   const [deductedPoint, setDeductedPoint] = useState(0);
 
@@ -100,7 +96,7 @@ function Invoice() {
 
   const token = localStorage.getItem("token");
   const coupon = location.state.selectedCoupons;
-  console.log("coupon", coupon)
+  // console.log("coupon", coupon)
 
   const [discounts, setDiscounts] = useState(
     Array(services.length).fill(discount)
@@ -132,7 +128,7 @@ function Invoice() {
   ); // Default to empty array if not set
 
   const filteredProducts = product.map(({ staff, ...rest }) => rest);
-
+const [productDiscounts, setProductDiscounts] = useState([]);
 
   const staffNames = service_by
     .map(
@@ -140,7 +136,7 @@ function Invoice() {
     )
     .flat();
 
-  console.log("staff name", staffNames);
+  // console.log("staff name", staffNames);
 
   const GST_RATE = 0.18; // 18% GST
   const CGST_RATE = GST_RATE / 2; // 9% CGST
@@ -158,10 +154,13 @@ function Invoice() {
 
   const apipoint = `${config.apiUrl}/api/swalook/inventory/product/?branch_name=${bid}`;
 
+  const [rawProductData, setRawProductData] = useState([]);
+  
+  // 1. Fetch product data from API
   useEffect(() => {
     const fetchProductData = async () => {
-      const token = localStorage.getItem("token"); // Ensure token is defined
-
+      const token = localStorage.getItem("token");
+  
       try {
         const response = await axios.get(apipoint, {
           headers: {
@@ -169,49 +168,11 @@ function Invoice() {
             Authorization: `Token ${token}`,
           },
         });
-
-        console.log("API Response", response.data); // Log API response
-
-        const productDatas = response.data.data;
-        console.log("ProductDatas", productDatas); // Log productDatas
-
+  
+        const productDatas = response?.data?.data || [];
+  
         if (Array.isArray(productDatas)) {
-          const selectedProductDetails = producData
-            .map((pd) => {
-              const product = productDatas.find((p) => p.id === pd.id);
-              if (product) {
-                // Ensure price and quantity are numbers
-                const price = Number(product.product_price) || 0;
-                const quantity = Number(pd.quantity) || 0;
-                const tax = Number(calculateTax(price)) || 0;
-                const cgst = Number(calculateCGST(price)) || 0;
-                const sgst = Number(calculateSGST(price)) || 0;
-
-                // Log values for debugging
-                console.log(
-                  `Price: ${price}, Quantity: ${quantity}, Tax: ${tax}, CGST: ${cgst}, SGST: ${sgst}`
-                );
-
-                // Calculate total
-                const total = price * quantity + tax + cgst + sgst;
-                console.log(`Calculated Total Before Rounding: ${total}`);
-
-                return {
-                  name: product.product_name,
-                  price: roundToTwoDecimals(price),
-                  quantity,
-                  tax: roundToTwoDecimals(tax),
-                  cgst: roundToTwoDecimals(cgst),
-                  sgst: roundToTwoDecimals(sgst),
-                  total: roundToTwoDecimals(total), // Use rounded total
-                };
-              }
-              return null;
-            })
-            .filter((product) => product !== null);
-
-          console.log("Selected Product Details", selectedProductDetails); // Log selectedProductDetails
-          setProductDetails(selectedProductDetails);
+          setRawProductData(productDatas); // 👈 Store raw product data
         } else {
           console.error("Unexpected response format:", response.data);
         }
@@ -219,9 +180,45 @@ function Invoice() {
         console.error("Error fetching product data:", error);
       }
     };
-
+  
     fetchProductData();
-  }, [apipoint, producData]); // Removed token from dependencies as it’s defined inside useEffect
+  }, [apipoint]);
+  
+  // 2. Recalculate product details whenever productDiscounts or producData changes
+  useEffect(() => {
+    const updatedDetails = producData
+      .map((pd, index) => {
+        const product = rawProductData.find((p) => p.id === pd.id);
+        if (product) {
+          const price = Number(product.product_price) || 0;
+          const quantity = Number(pd.quantity) || 0;
+          const tax = Number(calculateTax(price)) || 0;
+          const cgst = Number(calculateCGST(price)) || 0;
+          const sgst = Number(calculateSGST(price)) || 0;
+          const Discounts = productDiscounts[index] || 0;
+  
+          const total = price * quantity + tax + cgst + sgst;
+  
+          return {
+            name: product.product_name,
+            price: roundToTwoDecimals(price),
+            quantity,
+            Discounts,
+            tax: roundToTwoDecimals(tax),
+            cgst: roundToTwoDecimals(cgst),
+            sgst: roundToTwoDecimals(sgst),
+            total: roundToTwoDecimals(total),
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+      console.log("productDetails", updatedDetails);
+
+  
+    setProductDetails(updatedDetails); // ✅ always reflects latest discounts
+  }, [rawProductData, producData, productDiscounts]);
+   // Removed token from dependencies as it’s defined inside useEffect
 
   // Add dependencies for useEffect
 
@@ -263,7 +260,7 @@ function Invoice() {
     return acc + (coupon.coupon_price || 0);
   }, 0);
 
-  console.log("kjfdsfhsj", coupon_tax)
+  // console.log("kjfdsfhsj", coupon_tax)
   // const couponCGST = 0
   // const couponTotal = 0;
   // const couponSGST = 0;
@@ -272,7 +269,7 @@ function Invoice() {
   //    couponSGST = couponPrice * SGST_RATE;
   //   couponTax = couponCGST + couponSGST;
   //   couponTotal = couponPrice + couponTax;
-  //   // console.log("sahil",membershipSGST,membershipCGST);
+  //   // // console.log("sahil",membershipSGST,membershipCGST);
   // }
 
 
@@ -328,7 +325,7 @@ function Invoice() {
         sgstValue = 0;
         totalAmt = amountBeforeTax;
       }
-      console.log("dvkdbv", totalAmt);
+      // console.log("dvkdbv", totalAmt);
       // Total amount includes base price + tax if applicable
       return {
         taxAmount: parseFloat(taxAmount.toFixed(2)),
@@ -349,7 +346,7 @@ function Invoice() {
       const membershipSGST = Memebrship.price * SGST_RATE;
       membershipTax = membershipCGST + membershipSGST;
       membershipTotal = Memebrship.price + membershipTax;
-      // console.log("sahil",membershipSGST,membershipCGST);
+      // // console.log("sahil",membershipSGST,membershipCGST);
     }
     // Aggregate totals for services and products
     const totalServicePrices = prices.reduce(
@@ -368,7 +365,7 @@ function Invoice() {
 
     // Calculate totals for products
     const totalProductPrices = productDetails.reduce(
-      (acc, product) => acc + product.price * product.quantity,
+      (acc, product,index) => acc + product.price * product.quantity,
       0
     );
     const totalProductQuantity = productDetails.reduce(
@@ -398,7 +395,7 @@ function Invoice() {
       (acc, { totalAmt }) => acc + totalAmt,
       0
     );
-    console.log("false", isGST, isMemGst, isCouponGst)
+    // console.log("false", isGST, isMemGst, isCouponGst)
 
     // Product totals
     const totalProductTax = updatedProductTaxes.reduce(
@@ -413,11 +410,19 @@ function Invoice() {
       (acc, { sgstValue }) => acc + sgstValue,
       0
     );
-    const totalProductGrandTotal = updatedProductTaxes.reduce(
-      (acc, { totalAmt }) => acc + totalAmt,
-      0
-    );
-
+    const totalProductGrandTotal = updatedProductTaxes
+    .map((item, i) => {
+      const discount = productDiscounts[i] || 0;
+      return item.totalAmt - discount;
+    })
+    .reduce((acc, val) => acc + val, 0);
+  
+  
+    const productDiscount = Array.isArray(productDiscounts)
+    ? productDiscounts.reduce((acc, d) => acc + (parseFloat(d) || 0), 0)
+    : 0;
+  
+    
     // Final totals including membership
     const finalTotalPrice =
       totalServicePrices + totalProductPrices + membershipPrice + totalCouponPrice;
@@ -427,7 +432,7 @@ function Invoice() {
     // Update states
     setTotalPrice(finalTotalPrice.toFixed(2));
     setTotalQuantity(totalQuantity); // Updated with membership quantity
-    setTotalDiscount(totalServiceDiscount);
+    setTotalDiscount(totalServiceDiscount + productDiscount);
     setTotalTax((totalServiceTax + totalProductTax + membershipTax + totalCouponTax).toFixed(2));
     setTotalCGST((totalServiceCGST + totalProductCGST + coupon_tax).toFixed(2));
     setTotalSGST((totalServiceSGST + totalProductSGST + coupon_tax).toFixed(2));
@@ -481,6 +486,31 @@ function Invoice() {
     newDiscounts[index] = discountValue;
     setDiscounts(newDiscounts);
   };
+  const handleDiscountProduct = (index, value) => {
+    const discountValue = value === null || value === undefined ? 0 : parseFloat(value);
+  
+    setProductDiscounts(prevDiscounts => {
+      const newDiscounts = [...prevDiscounts];
+  
+      // Fill missing indexes with 0
+      while (newDiscounts.length <= index) {
+        newDiscounts.push(0);
+      }
+  
+      newDiscounts[index] = discountValue;
+      console.log("newDiscounts", newDiscounts);
+  
+      return newDiscounts; 
+    });
+  };
+  
+  
+  
+  console.log("productDiscounts", productDiscounts);
+  
+  
+  
+  
 
   const handleTaxBlur = (index, value) => {
     const newTaxes = [...taxes];
@@ -564,7 +594,7 @@ function Invoice() {
       })),
       // ...productDetails.map((product, index) => {
       //   const adjustedIndex = index + services.length;
-      //   console.log("producttttttttt", product);
+      //   // console.log("producttttttttt", product);
 
       //   if (isGST) {
       //     return {
@@ -631,7 +661,7 @@ function Invoice() {
     });
     
     // Now, you have two separate arrays: serviceInvoice and productInvoice
-    console.log("Product Invoice:", productInvoice,productDetails);
+    // console.log("Product Invoice:", productInvoice,productDetails);
     setInvoice(newInvoice);
 
    
@@ -700,7 +730,7 @@ function Invoice() {
     }
   };
 
-  console.log("service", service_by);
+  // console.log("service", service_by);
 
   const [getInvoiceId, setInvoiceId] = useState(invoiceId);
 
@@ -723,7 +753,7 @@ function Invoice() {
     sgsts = Memebrship.price * SGST_RATE;
     membershipTax = cgsts + sgsts;
     membershipTotal = Memebrship.price + membershipTax;
-    console.log("shjbfhbhgbefbehjbfhjdb", cgsts, sgsts);
+    // console.log("shjbfhbhgbefbehjbfhjdb", cgsts, sgsts);
   }
 
   // const handlePrint = async () => {
@@ -795,7 +825,7 @@ function Invoice() {
           },
         }
       );
-      console.log("PDF saved successfully", response.data);
+      // console.log("PDF saved successfully", response.data);
     } catch (error) {
       console.error("Error saving PDF:", error);
     }
@@ -1139,7 +1169,6 @@ function Invoice() {
   );
 })};
 
-            {/* Product Rows */}
             {productDetails.map((product, index) => (
               <View style={styles.tableRow} key={index}>
                 <Text style={[styles.tableCell, { width: "10%" }]}>
@@ -1154,7 +1183,7 @@ function Invoice() {
                 <Text style={[styles.tableCell, { width: "10%" }]}>
                   {product.quantity}
                 </Text>
-                <Text style={[styles.tableCell, { width: "10%" }]}>0</Text>
+                <Text style={[styles.tableCell, { width: "10%" }]}>{product.Discounts}</Text>
                 {isGST || isMemGst || isCouponGst && (
                   <>
                     <Text style={[styles.tableCell, { width: "10%" }]}>
@@ -1245,7 +1274,7 @@ function Invoice() {
 
       if (blob) {
         // If the blob is created successfully, download it
-        console.log("PDF Blob:", blob);
+        // console.log("PDF Blob:", blob);
         saveAs(blob, `Invoice-${invoiceData.getInvoiceId}.pdf`);
         const pdfRef = ref(
           storage,
@@ -1524,7 +1553,6 @@ function Invoice() {
                       >
                         0
                       </td>{" "}
-                      {/* Discount is always 0 */}
                       {isGST || isMemGst || isCouponGst ? (
                         <>
                           <td
@@ -1666,109 +1694,97 @@ function Invoice() {
         </tr>
       );
     })}
-                  {productDetails.length > 0 && (
-                    <>
-                      <tr
-                        style={{
-                          border: "1px solid #787871",
-                          padding: "3px",
-                          backgroundColor: "#fff",
-                        }}
-                      >
-                        <td scope="col" style={{ textAlign: "center" }}>
-                          3
-                        </td>
-                        <td
-                          scope="col"
-                          className="text-center"
-                          style={{ textAlign: "center" }}
-                        >
-                          {productDetails[0].name}
-                        </td>
-                        <td
-                          scope="col"
-                          className="text-center"
-                          style={{ textAlign: "center" }}
-                        >
-                          <input
-                            type="number"
-                            className="editable-field"
-                            value={productDetails[0].price}
-                            readOnly
-                          />
-                        </td>
-                        <td
-                          scope="col"
-                          className="text-center"
-                          style={{ textAlign: "center" }}
-                        >
-                          {productDetails[0].quantity}
-                        </td>
-                        <td
-                          scope="col"
-                          className="text-center"
-                          style={{ textAlign: "center" }}
-                        >
-                          0
-                        </td>
-                        {isGST || isMemGst || isCouponGst ? (
-                          <>
-                            <td
-                              scope="col"
-                              className="text-center"
-                              style={{ textAlign: "center" }}
-                            >
-                              {productDetails[0].tax}
-                            </td>
-                            <td
-                              scope="col"
-                              className="text-center"
-                              style={{ textAlign: "center" }}
-                            >
-                              {productDetails[0].cgst}
-                            </td>
-                            <td
-                              scope="col"
-                              className="text-center"
-                              style={{ textAlign: "center" }}
-                            >
-                              {productDetails[0].sgst}
-                            </td>
-                          </>
-                        ) : null}
-                        {isGST || membergst ? (
-                          <td
-                            scope="col"
-                            style={{
-                              width: "20%",
-                              color: "black",
-                              textAlign: "center",
-                            }}
-                          >
-                            {(
-                              productDetails[0].total -
-                              productDetails[0].cgst -
-                              productDetails[0].sgst
-                            ).toFixed(2)}
-                          </td>
-                        ) : (
-                          <td
-                            scope="col"
-                            style={{
-                              width: "20%",
-                              color: "black",
-                              textAlign: "center",
-                            }}
-                          >
-                            {productDetails[0].total -
-                              productDetails[0].tax -
-                              productDetails[0].cgst -
-                              productDetails[0].sgst}
-                          </td>
-                        )}
-                      </tr>
-                    </>
-                  )}
+                 {productDetails.length > 0 &&
+  productDetails.map((product, index) => (
+    <tr
+      key={index}
+      style={{
+        border: "1px solid #787871",
+        padding: "3px",
+        backgroundColor: "#fff",
+      }}
+    >
+      <td style={{ textAlign: "center" }}>{index + 1}</td>
+
+      <td className="text-center" style={{ textAlign: "center" }}>
+        {product.name}
+      </td>
+
+      <td className="text-center" style={{ textAlign: "center" }}>
+        <input
+          type="number"
+          className="editable-field"
+          value={product.price}
+          readOnly
+        />
+      </td>
+
+      <td className="text-center" style={{ textAlign: "center" }}>
+        {product.quantity}
+      </td>
+      <td className="text-center" style={{ textAlign: "center" }}>
+
+      <input
+                          type="number"
+                          className="editable-field"
+                          id={`discount_input_${index}`}
+                          defaultValue={
+                            discounts[index] === null ||
+                            discounts[index] === undefined
+                              ? 0
+                              : discounts[index]
+                          }
+                          onBlur={(e) =>
+                            handleDiscountProduct(index, e.target.value)
+                          }
+                        />
+
+
+</td>
+
+      {isGST || isMemGst || isCouponGst ? (
+        <>
+          <td className="text-center" style={{ textAlign: "center" }}>
+            {product.tax}
+          </td>
+          <td className="text-center" style={{ textAlign: "center" }}>
+            {product.cgst}
+          </td>
+          <td className="text-center" style={{ textAlign: "center" }}>
+            {product.sgst}
+          </td>
+        </>
+      ) : null}
+
+      {(isGST || membergst) ? (
+        <td
+          style={{
+            width: "20%",
+            color: "black",
+            textAlign: "center",
+          }}
+        >
+          {(product.total - product.cgst - product.sgst).toFixed(2)}
+        </td>
+      ) : (
+        <td
+          style={{
+            width: "20%",
+            color: "black",
+            textAlign: "center",
+          }}
+        >
+          {(
+            product.total -
+            product.tax -
+            product.cgst -
+            product.sgst
+          ).toFixed(2)}
+        </td>
+      )}
+    </tr>
+))}
+
 
                   {/* Total Row */}
                   <tr

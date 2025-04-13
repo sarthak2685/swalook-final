@@ -43,6 +43,8 @@ import Inquiries from "./components/Pages/Inquery/Inquires.jsx";
 import NewInquiry from "./components/Pages/Inquery/NewInquiry.jsx";
 import CompanyTarget from "./components/Pages/CompanyTarget.jsx";
 import InvenotrySetting from "./components/Pages/InvenotrySetting.jsx";
+import Templates from "./components/Pages/Templates.jsx";
+import MessageDetails from "./components/Pages/MessageDetails.jsx";
 function App() {
     const isLoggedIn = Cookies.get("loggedIn") === "true";
     const salonName = Cookies.get("salonName");
@@ -168,6 +170,14 @@ function App() {
                             path="/:salon_name/:branchName/targetsetting"
                             element={<CompanyTarget />}
                         />
+                        <Route
+                            path="/:salon_name/:branchName/templates"
+                            element={<Templates />}
+                        />
+                        <Route
+                            path="/:salon_name/:branchName/message-details"
+                            element={<MessageDetails />}
+                            />
                     </Route>
 
                     <Route path="*" element={<ErrorPage />} />
