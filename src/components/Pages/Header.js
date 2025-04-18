@@ -32,6 +32,7 @@ function Header() {
     console.log("profile", profile)
 
 
+
     const fetchInventory = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -254,7 +255,7 @@ function Header() {
                                     src={`${config.apiUrl}${profile}`}
                                     alt="Profile"
                                     className="w-16 h-16 rounded-full object-contain"
-                                />
+                            />
                             ) : (
                                 <FaUserCircle className="text-gray-500 size-14" />
                             )}
