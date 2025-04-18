@@ -20,6 +20,7 @@ const MessageDetails = () => {
   const phonenumber = localStorage.getItem("mobile_no");
   const [selectedCustomers, setSelectedCustomers] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [isFBLoaded, setIsFBLoaded] = useState(false);
 
   const customers = [
     { id: 1, name: "Promoth", phone: "+91-8148148396" },
@@ -87,8 +88,195 @@ const MessageDetails = () => {
   //   address: salonDetails.address,
   //   mobile_no: salonDetails.phonenumber,
   // };
-
-
+  
+  useEffect(() => {
+    // Load the Facebook SDK (only works on HTTPS or localhost)
+    const loadFacebookSDK = () => {
+      if (typeof window.FB === "undefined") {
+        const script = document.createElement("script");
+        script.src = "https://connect.facebook.net/en_US/sdk.js";
+        script.async = true;
+        script.onload = () => {
+          window.FB.init({
+            appId: "1084177693728089", // Replace with your Facebook app ID
+            cookie: true,
+            xfbml: true,
+            version: "v19.0",
+          });
+          setIsFBLoaded(true);
+        };
+        document.body.appendChild(script);
+      } else {
+        setIsFBLoaded(true);
+      }
+    };
+  
+    loadFacebookSDK();
+  }, []);
+  
+  // Function to handle Facebook login and sharing
+  const handleFacebookShare = () => {
+    if (isFBLoaded && typeof window.FB !== "undefined") {
+      console.log("Facebook SDK is loaded.");
+      window.FB.getLoginStatus((response) => {
+        console.log("Facebook login status:", response);
+        if (response.status === 'connected') {
+          shareToFacebook(response.authResponse.accessToken);
+        } else {
+          window.FB.login((loginResponse) => {
+            if (loginResponse.authResponse) {
+              shareToFacebook(loginResponse.authResponse.accessToken);
+            } else {
+              alert("Facebook login failed.");
+            }
+          }, {
+            scope: 'public_profile,email,pages_show_list,pages_read_engagement'
+          });
+        }
+      });
+    } else {
+      console.error("Facebook SDK is not loaded.");
+    }
+  };
+  
+  // Function to share content on Facebook
+  const shareToFacebook = (accessToken) => {
+    window.FB.ui({
+      method: "share",
+      href: `https://yourwebsite.com/${selectedTemplate.image}`,
+    }, function (response) {
+      if (response && !response.error_message) {
+        alert("Sharing was successful!");
+      } else {
+        alert("Error while sharing.");
+      }
+    });
+  };
+  
+  // Function to handle Instagram sharing
+  const handleInstagramShare = () => {
+    if (typeof window.FB !== "undefined") {
+      window.FB.getLoginStatus((response) => {
+        if (response.status === 'connected') {
+          handleInstagramPost(response.authResponse.accessToken);
+        } else {
+          window.FB.login(function (loginResponse) {
+            if (loginResponse.authResponse) {
+              handleInstagramPost(loginResponse.authResponse.accessToken);
+            } else {
+              alert("User cancelled login or did not fully authorize.");
+            }
+          }, {
+            scope: 'public_profile,email,pages_show_list,pages_read_engagement,instagram_basic,instagram_content_publish'
+          });
+        }
+      });
+    } else {
+      console.error("Facebook SDK is not loaded.");
+    }
+  };
+  
+  // Async handler for Instagram post
+  const handleInstagramPost = async (accessToken) => {
+    try {
+      const longLivedToken = await exchangeToken(); // Optional: use if your backend handles long-lived token
+      await postToInstagram(longLivedToken || accessToken);
+    } catch (err) {
+      console.error("Instagram share error:", err);
+      alert("Something went wrong while posting to Instagram.");
+    }
+  };
+  
+  // Function to post to Instagram
+  const postToInstagram = async (accessToken) => {
+    try {
+      const pages = await fetchPages(accessToken);
+      const selectedPage = pages[0];
+      const instagramId = await fetchInstagramId(selectedPage.id, accessToken);
+      await uploadToInstagram(instagramId, 'https://example.com/image.jpg', 'Check this out!', accessToken);
+      alert("Posted to Instagram!");
+    } catch (err) {
+      console.error("Instagram post error:", err);
+      alert("Something went wrong while posting to Instagram.");
+    }
+  };
+  
+  // Function to exchange token (called after login)
+  const exchangeToken = async () => {
+    try {
+      const res = await fetch(`${config.apiUrl}/api/swalook/fb/exchange-token/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${localStorage.getItem('token')}`
+        },
+      });
+      const data = await res.json();
+      console.log('Exchanged Access Token:', data.access_token);
+      return data.access_token;
+    } catch (error) {
+      console.error('Token exchange failed:', error);
+    }
+  };
+  
+  // Fetch pages
+  const fetchPages = async (accessToken) => {
+    try {
+      const res = await fetch(`${config.apiUrl}/api/swalook/fb/pages/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const data = await res.json();
+      console.log('Pages:', data.pages);
+      return data.pages;
+    } catch (error) {
+      console.error('Error fetching pages:', error);
+    }
+  };
+  
+  // Fetch Instagram ID
+  const fetchInstagramId = async (pageId, accessToken) => {
+    try {
+      const res = await fetch(`${config.apiUrl}/api/swalook/fb/instagram-id/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ page_id: pageId }),
+      });
+      const data = await res.json();
+      console.log('Instagram ID:', data.instagram_id);
+      return data.instagram_id;
+    } catch (error) {
+      console.error('Error fetching Instagram ID:', error);
+    }
+  };
+  
+  // Upload to Instagram
+  const uploadToInstagram = async (instagramId, imageUrl, caption, accessToken) => {
+    try {
+      const res = await fetch(`${config.apiUrl}/api/swalook/fb/upload-instagram/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          instagram_id: instagramId,
+          image_url: imageUrl,
+          caption: caption,
+        }),
+      });
+      const data = await res.json();
+      console.log('Upload success:', data);
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
+  };
+  
+  
   const handleDownload = async () => {
     setIsDownloading(true);
 
@@ -156,14 +344,7 @@ const MessageDetails = () => {
         <div className="flex gap-6">
           <div className="border p-2 rounded-lg relative inline-block" ref={imageRef}>
             <img src={`${config.apiUrl}${selectedTemplate.image}`} alt={selectedTemplate.title} className="w-full h-auto object-contain" />
-            {userText && (
-  <p
-    className="text-lg font-semibold mt-2 break-words text-center whitespace-pre-wrap max-w-[600px] mx-auto"
-    style={{ textAlign: 'justify', textJustify: 'inter-word' }}
-  >
-    {userText}
-  </p>
-)}
+
             <div className="bg-white text-sm p-3 border-t mt-2 flex flex-col md:flex-row md:items-center justify-between">
               <div className="flex items-center space-x-3 mb-2 md:mb-0">
                 <img src={`${config.apiUrl}${salonDetails.logo}`} alt="Salon Logo" className="w-12 h-12 border-2 border-gray-400" />
@@ -187,20 +368,30 @@ const MessageDetails = () => {
               <span className="font-semibold">Please Note: </span>Your logo will be added when you download or share.
             </p>
             <div className="mt-4">
-            <textarea
-  ref={textareaRef}
-  value={userText}
-  onChange={(e) => {
-    const input = e.target.value;
-    if (input.length <= 150) {
-      setUserText(input);
-    }
-  }}
-  maxLength={150}
-  rows={1}
-  className="w-full rounded-lg border border-gray-300 bg-white px-5 py-3 text-base text-gray-800 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-300 focus:outline-none resize-none overflow-y-auto min-h-[3.2rem] max-h-[7.5rem] transition-all duration-200 leading-[1.6] break-words"
-  placeholder="Enter your text (max 150 characters)"
-/>
+            <div className="mt-4">
+  <label className="text-lg font-semibold mb-2 block">Instagram Caption</label>
+  <textarea
+    ref={textareaRef}
+    value={userText}
+    onChange={(e) => {
+      const input = e.target.value;
+      if (input.length <= 150) {
+        setUserText(input);
+      }
+    }}
+    maxLength={150}
+    rows={1}
+    className="w-full rounded-lg border border-gray-300 bg-white px-5 py-3 text-base text-gray-800 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-300 focus:outline-none resize-none overflow-y-auto min-h-[3.2rem] max-h-[7.5rem] transition-all duration-200 leading-[1.6] break-words"
+  />
+  
+  <button
+    onClick={() => setUserText("✨ Transform your look today! Visit us and feel the difference. 💇‍♀️💅 #SalonVibes")}
+    className="mt-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-300"
+  >
+    Generate Caption using AI
+  </button>
+</div>
+
 
 
 
@@ -237,7 +428,7 @@ const MessageDetails = () => {
       </div>
       {isShareModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-80 relative">
+          <div className="bg-white p-6 rounded-xl shadow-xl ml-80 w-80 relative">
             <button
               className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl font-bold"
               onClick={() => setIsShareModalOpen(false)}
@@ -259,7 +450,7 @@ const MessageDetails = () => {
               </button>
 
               <button
-                onClick={() => alert("Instagram sharing logic here")}
+onClick={handleInstagramShare}
                 className="flex flex-col items-center gap-1 hover:scale-110 transition"
               >
                 <img
@@ -271,7 +462,7 @@ const MessageDetails = () => {
               </button>
 
               <button
-                onClick={() => alert("Facebook sharing logic here")}
+                onClick={handleFacebookShare}
                 className="flex flex-col items-center gap-1 hover:scale-110 transition"
               >
                 <img
