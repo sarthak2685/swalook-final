@@ -28,6 +28,10 @@ function Header() {
     const sname = localStorage.getItem("s-name");
     const branchName = localStorage.getItem("branch_name");
     const bid = localStorage.getItem("branch_id");
+    const profile= localStorage.getItem("profile_pic") || "logo"
+    console.log("profile", profile)
+
+
 
     const fetchInventory = async () => {
         try {
@@ -246,12 +250,12 @@ function Header() {
                         onClick={toggleProfileDropdown}
                     >
                         <div className="flex flex-row items-baseline justify-center">
-                            {profileImage ? (
+                            {profile ? (
                                 <img
-                                    src={URL.createObjectURL(profileImage)}
+                                    src={`${config.apiUrl}${profile}`}
                                     alt="Profile"
-                                    className="w-16 h-16 rounded-full object-cover"
-                                />
+                                    className="w-16 h-16 rounded-full object-contain"
+                            />
                             ) : (
                                 <FaUserCircle className="text-gray-500 size-14" />
                             )}

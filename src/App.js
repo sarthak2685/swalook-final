@@ -45,6 +45,8 @@ import CompanyTarget from "./components/Pages/CompanyTarget.jsx";
 import InvenotrySetting from "./components/Pages/InvenotrySetting.jsx";
 import Templates from "./components/Pages/Templates.jsx";
 import MessageDetails from "./components/Pages/MessageDetails.jsx";
+import WhatsappTemplates from "./components/Pages/WhatsappTemplates.jsx";
+import WhatsappDetail from "./components/Pages/WhatsappDetail.jsx";
 function App() {
     const isLoggedIn = Cookies.get("loggedIn") === "true";
     const salonName = Cookies.get("salonName");
@@ -178,6 +180,14 @@ function App() {
                             path="/:salon_name/:branchName/message-details"
                             element={<MessageDetails />}
                             />
+                            <Route
+                            path="/:salon_name/:branchName/whatsapp-templates"
+                            element={<WhatsappTemplates />}
+                        />
+                         <Route
+                            path="/:salon_name/:branchName/whatsapp-details"
+                            element={<WhatsappDetail />}
+                            />
                     </Route>
 
                     <Route path="*" element={<ErrorPage />} />
@@ -189,3 +199,7 @@ function App() {
 }
 
 export default App;
+
+
+
+

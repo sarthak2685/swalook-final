@@ -28,11 +28,10 @@ const NavItem = ({ to, icon: Icon, label, disabled, isActive, onClick }) => {
         >
             <Link
                 to={to}
-                className={`nav-link ${
-                    isActive
+                className={`nav-link ${isActive
                         ? "bg-blue-500 text-white shadow-md"
                         : "text-black hover:bg-blue-500 hover:text-white"
-                } flex items-center p-4 w-58 h-14 rounded-md transition-all ease-in-out`}
+                    } flex items-center p-4 w-58 h-14 rounded-md transition-all ease-in-out`}
                 onClick={onClick}
             >
                 {typeof Icon === "function" ? (
@@ -124,9 +123,8 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
 
     return (
         <div
-            className={`top-0 left-0 bottom-0 flex flex-col justify-start bg-white min-h-screen p-2 z-50 shadow-lg gap-0 transition-all duration-300 fixed lg:block md:w-[298px] lg:w-[300px] ${
-                sidebarOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
+            className={`top-0 left-0 bottom-0 flex flex-col justify-start bg-white min-h-screen p-2 z-50 shadow-lg gap-0 transition-all duration-300 fixed lg:block md:w-[298px] lg:w-[300px] ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
         >
             <img
                 src={Logo}
@@ -259,19 +257,13 @@ const VertNav = ({ sidebarOpen, toggleSidebar }) => {
                         )
                     }
                 />
-                {/* <NavItem
+                <NavItem
                     to={`/${sname}/${branchName}/templates`}
-                    icon={() => <BiLayout size={27} margin={5} />}
+                    icon={() => <BiLayout size={27} />}
                     label="Templates"
                     disabled={userType === "staff"}
                     isActive={activeLink === "templates"}
-                    onClick={() =>
-                        handleLinkClick(
-                            "templates",
-                            `/${sname}/${branchName}/templates`
-                        )
-                    }
-                /> */}
+                    onClick={() => handleLinkClick("templates", `/${sname}/${branchName}/templates`)} />
             </div>
 
             {/* <div className="flex flex-col items-center justify-center mt-4 gap-2 mb-4">
