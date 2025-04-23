@@ -18,15 +18,16 @@ const ModeOfPayment = () => {
         cash: "#328cd2",
         upi: "#01e296",
         card: "#ffb01a",
-        netbanking: "#9147ff",
-        unknown: "#666666",
+        net_banking: "#9147ff",
+        other: "#666666",
     };
 
     const defaultPaymentModes = [
         { payment_mode: "cash", total_revenue: "" },
         { payment_mode: "upi", total_revenue: "" },
         { payment_mode: "card", total_revenue: "" },
-        { payment_mode: "netbanking", total_revenue: "" },
+        { payment_mode: "net_banking", total_revenue: "" },
+        { payment_mode: "other", total_revenue: "" },
     ];
 
     const formatDate = (date) => {
@@ -38,7 +39,7 @@ const ModeOfPayment = () => {
 
     const getCurrentWeekRange = () => {
         const today = new Date();
-        const dayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
+        const dayOfWeek = today.getDay();
         const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
         const sundayOffset = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
 
@@ -98,7 +99,7 @@ const ModeOfPayment = () => {
                         if (item.payment_mode) {
                             processedData.push({
                                 payment_mode: item.payment_mode,
-                                total_revenue: item.total_revenue,
+                                total_revenue: parseFloat(item.total_revenue),
                             });
                         }
                     });
@@ -106,14 +107,12 @@ const ModeOfPayment = () => {
 
                 if (data.data_of_new_mode) {
                     data.data_of_new_mode.forEach((item) => {
-                        item.payment_mode.forEach((mode) => {
-                            if (mode.mode) {
-                                processedData.push({
-                                    payment_mode: mode.mode,
-                                    total_revenue: parseFloat(mode.amount),
-                                });
-                            }
-                        });
+                        if (item.mode) {
+                            processedData.push({
+                                payment_mode: item.mode,
+                                total_revenue: parseFloat(item.amount),
+                            });
+                        }
                     });
                 }
 
@@ -239,7 +238,7 @@ const ModeOfPayment = () => {
                                         color:
                                             paymentModeColors[
                                                 mode.payment_mode.toLowerCase()
-                                            ] || paymentModeColors.unknown,
+                                            ] || paymentModeColors.other,
                                     }}
                                 >
                                     {mode.payment_mode}
@@ -250,7 +249,7 @@ const ModeOfPayment = () => {
                                         color:
                                             paymentModeColors[
                                                 mode.payment_mode.toLowerCase()
-                                            ] || paymentModeColors.unknown,
+                                            ] || paymentModeColors.other,
                                     }}
                                 >
                                     {mode.total_revenue === ""

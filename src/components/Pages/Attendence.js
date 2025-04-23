@@ -1,185 +1,469 @@
 import React, { useState, useEffect } from "react";
-import Calendar from "react-calendar";
-import 'react-calendar/dist/Calendar.css';
-import '../Styles/Attendance.css'; 
+import {
+    format,
+    parseISO,
+    addDays,
+    isWithinInterval,
+    isSameDay,
+} from "date-fns";
 import config from "../../config";
 
-const AttendancePopup = ({ onClose, onAttendanceMarked, staffId }) => {
-  const [markedDates, setMarkedDates] = useState({});
-  const [originalMarkedDates, setOriginalMarkedDates] = useState({}); // Store original attendance
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
+const AttendancePopup = ({ onClose, staffName, staffId }) => {
+    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const [selectedRange, setSelectedRange] = useState({
+        start: null,
+        end: null,
+    });
+    const [showTimeModal, setShowTimeModal] = useState(false);
+    const [timeEntries, setTimeEntries] = useState([]);
+    const [attendanceData, setAttendanceData] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  // Fetch attendance data
-  const fetchAttendance = async () => {
-    const token = localStorage.getItem('token');
-    const bid = localStorage.getItem('branch_id');
+    const userType = localStorage.getItem("type");
 
-    try {
-      const response = await fetch(`${config.apiUrl}/api/swalook/staff/attendance/?branch_name=${bid}&staff_id=${staffId}&month=${new Date().getMonth() + 1}&year=${new Date().getFullYear()}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Token ${token}`,
-        },
-      });
+    // Fetch attendance data
+    useEffect(() => {
+        const fetchAttendance = async () => {
+            const token = localStorage.getItem("token");
+            const bid = localStorage.getItem("branch_id");
 
-      if (response.ok) {
-        const attendanceResponse = await response.json();
-        console.log("Fetched attendance data:", attendanceResponse);
+            try {
+                const response = await fetch(
+                    `${
+                        config.apiUrl
+                    }/api/swalook/staff/attendance/?branch_name=${bid}&staff_id=${staffId}&month=${
+                        currentMonth + 1
+                    }&year=${currentYear}`,
+                    { headers: { Authorization: `Token ${token}` } }
+                );
 
-        const attendanceData = attendanceResponse.table_data;
+                if (!response.ok) throw new Error("Failed to fetch attendance");
 
-        for (const mobileNumber in attendanceData) {
-          const staffData = attendanceData[mobileNumber];
+                const { table_data } = await response.json();
+                const data = {};
 
-          if (staffData.id === staffId) {
-            console.log("Staff ID matched!");
+                Object.values(table_data).forEach((staff) => {
+                    staff.present_dates.forEach((dateStr) => {
+                        const date = parseISO(dateStr);
+                        data[format(date, "yyyy-MM-dd")] = {
+                            status: "present",
+                            inTime: "09:00",
+                            outTime: "18:00",
+                        };
+                    });
+                });
 
-            const newMarkedDates = {};
-
-            if (staffData?.present_dates?.length > 0) {
-              staffData.present_dates.forEach((entry) => {
-                const date = new Date(entry.date).toDateString();
-                newMarkedDates[date] = "P"; // Mark as "Present"
-              });
+                setAttendanceData(data);
+                setLoading(false);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
             }
+        };
 
-            if (staffData?.leave_dates?.length > 0) {
-              staffData.leave_dates.forEach((entry) => {
-                const date = new Date(entry.date).toDateString();
-                newMarkedDates[date] = "A"; // Mark as "Absent"
-              });
-            }
+        fetchAttendance();
+    }, [currentMonth, currentYear, staffId]);
 
-            setMarkedDates(newMarkedDates);
-            setOriginalMarkedDates(newMarkedDates); // Store the original state
-            setLoading(false);
-            break;
-          } else {
-            console.log("Staff ID did not match for this mobile number.");
-          }
+    // Handle date selection
+    const handleDateClick = (day) => {
+        const date = new Date(currentYear, currentMonth, day);
+        if (date > new Date()) return;
+
+        // If no range selected or both dates selected, start new range
+        if (!selectedRange.start || selectedRange.end) {
+            setSelectedRange({ start: date, end: null });
         }
-      } else {
-        setError('Failed to fetch attendance.');
-        setLoading(false);
-      }
-    } catch (error) {
-      setError('Error while fetching attendance.');
-      setLoading(false);
-    }
-  };
+        // If only start date selected
+        else {
+            // If clicked date is before start date, make it the new start
+            if (date < selectedRange.start) {
+                setSelectedRange({ start: date, end: selectedRange.start });
+            }
+            // If clicked date is after start date, make it the end
+            else {
+                setSelectedRange((prev) => ({ ...prev, end: date }));
+            }
+        }
+    };
 
-  useEffect(() => {
-    fetchAttendance();
-  }, []);
+    // Prepare time entries when range is selected
+    const prepareTimeEntries = () => {
+        if (!selectedRange.start) return;
 
-  // Handle date click (mark or unmark attendance)
-  const handleDateClick = (date) => {
-    const dateString = date.toDateString();
+        // If only start date is selected, treat as single day
+        const endDate = selectedRange.end || selectedRange.start;
 
-    if (date.getMonth() === currentMonth && date.getFullYear() === currentYear && date <= today) {
-      setMarkedDates((prev) => ({
-        ...prev,
-        [dateString]: prev[dateString] === "P" ? "A" : "P",
-      }));
-    } else {
-      console.log("Cannot modify past attendance.");
-    }
-  };
+        const entries = [];
+        let currentDate = selectedRange.start;
 
-  // Save only modified attendance data
-  const saveAttendance = async () => {
-    // Compare current marked dates with the original ones and get only modified dates
-    const modifiedDates = Object.keys(markedDates).filter((dateString) => {
-      return markedDates[dateString] !== originalMarkedDates[dateString];
-    });
+        while (currentDate <= endDate) {
+            const dateKey = format(currentDate, "yyyy-MM-dd");
+            entries.push({
+                date: dateKey,
+                inTime: attendanceData[dateKey]?.inTime || "09:00",
+                outTime: attendanceData[dateKey]?.outTime || "18:00",
+                existing: !!attendanceData[dateKey],
+            });
+            currentDate = addDays(currentDate, 1);
+        }
 
-    const attendanceData = modifiedDates.map((dateString) => {
-      const dateObject = new Date(dateString);
+        setTimeEntries(entries);
+        setShowTimeModal(true);
+    };
 
-      return {
-        of_month: new Date().getMonth() + 1,
-        year: new Date().getFullYear(),
-        attend: markedDates[dateString] === "P",
-        leave: markedDates[dateString] === "A",
-        date: dateObject,
-        id: staffId,
-      };
-    });
+    // Handle time input changes
+    const handleTimeChange = (index, field, value) => {
+        const updatedEntries = [...timeEntries];
+        updatedEntries[index][field] = value;
+        setTimeEntries(updatedEntries);
+    };
 
-    const token = localStorage.getItem('token');
-    const bid = localStorage.getItem('branch_id');
+    // Save attendance data
+    const saveAttendance = async () => {
+        const token = localStorage.getItem("token");
+        const bid = localStorage.getItem("branch_id");
 
-    try {
-      const response = await fetch(`${config.apiUrl}/api/swalook/staff/attendance/?branch_name=${bid}&staff_id=${staffId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ json_data: attendanceData }),
-      });
+        const attendanceData = timeEntries.map((entry) => ({
+            date: entry.date,
+            in_time: entry.inTime,
+            out_time: entry.outTime,
+            attend: "True",
+            leave: "False",
+            of_month: currentMonth + 1,
+            year: currentYear,
+            id: staffId,
+        }));
 
-      if (response.ok) {
-        console.log('Attendance marked successfully');
-        onAttendanceMarked(staffId, attendanceData);
-        onClose();
-        //reload the window
-        window.location.reload();
-      } else {
-        console.error('Failed to mark attendance:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error while marking attendance:', error);
-    }
-  };
+        try {
+            const response = await fetch(
+                `${config.apiUrl}/api/swalook/staff/attendance/?branch_name=${bid}&staff_id=${staffId}&type=${userType}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Token ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ json_data: attendanceData }),
+                }
+            );
 
-  // Render calendar date content
-  const tileContent = ({ date, view }) => {
-    if (view === "month") {
-      const status = markedDates[date.toDateString()];
-      return status === "P" ? <span className="attendance-present">✔️</span> :
-        status === "A" ? <span className="attendance-absent">❌</span> :
-        null;
-    }
-    return null;
-  };
+            if (!response.ok) throw new Error("Failed to save attendance");
 
-  const tileDisabled = ({ date }) => {
-    return date.getMonth() !== currentMonth || date.getFullYear() !== currentYear;
-  };
+            onClose();
+        } catch (error) {
+            console.error("Error saving attendance:", error);
+            setError(error.message);
+        }
+    };
 
-  return (
-    <div className="attendance-popup-overlay">
-      <div className="attendance-popup-container">
-        <h2 className="attendance-popup-title">Attendance</h2>
-        {loading ? (
-          <p>Loading attendance...</p>
-        ) : error ? (
-          <p>{error}</p>
-        ) : (
-          <Calendar
-            onClickDay={handleDateClick}
-            tileContent={tileContent}
-            tileDisabled={tileDisabled}
-            maxDate={today}
-            className="custom-calendar"
-          />
-        )}
-        <div className="attendance-popup-footer">
-          <button className="attendance-save-button" onClick={saveAttendance}>
-            Save 
-          </button>
-          <button className="attendance-close-button" onClick={onClose}>
-            Close
-          </button>
+    // Month navigation
+    const changeMonth = (increment) => {
+        setCurrentMonth((prev) => {
+            const newMonth = prev + increment;
+            if (newMonth < 0) {
+                setCurrentYear((prevYear) => prevYear - 1);
+                return 11;
+            }
+            if (newMonth > 11) {
+                setCurrentYear((prevYear) => prevYear + 1);
+                return 0;
+            }
+            return newMonth;
+        });
+    };
+
+    // Check if a date is selected (in range or single date)
+    const isDateSelected = (date) => {
+        if (!selectedRange.start) return false;
+
+        const endDate = selectedRange.end || selectedRange.start;
+        return isWithinInterval(date, {
+            start:
+                selectedRange.start < endDate ? selectedRange.start : endDate,
+            end: selectedRange.start < endDate ? endDate : selectedRange.start,
+        });
+    };
+
+    // Render calendar
+    const renderCalendar = () => {
+        const daysInMonth = new Date(
+            currentYear,
+            currentMonth + 1,
+            0
+        ).getDate();
+        const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay();
+        const monthNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ];
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        return (
+            <div className="bg-white rounded-lg p-4 shadow-md">
+                <div className="flex justify-between items-center mb-4">
+                    <button
+                        onClick={() => changeMonth(-1)}
+                        className="p-2 rounded hover:bg-gray-100"
+                    >
+                        &lt;
+                    </button>
+                    <h2 className="text-lg font-semibold">
+                        {monthNames[currentMonth]} {currentYear}
+                    </h2>
+                    <button
+                        onClick={() => changeMonth(1)}
+                        className="p-2 rounded hover:bg-gray-100"
+                    >
+                        &gt;
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-7 gap-1 mb-2">
+                    {dayNames.map((day) => (
+                        <div
+                            key={day}
+                            className="text-center text-xs font-medium text-gray-500"
+                        >
+                            {day}
+                        </div>
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-7 gap-1">
+                    {Array(firstDayOfWeek)
+                        .fill()
+                        .map((_, i) => (
+                            <div key={`empty-${i}`} className="h-8"></div>
+                        ))}
+
+                    {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(
+                        (day) => {
+                            const date = new Date(
+                                currentYear,
+                                currentMonth,
+                                day
+                            );
+                            const dateKey = format(date, "yyyy-MM-dd");
+                            const isToday = isSameDay(date, new Date());
+                            const isFuture = date > new Date();
+                            const isSelected = isDateSelected(date);
+                            const isStartDate =
+                                selectedRange.start &&
+                                isSameDay(date, selectedRange.start);
+                            const isEndDate =
+                                selectedRange.end &&
+                                isSameDay(date, selectedRange.end);
+                            const isPresent =
+                                attendanceData[dateKey]?.status === "present";
+
+                            let cellClass =
+                                "h-8 w-8 flex items-center justify-center rounded-full text-xs mx-auto relative";
+
+                            if (isToday) cellClass += " border border-blue-500";
+
+                            // Selected range styling
+                            if (isSelected) {
+                                cellClass += " bg-blue-100";
+
+                                // Start and end date styling
+                                if (isStartDate || isEndDate) {
+                                    cellClass +=
+                                        " bg-blue-600 text-white font-bold";
+                                }
+
+                                // For dates in between
+                                else {
+                                    cellClass += " bg-blue-200";
+                                }
+                            }
+
+                            // Present but not selected
+                            else if (isPresent) {
+                                cellClass += " bg-green-100 text-green-800";
+                            }
+
+                            // Absent but not selected
+                            else if (!isFuture) {
+                                cellClass += " bg-red-100 text-red-800";
+                            }
+
+                            // Future dates
+                            if (isFuture) {
+                                cellClass +=
+                                    " bg-gray-100 text-gray-400 cursor-not-allowed";
+                            } else {
+                                cellClass +=
+                                    " cursor-pointer hover:bg-gray-100";
+                            }
+
+                            return (
+                                <div
+                                    key={day}
+                                    className={cellClass}
+                                    onClick={() => handleDateClick(day)}
+                                >
+                                    {day}
+                                    {(isStartDate || isEndDate) && (
+                                        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-yellow-400"></span>
+                                    )}
+                                </div>
+                            );
+                        }
+                    )}
+                </div>
+
+                {(selectedRange.start || selectedRange.end) && (
+                    <div className="mt-4 flex justify-center">
+                        <button
+                            onClick={prepareTimeEntries}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                        >
+                            {selectedRange.end
+                                ? "Set Times for Selected Range"
+                                : "Set Time for Selected Date"}
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-auto">
+                <div className="flex justify-between items-center border-b p-4">
+                    <h2 className="text-xl font-semibold">
+                        Mark Attendance: {staffName}
+                    </h2>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-gray-700 text-2xl"
+                    >
+                        &times;
+                    </button>
+                </div>
+                <div className="p-4 md:p-6">
+                    {loading ? (
+                        <div className="flex justify-center items-center h-40">
+                            <p>Loading attendance data...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="text-red-500 text-center p-4">
+                            {error}
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            {renderCalendar()}
+                        </div>
+                    )}
+                </div>
+                {showTimeModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-10">
+                        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+                            <div className="border-b p-4">
+                                <h3 className="text-lg font-semibold">
+                                    Enter Time Details
+                                </h3>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-4">
+                                <div className="grid grid-cols-1 gap-4">
+                                    {timeEntries.map((entry, index) => (
+                                        <div
+                                            key={index}
+                                            className="border rounded-lg p-4"
+                                        >
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <div className="font-medium mb-3 text-center md:text-left">
+                                                    <label className="block text-sm text-gray-600 mb-1">
+                                                        Date
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        value={entry.date}
+                                                        className="w-full p-2 border rounded-md"
+                                                        readOnly
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm text-gray-600 mb-1">
+                                                        In-Time
+                                                    </label>
+                                                    <input
+                                                        type="time"
+                                                        value={entry.inTime}
+                                                        onChange={(e) =>
+                                                            handleTimeChange(
+                                                                index,
+                                                                "inTime",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="w-full p-2 border rounded-md"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm text-gray-600 mb-1">
+                                                        Out-Time
+                                                    </label>
+                                                    <input
+                                                        type="time"
+                                                        value={entry.outTime}
+                                                        onChange={(e) =>
+                                                            handleTimeChange(
+                                                                index,
+                                                                "outTime",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="w-full p-2 border rounded-md"
+                                                    />
+                                                </div>
+                                            </div>
+                                            {entry.existing && (
+                                                <div className="text-xs text-green-600 mt-2 text-center">
+                                                    Existing entry will be
+                                                    updated
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="border-t p-4 flex justify-end gap-4">
+                                <button
+                                    onClick={() => setShowTimeModal(false)}
+                                    className="px-4 py-2 border rounded-md text-sm hover:bg-gray-100 min-w-[80px]"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    onClick={saveAttendance}
+                                    className="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 min-w-[80px]"
+                                >
+                                    Save All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default AttendancePopup;

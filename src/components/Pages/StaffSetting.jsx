@@ -9,6 +9,27 @@ const StaffSetting = () => {
     const bid = localStorage.getItem("branch_id");
 
     const [monthDays, setMonthDays] = useState({});
+    const [attendanceTimings, setAttendanceTimings] = useState({
+        inTime: "09:00",
+        outTime: "17:00",
+    });
+    const [workingHours, setWorkingHours] = useState("8 Hours");
+
+    // Full month names mapping
+    const monthNames = {
+        Jan: "January",
+        Feb: "February",
+        Mar: "March",
+        Apr: "April",
+        May: "May",
+        Jun: "June",
+        Jul: "July",
+        Aug: "August",
+        Sep: "September",
+        Oct: "October",
+        Nov: "November",
+        Dec: "December",
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,6 +67,17 @@ const StaffSetting = () => {
                     };
                     setMonthDays(updatedMonthDays);
                 }
+
+                if (data.attendance_timings) {
+                    setAttendanceTimings({
+                        inTime: data.attendance_timings.in_time || "09:00",
+                        outTime: data.attendance_timings.out_time || "17:00",
+                    });
+                    calculateWorkingHours(
+                        data.attendance_timings.in_time || "09:00",
+                        data.attendance_timings.out_time || "17:00"
+                    );
+                }
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -53,6 +85,41 @@ const StaffSetting = () => {
 
         fetchData();
     }, [bid, token]);
+
+    const calculateWorkingHours = (inTime, outTime) => {
+        if (!inTime || !outTime) {
+            setWorkingHours("0 Hours");
+            return;
+        }
+
+        const [inHours, inMinutes] = inTime.split(":").map(Number);
+        const [outHours, outMinutes] = outTime.split(":").map(Number);
+
+        let totalHours = outHours - inHours;
+        let totalMinutes = outMinutes - inMinutes;
+
+        if (totalMinutes < 0) {
+            totalHours -= 1;
+            totalMinutes += 60;
+        }
+
+        setWorkingHours(`${totalHours}.${totalMinutes} Hours`);
+    };
+
+    const handleTimeChange = (e) => {
+        const { name, value } = e.target;
+        setAttendanceTimings((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        // Calculate working hours when both times are set
+        if (name === "inTime" && attendanceTimings.outTime) {
+            calculateWorkingHours(value, attendanceTimings.outTime);
+        } else if (name === "outTime" && attendanceTimings.inTime) {
+            calculateWorkingHours(attendanceTimings.inTime, value);
+        }
+    };
 
     const handleMonthDaysChange = (month, newValue) => {
         setMonthDays((prev) => ({
@@ -88,6 +155,8 @@ const StaffSetting = () => {
                     },
                     body: JSON.stringify({
                         json_data: jsonData,
+                        in_time: attendanceTimings.inTime,
+                        out_time: attendanceTimings.outTime,
                     }),
                 }
             );
@@ -112,6 +181,21 @@ const StaffSetting = () => {
                         Dec: result.data.json_data["12"],
                     };
                     setMonthDays(updatedMonthDays);
+
+                    if (result.data.json_data.attendance_timings) {
+                        setAttendanceTimings({
+                            inTime: result.data.json_data.attendance_timings
+                                .in_time,
+                            outTime:
+                                result.data.json_data.attendance_timings
+                                    .out_time,
+                        });
+                        calculateWorkingHours(
+                            result.data.json_data.attendance_timings.in_time,
+                            result.data.json_data.attendance_timings.out_time
+                        );
+                    }
+
                     localStorage.setItem(
                         "monthDays",
                         JSON.stringify(updatedMonthDays)
@@ -135,65 +219,117 @@ const StaffSetting = () => {
 
     return (
         <>
-            <Header />
-            <VertNav />
-            <Helmet>
-                <title>Staff Settings</title>
-            </Helmet>
-            <div className="staff-setting-container bg-white p-4 md:p-10 mx-auto md:ml-72">
-                <h2 className="text-center text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">
-                    Staff Settings
-                </h2>
+            <div className="min-h-screen bg-gray-50">
+                <Header />
+                <VertNav />
+                <Helmet>
+                    <title>Staff Settings</title>
+                </Helmet>
+                <div className="p-4 md:p-8 md:ml-72">
+                    <div className="bg-white shadow-xl rounded-3xl p-6 md:p-8 mx-auto">
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">
+                            Staff Settings
+                        </h2>
 
-                <div className="table-section mb-6 md:mb-10">
-                    <h3 className="text-gray-700 text-base md:text-lg font-semibold mb-2 md:mb-4">
-                        Number of Days in Each Month
-                    </h3>
-                    <div className="overflow-x-auto">
-                        <table className="w-full styled-table">
-                            <thead>
-                                <tr>
-                                    <th className="bg-gray-200 px-2 md:px-4 py-2">
-                                        Month
-                                    </th>
-                                    <th className="bg-gray-200 px-2 md:px-4 py-2">
-                                        Days
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.keys(monthDays).map((month) => (
-                                    <tr key={month}>
-                                        <td className="border text-center px-2 md:px-4 py-2">
-                                            {month}
-                                        </td>
-                                        <td className="border text-center px-2 md:px-4 py-2">
-                                            <input
-                                                type="number"
-                                                className="input-field text-center w-full"
-                                                value={monthDays[month]}
-                                                onChange={(e) =>
-                                                    handleMonthDaysChange(
-                                                        month,
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        {/* Attendance Timings Section */}
+                        <div className="mb-8 bg-gray-50 p-6 rounded-2xl">
+                            <h3 className="text-lg md:text-xl font-semibold text-gray-700 mb-4">
+                                Attendance Timings
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                <div className="space-y-1">
+                                    <label className="block text-sm font-medium text-gray-600">
+                                        In-time
+                                    </label>
+                                    <input
+                                        type="time"
+                                        name="inTime"
+                                        value={attendanceTimings.inTime}
+                                        onChange={handleTimeChange}
+                                        className="w-full border border-gray-300 rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="block text-sm font-medium text-gray-600">
+                                        Out-time
+                                    </label>
+                                    <input
+                                        type="time"
+                                        name="outTime"
+                                        value={attendanceTimings.outTime}
+                                        onChange={handleTimeChange}
+                                        className="w-full border border-gray-300 rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="block text-sm font-medium text-gray-600">
+                                        Working Hours
+                                    </label>
+                                    <div className="bg-gray-100 px-4 py-2 rounded-full text-gray-800 font-medium text-center">
+                                        {workingHours}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Month Days Section */}
+                        <div className="mb-8">
+                            <h3 className="text-lg md:text-xl font-semibold text-gray-700 mb-4">
+                                Number of Days in Each Month
+                            </h3>
+                            <div className="overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="bg-gray-50">
+                                            <th className="px-6 py-3 text-center text-lg font-semibold uppercase tracking-wider">
+                                                Month
+                                            </th>
+                                            <th className="px-6 py-3 text-center text-lg font-semibold uppercase tracking-wider">
+                                                Days
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {Object.keys(monthDays).map((month) => (
+                                            <tr
+                                                key={month}
+                                                className="hover:bg-gray-50"
+                                            >
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700 text-center">
+                                                    {monthNames[month]}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                    <input
+                                                        type="number"
+                                                        className="w-24 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all mx-auto text-center"
+                                                        value={monthDays[month]}
+                                                        onChange={(e) =>
+                                                            handleMonthDaysChange(
+                                                                month,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        min="1"
+                                                        max="31"
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* Save Button */}
+                        <div className="flex justify-center">
+                            <button
+                                onClick={handleSaveSettings}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-full shadow-md transition duration-200 transform hover:scale-105"
+                            >
+                                Save Settings
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                <div className="button-container text-center">
-                    <button
-                        onClick={handleSaveSettings}
-                        className="save-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-                    >
-                        Save Settings
-                    </button>
                 </div>
             </div>
         </>
