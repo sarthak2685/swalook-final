@@ -28,10 +28,8 @@ function Header() {
     const sname = localStorage.getItem("s-name");
     const branchName = localStorage.getItem("branch_name");
     const bid = localStorage.getItem("branch_id");
-    const profile= localStorage.getItem("profile_pic") || "logo"
-    console.log("profile", profile)
-
-
+    const profile = localStorage.getItem("profile_pic") || "logo";
+    console.log("profile", profile);
 
     const fetchInventory = async () => {
         try {
@@ -253,9 +251,10 @@ function Header() {
                             {profile ? (
                                 <img
                                     src={`${config.apiUrl}${profile}`}
+                                    src={`${config.apiUrl}${profile}`}
                                     alt="Profile"
                                     className="w-16 h-16 rounded-full object-contain"
-                            />
+                                />
                             ) : (
                                 <FaUserCircle className="text-gray-500 size-14" />
                             )}
