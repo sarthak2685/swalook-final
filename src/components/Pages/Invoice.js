@@ -14,6 +14,8 @@ import config from "../../config";
 import { CircularProgress } from "@mui/material";
 import { storage } from "../../utils/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import Select from "react-select";
+
 import {
     pdf,
     Document,
@@ -64,7 +66,6 @@ function Invoice() {
     const services = location.state.GBselectedServices;
     const product = location.state.productData;
     console.log("product ho tum", product);
-    console.log("service  ho tum", services);
 
     // console.log("anaf",services)
     const isGST = services.length > 0 && services[0].gst === "Exclusive";
@@ -98,9 +99,8 @@ function Invoice() {
     // console.log("coupon", coupon)
 
     const [discounts, setDiscounts] = useState(
-        services.map((service) => service.discountValue || 0)
+        Array(services.length).fill(discount)
     );
-
     const [taxes, setTaxes] = useState(Array(services.length).fill(0));
     const [cgst, setCGST] = useState(
         Array(location.state.GBselectedServices.length).fill(0)
@@ -189,23 +189,21 @@ function Invoice() {
         const updatedDetails = producData
             .map((pd, index) => {
                 const product = rawProductData.find((p) => p.id === pd.id);
-                console.log("product", producData);
                 if (product) {
                     const price = Number(product.product_price) || 0;
                     const quantity = Number(pd.quantity) || 0;
                     const tax = Number(calculateTax(price)) || 0;
                     const cgst = Number(calculateCGST(price)) || 0;
                     const sgst = Number(calculateSGST(price)) || 0;
-                    const discount = Number(pd.discountValue) || 0;
+                    const Discounts = productDiscounts[index] || 0;
 
-                    const total =
-                        price * quantity + tax + cgst + sgst - discount;
+                    const total = price * quantity + tax + cgst + sgst;
 
                     return {
                         name: product.product_name,
                         price: roundToTwoDecimals(price),
                         quantity,
-                        Discounts: discount,
+                        Discounts,
                         tax: roundToTwoDecimals(tax),
                         cgst: roundToTwoDecimals(cgst),
                         sgst: roundToTwoDecimals(sgst),
@@ -220,15 +218,6 @@ function Invoice() {
         setProductDetails(updatedDetails); // ✅ always reflects latest discounts
     }, [rawProductData, producData, productDiscounts]);
     // Removed token from dependencies as it’s defined inside useEffect
-    useEffect(() => {
-        if (producData.length) {
-            const initialDiscounts = producData.map((product) => ({
-                id: product.id,
-                discountValue: product.discountValue || 0, // fallback if undefined
-            }));
-            setProductDiscounts(initialDiscounts);
-        }
-    }, [producData]);
 
     // Add dependencies for useEffect
 
@@ -422,26 +411,15 @@ function Invoice() {
             (acc, { sgstValue }) => acc + sgstValue,
             0
         );
-        const totalProductGrandTotal = updatedProductTaxes.reduce(
-            (acc, item, i) => {
-                const discount =
-                    typeof productDiscounts[i]?.discountValue === "number"
-                        ? productDiscounts[i].discountValue
-                        : parseFloat(productDiscounts[i]?.discountValue) || 0;
-                return acc + (item.totalAmt - discount);
-            },
-            0
-        );
+        const totalProductGrandTotal = updatedProductTaxes
+            .map((item, i) => {
+                const discount = productDiscounts[i] || 0;
+                return item.totalAmt - discount;
+            })
+            .reduce((acc, val) => acc + val, 0);
 
         const productDiscount = Array.isArray(productDiscounts)
-            ? parseFloat(
-                  productDiscounts
-                      .reduce(
-                          (acc, d) => acc + (parseFloat(d.discountValue) || 0),
-                          0
-                      )
-                      .toFixed(2)
-              )
+            ? productDiscounts.reduce((acc, d) => acc + (parseFloat(d) || 0), 0)
             : 0;
 
         // Final totals including membership
@@ -606,7 +584,7 @@ function Invoice() {
 
     const handleGenerateInvoice = async (e) => {
         e.preventDefault();
-        if (invoiceGenerated) {
+        if (invoiceGenerated && totalPayment === final_price) {
             setPopupMessage("Invoice has already been generated");
             setShowPopup(true);
             return;
@@ -722,10 +700,10 @@ function Invoice() {
             coupon: coupon,
             // If payment_mode is an object, convert it to a list of dictionaries
             new_mode:
-                Object.keys(payment_mode).length > 0
-                    ? Object.keys(payment_mode).map((mode) => ({
+                Object.keys(paymentModes).length > 0
+                    ? Object.keys(paymentModes).map((mode) => ({
                           mode: mode,
-                          amount: payment_mode[mode],
+                          amount: paymentModes[mode],
                       }))
                     : [{ mode: "cash", amount: total_prise }], // Default to cash if payment_mode is empty
         };
@@ -843,6 +821,36 @@ function Invoice() {
     //   });
     // };
 
+    const [paymentModes, setPaymentModes] = useState({});
+
+    const [selectedPayments, setSelectedPayments] = useState([]);
+    const [amounts, setAmounts] = useState({});
+    const options = [
+        { value: "cash", label: "Cash" },
+        { value: "upi", label: "UPI" },
+        { value: "card", label: "Card" },
+        { value: "net_banking", label: "Net Banking" },
+        { value: "other", label: "Other" },
+    ];
+
+    const handleSelectChange = (selectedOptions) => {
+        const updatedPayments = {};
+        selectedOptions.forEach((option) => {
+            updatedPayments[option.value] = paymentModes[option.value] || ""; // Preserve existing amount
+        });
+        setPaymentModes(updatedPayments);
+    };
+    const handleAmountChange = (mode, value) => {
+        setPaymentModes((prev) => ({
+            ...prev,
+            [mode]: value, // Update the amount for the selected mode
+        }));
+    };
+
+    const totalPayment = Object.values(paymentModes).reduce(
+        (sum, amount) => sum + (parseFloat(amount) || 0),
+        0
+    );
     const handleSendInvoice = async (formData) => {
         const token = localStorage.getItem("token");
 
@@ -982,7 +990,7 @@ function Invoice() {
             address,
             email,
             mobile_no,
-            payment_mode,
+            paymentModes,
             getInvoiceId,
             getCurrentDate,
             isGST,
@@ -1030,10 +1038,10 @@ function Invoice() {
                             <Text style={styles.paymentTitle}>
                                 Payment Mode:
                             </Text>
-                            {Object.keys(payment_mode).map((mode) => (
+                            {Object.keys(paymentModes).map((mode) => (
                                 <Text key={mode} style={styles.paymentText}>
                                     <Text style={styles.bold}>{mode}:</Text>{" "}
-                                    {payment_mode[mode]}
+                                    {paymentModes[mode]}
                                 </Text>
                             ))}
                         </View>
@@ -1133,7 +1141,7 @@ function Invoice() {
                                 <Text
                                     style={[styles.tableCell, { width: "10%" }]}
                                 >
-                                    {service.discountValue || 0}
+                                    {service.discount || 0}
                                 </Text>
 
                                 {/* Check if GST fields should be displayed */}
@@ -1609,9 +1617,9 @@ function Invoice() {
                                 <p>
                                     <b>Payment Mode:</b>
                                 </p>
-                                {Object.keys(payment_mode).map((mode) => (
+                                {Object.keys(paymentModes).map((mode) => (
                                     <p key={mode}>
-                                        <b>{mode}:</b> {payment_mode[mode]}
+                                        <b>{mode}:</b> {paymentModes[mode]}
                                     </p>
                                 ))}
                             </div>
@@ -1752,7 +1760,25 @@ function Invoice() {
                                                 className="text-center"
                                                 style={{ textAlign: "center" }}
                                             >
-                                                {service.discountValue}
+                                                <input
+                                                    type="number"
+                                                    className="editable-field"
+                                                    id={`discount_input_${index}`}
+                                                    defaultValue={
+                                                        discounts[index] ===
+                                                            null ||
+                                                        discounts[index] ===
+                                                            undefined
+                                                            ? 0
+                                                            : discounts[index]
+                                                    }
+                                                    onBlur={(e) =>
+                                                        handleDiscountBlur(
+                                                            index,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
                                             </td>
                                             {isGST ||
                                             isMemGst ||
@@ -2132,13 +2158,32 @@ function Invoice() {
                                                     {product.quantity}
                                                 </td>
                                                 <td
-                                                    scope="col"
                                                     className="text-center"
                                                     style={{
                                                         textAlign: "center",
                                                     }}
                                                 >
-                                                    {product.Discounts}
+                                                    <input
+                                                        type="number"
+                                                        className="editable-field"
+                                                        id={`discount_input_${index}`}
+                                                        defaultValue={
+                                                            discounts[index] ===
+                                                                null ||
+                                                            discounts[index] ===
+                                                                undefined
+                                                                ? 0
+                                                                : discounts[
+                                                                      index
+                                                                  ]
+                                                        }
+                                                        onBlur={(e) =>
+                                                            handleDiscountProduct(
+                                                                index,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
                                                 </td>
 
                                                 {isGST ||
@@ -2347,15 +2392,99 @@ function Invoice() {
                             </div>
                         </div>
                     </div>
+
+                    <div className="flex flex-col">
+                        <span className="font-semibold items-start flex mb-4">
+                            Mode of Payment
+                        </span>
+                        <Select
+                            isMulti
+                            isSearchable={false}
+                            options={options}
+                            className="col-span-1 p-1 rounded-full font-semibold placeholder-gray-400 z-0"
+                            onChange={handleSelectChange}
+                            placeholder="Select Payment Mode"
+                            required
+                        />
+                    </div>
+
+                    {/* Payment Amount Table */}
+                    {Object.keys(paymentModes).length > 0 && (
+                        <div className="mt-4">
+                            <table className="sm:w-full md:w-1/3 border-collapse border border-gray-300">
+                                <thead>
+                                    <tr className="bg-gray-100">
+                                        <th className="border border-gray-300 p-2">
+                                            Payment Mode
+                                        </th>
+                                        <th className="border border-gray-300 p-2">
+                                            Amount
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Object.keys(paymentModes).map((mode) => (
+                                        <tr key={mode}>
+                                            <td className="border border-gray-300 p-2">
+                                                {mode}
+                                            </td>
+                                            <td className="border border-gray-300 p-2">
+                                                <input
+                                                    type="digit"
+                                                    placeholder="Enter Amount"
+                                                    value={paymentModes[mode]}
+                                                    onChange={(e) =>
+                                                        handleAmountChange(
+                                                            mode,
+                                                            parseFloat(
+                                                                e.target.value
+                                                            ) || 0
+                                                        )
+                                                    }
+                                                    className="w-full border border-gray-300 rounded-[2.5rem] p-2"
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                                <tfoot>
+                                    <tr className="bg-gray-100 font-semibold">
+                                        <td className="p-2 border text-left">
+                                            Total Payment
+                                        </td>
+                                        <td className="p-2 border">
+                                            {final_price}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            {/* Error Message if amounts don't match */}
+                            {totalPayment !== final_price && (
+                                <p className="text-red-500 mt-2">
+                                    Error: Payment total (
+                                    {totalPayment.toFixed(2)}) does not match
+                                    the Grand Total ({final_price.toFixed(2)})!
+                                </p>
+                            )}
+                        </div>
+                    )}
                 </form>
             </div>
             <div className="flex items-center justify-center mt-8">
                 <button
-                    className="flex items-center justify-center px-6 py-2 text-white 
-              bg-blue-500 rounded-md hover:bg-blue-600 
-              focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
+                    type="submit"
                     onClick={handleGenerateInvoice}
-                    disabled={loading || invoiceGenerated}
+                    disabled={
+                        totalPayment !== final_price ||
+                        loading ||
+                        invoiceGenerated
+                    } // Disable if totals don't match
+                    className={`py-2 px-12 bg-blue-500 text-xl text-white font-semibold rounded-[2.5rem] ${
+                        totalPayment !== final_price
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                    }`}
                 >
                     {loading ? (
                         <CircularProgress size={24} color="inherit" />

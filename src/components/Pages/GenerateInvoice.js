@@ -7,6 +7,7 @@ import Header from "./Header";
 import VertNav from "./VertNav";
 import { FaTimes } from "react-icons/fa";
 import Select from "react-select";
+
 import { Helmet } from "react-helmet";
 import config from "../../config";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -38,8 +39,11 @@ function GenerateInvoice() {
     const [value, selectedValues] = useState([]);
     const [service_by, setServiceBy] = useState([]);
     const [service, setService] = useState([]);
+
     const [staff, setStaff] = useState([]);
+
     const [discount, setDiscount] = useState(0);
+
     const [isGST, setIsGST] = useState(false);
     const [gst_number, setGSTNumber] = useState("");
     const [comments, setComments] = useState("");
@@ -50,19 +54,22 @@ function GenerateInvoice() {
     const [hasFetchedServicesCategory, setHasFetchedServicesCategory] =
         useState(false);
     const [hasFetchedProducts, setHasFetchedProducts] = useState(false);
-    const [selectedList, setSelectedList] = useState([]);
-    const [selectedCategoryValues, setSelectedCategoryValues] = useState([]);
-    const [selectedCategoryList, setSelectedCategoryList] = useState([]);
+    const [selectedList, setSelectedList] = useState([]); // Initialize selectedList as an empty array
+    const [selectedCategoryValues, setSelectedCategoryValues] = useState([]); // Initialize selectedList as an empty array
+    const [selectedCategoryList, setSelectedCategoryList] = useState([]); // Initialize selectedList as an empty array
     const [selectedServiceValues, setSelectedServiceValues] = useState([]);
     const [productList, setProductList] = useState([]);
+
     const [isServiceModalOpen, setServiceModalOpen] = useState(false);
     const [isProductModalOpen, setProductModalOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState(""); // Tracks selected service category
     const [searchQuery, setSearchQuery] = useState("");
+
     const [selectedServices, setSelectedServices] = useState([]);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [deleteInvoiceId, setDeleteInvoiceId] = useState(null);
     const [anniversaryDate, setAnniversaryDate] = useState(null);
+
     const [userExists, setUserExists] = useState(null);
     const [membershipOptions, setMembershipOptions] = useState(false);
     const [selectMembership, setSelectMembership] = useState("");
@@ -71,84 +78,7 @@ function GenerateInvoice() {
     const [selectCoupon, setSelectCoupon] = useState("");
     const [userId, setUserId] = useState(null);
     const modalRef = useRef(null);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [dialogTitle, setDialogTitle] = useState("");
-    const [dialogMessage, setDialogMessage] = useState("");
-    const branchName = localStorage.getItem("branch_name");
-    const sname = localStorage.getItem("s-name");
-    const [InvoiceId, setInvoiceId] = useState("");
-    const [inventoryData, setInventoryData] = useState([]);
-    const [pq, setPQ] = useState("");
-    const [product_value, setProductValue] = useState([]);
-    const [productData, setProductData] = useState([]);
-    const [customerName, setCustomerName] = useState("");
-    const [customerNumber, setCustomerNumber] = useState("");
-    const [loyaltyProgram, setLoyaltyProgram] = useState("");
-    const [points, setPoints] = useState(0);
-    const [expiryDays, setExpiryDays] = useState("");
-    const [showPopup, setShowPopup] = useState(false);
-    const [popupMessage, setPopupMessage] = useState("");
-    const [staffData, setStaffData] = useState([]);
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [customerData, setCustomerData] = useState(null);
-    const [apiCalled, setApiCalled] = useState(false);
-    const [staffApiCalled, setStaffApiCalled] = useState(false);
-    const [dateOfBirth, setDateOfBirth] = useState(null);
-    const [filter, setFilter] = useState("all");
-    const [genderFilter, setGenderFilter] = useState([]);
-    const [paymentModes, setPaymentModes] = useState({});
-    const bid = localStorage.getItem("branch_id");
-    const token = localStorage.getItem("token");
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [deductedPoints, setDeductedPoints] = useState("");
-    const [valueDeductedPoints, setValueDeductedPoints] = useState("");
-    const [customerId, setCustomerId] = useState("");
-    const location = useLocation();
-    const { appointment } = location.state || {};
-
-    // Calculate discount amount for an item
-    const calculateDiscountAmount = (item) => {
-        if (!item.discountValue) return 0;
-
-        const subtotal = (item.price || 0) * (item.quantity || 1);
-
-        return item.discountType === "percentage"
-            ? (subtotal * item.discountValue) / 100
-            : Math.min(item.discountValue, subtotal);
-    };
-
-    // Calculate totals
-    const calculateTotals = () => {
-        const subtotal = combinedList.reduce(
-            (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
-            0
-        );
-
-        const totalDiscount = combinedList.reduce(
-            (sum, item) => sum + calculateDiscountAmount(item),
-            0
-        );
-
-        const totalGST = combinedList.reduce((sum, item) => {
-            if (item.gst === "Inclusive") {
-                return sum + item.price * (item.quantity || 1) * 0.18;
-            } else if (item.gst === "Exclusive") {
-                return sum + item.price * (item.quantity || 1) * 0.18;
-            }
-            return sum;
-        }, 0);
-
-        return {
-            subtotal: subtotal.toFixed(2),
-            totalDiscount: totalDiscount.toFixed(2),
-            totalGST: totalGST.toFixed(2),
-            grandTotal: (subtotal - totalDiscount).toFixed(2),
-        };
-    };
-
-    const combinedList = [...selectedList, ...productList];
-    const totals = calculateTotals();
-
+    // Close modal on outside click
     const handleClickOutside = (event) => {
         if (modalRef.current && !modalRef.current.contains(event.target)) {
             setServiceModalOpen(false);
@@ -162,6 +92,45 @@ function GenerateInvoice() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    const handleProduct_Select = () => {
+        // Action after selecting products
+        setProductModalOpen(false);
+    };
+
+    const [dialogOpen, setDialogOpen] = useState(false); // State for dialog visibility
+    const [dialogTitle, setDialogTitle] = useState(""); // State for dialog title
+    const [dialogMessage, setDialogMessage] = useState(""); // State for dialog message
+
+    const branchName = localStorage.getItem("branch_name");
+    const sname = localStorage.getItem("s-name");
+    console.log(sname);
+    const [InvoiceId, setInvoiceId] = useState("");
+    const [inventoryData, setInventoryData] = useState([]);
+    const [pq, setPQ] = useState("");
+    const [product_value, setProductValue] = useState([]);
+    const [productData, setProductData] = useState([]);
+
+    const [customerName, setCustomerName] = useState("");
+    const [customerNumber, setCustomerNumber] = useState("");
+    //  const [email, setEmail] = useState('');
+    const [loyaltyProgram, setLoyaltyProgram] = useState("");
+    const [points, setPoints] = useState(0);
+    const [expiryDays, setExpiryDays] = useState("");
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState("");
+    const [staffData, setStaffData] = useState([]);
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    const [customerData, setCustomerData] = useState(null);
+    const [apiCalled, setApiCalled] = useState(false);
+    const [staffApiCalled, setStaffApiCalled] = useState(false);
+    const [dateOfBirth, setDateOfBirth] = useState(null);
+    const [filter, setFilter] = useState("all"); // "all", "men", "women"
+    const [genderFilter, setGenderFilter] = useState([]); // Default is no filter
+    const [paymentModes, setPaymentModes] = useState({});
+
+    const bid = localStorage.getItem("branch_id");
+    const token = localStorage.getItem("token");
 
     const fetchData = async () => {
         try {
@@ -205,7 +174,6 @@ function GenerateInvoice() {
 
             result.data.forEach((product) => {
                 if (product.stocks_in_hand <= 0) return; // 🚫 Skip products with no stock
-
                 const categoryName =
                     product.category_details?.product_category ||
                     "Uncategorized";
@@ -217,7 +185,7 @@ function GenerateInvoice() {
                         products: [],
                     });
                 }
-
+                // console.log("check", categoryMap,product)
                 categoryMap.get(categoryName).products.push({
                     id: product.id,
                     name: product.product_name || "Unnamed Product",
@@ -226,6 +194,9 @@ function GenerateInvoice() {
                     staff: [],
                     note: "No notes added",
                     category: categoryName,
+                    stock: product.stocks_in_hand, // Added stock information
+                    unit: product.unit || "", // Added unit information
+                    expiryDate: product.expiry_date, // Added expiry date
                 });
             });
 
@@ -587,58 +558,38 @@ function GenerateInvoice() {
 
     // Handle input change for quantity and price
     const handleInputChange = (index, field, value) => {
-        const updatedList = [...combinedList];
-
-        // Handle empty values
         if (value === "") {
-            updatedList[index][field] = "";
-            updateCombinedList(updatedList);
+            // Allow empty value while typing
+            if (index < selectedList.length) {
+                const updatedSelectedList = [...selectedList];
+                updatedSelectedList[index][field] = "";
+                setSelectedList(updatedSelectedList);
+            } else {
+                const productIndex = index - selectedList.length;
+                if (productIndex < productList.length) {
+                    const updatedProductList = [...productList];
+                    updatedProductList[productIndex][field] = "";
+                    setProductList(updatedProductList);
+                }
+            }
             return;
         }
 
-        // Handle numeric values
-        const numericValue =
-            field === "price"
-                ? parseFloat(value) || 0
-                : parseInt(value, 10) || 1;
+        const newValue = parseInt(value, 10) || 1;
 
-        // Special handling for discount value
-        if (field === "discountValue") {
-            // Validate percentage discount doesn't exceed 100%
-            if (
-                updatedList[index].discountType === "percentage" &&
-                numericValue > 100
-            ) {
-                return; // Don't update if invalid
-            }
-
-            // Validate fixed discount doesn't exceed item subtotal
-            if (updatedList[index].discountType === "fixed") {
-                const subtotal =
-                    (updatedList[index].price || 0) *
-                    (updatedList[index].quantity || 1);
-                if (numericValue > subtotal) {
-                    return; // Don't update if invalid
-                }
+        if (index < selectedList.length) {
+            const updatedSelectedList = [...selectedList];
+            updatedSelectedList[index][field] = newValue;
+            setSelectedList(updatedSelectedList);
+            updateServicesTableData(updatedSelectedList);
+        } else {
+            const productIndex = index - selectedList.length;
+            if (productIndex < productList.length) {
+                const updatedProductList = [...productList];
+                updatedProductList[productIndex][field] = newValue;
+                setProductList(updatedProductList);
             }
         }
-
-        updatedList[index][field] = numericValue;
-        updateCombinedList(updatedList);
-    };
-
-    // Update your combined list state
-    const updateCombinedList = (updatedList) => {
-        // Update the appropriate state based on item type
-        const services = updatedList.filter((item) =>
-            selectedList.some((s) => s.id === item.id)
-        );
-        const products = updatedList.filter((item) =>
-            productList.some((p) => p.id === item.id)
-        );
-
-        setSelectedList(services);
-        setProductList(products);
     };
 
     // Update service table data
@@ -682,6 +633,8 @@ function GenerateInvoice() {
     console.log("Selected salon:", sname);
     console.log(staffData);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const openModal = (index) => {
         setIsModalOpen(index); // Set the index of the row whose modal should be open
     };
@@ -723,6 +676,9 @@ function GenerateInvoice() {
     const handleGSTChange = (event) => {
         setIsGST(true);
     };
+
+    const [deductedPoints, setDeductedPoints] = useState("");
+    const [valueDeductedPoints, setValueDeductedPoints] = useState("");
 
     const fetchSpecificSerial = async () => {
         try {
@@ -1235,6 +1191,8 @@ function GenerateInvoice() {
     const hasCoupon = Array.isArray(couponType) && couponType.length > 0;
     console.log("hasCoupon", hasCoupon, hasMembership);
 
+    const [customerId, setCustomerId] = useState("");
+
     const fetchCustomerData = async () => {
         if (!mobile_no || mobile_no.length !== 10) {
             console.error("Invalid mobile number.");
@@ -1266,6 +1224,7 @@ function GenerateInvoice() {
         }
     };
 
+    const combinedList = [...selectedList, ...productList];
     console.log("combinedList", combinedList);
 
     // Debounced effect
@@ -1459,14 +1418,13 @@ function GenerateInvoice() {
         membershipPrice +
         couponDiscount -
         deductedPoints -
-        valueDeductedPoints -
-        (totals?.totalDiscount || 0); // <- Safeguard in case totals is undefined
+        valueDeductedPoints;
 
     const formattedGrandTotal = isNaN(grandTotal) ? 0 : grandTotal;
 
     const grandTotalFormatted = formattedGrandTotal.toFixed(2);
     const handleInvoiceSubmit = (e) => {
-        if (totalPayment === grandTotal) {
+        if (grandTotal) {
             console.log("Form submitted");
         } else {
             e.preventDefault();
@@ -1486,6 +1444,9 @@ function GenerateInvoice() {
         }));
     };
 
+    // Use useLocation to access the passed state
+    const location = useLocation();
+    const { appointment } = location.state || {};
     // Set initial values from appointment data
     console.log("Appointment", appointment);
     useEffect(() => {
@@ -1502,271 +1463,6 @@ function GenerateInvoice() {
             setStaff(appointment.service_by || "");
         }
     }, [appointment]);
-
-    // Render the Service Table with Discount Functionality
-    const renderServiceTable = () => (
-        <div className="my-4" id="service-table">
-            {combinedList.length > 0 ? (
-                <table className="w-full border border-gray-200">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="border px-4 py-2">Category</th>
-                            <th className="border px-4 py-2">Name</th>
-                            <th className="border px-4 py-2">Price</th>
-                            <th className="border px-4 py-2">Quantity</th>
-                            <th className="border px-4 py-2">GST</th>
-                            <th className="border px-4 py-2">Discount</th>
-                            <th className="border px-4 py-2">Staff</th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-center">
-                        {combinedList.map((item, index) => (
-                            <tr key={index} className="border">
-                                <td className="p-2 border">
-                                    {item.category || "Uncategorized"}
-                                </td>
-                                <td className="p-2 border">
-                                    {item.name || item.Description}
-                                </td>
-                                <td className="p-2 border">
-                                    <input
-                                        type="number"
-                                        className="border w-20 px-2 py-1 text-center"
-                                        placeholder="Price"
-                                        min="0"
-                                        step="0.01"
-                                        value={
-                                            item.gst === "Inclusive"
-                                                ? (item.price / 1.18).toFixed(2)
-                                                : item.price || ""
-                                        }
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                index,
-                                                "price",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </td>
-                                <td className="p-2 border">
-                                    <input
-                                        type="number"
-                                        className="border w-20 px-2 py-1 text-center"
-                                        placeholder="Qty"
-                                        min="1"
-                                        value={
-                                            item.quantity !== undefined
-                                                ? item.quantity
-                                                : 1
-                                        }
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                index,
-                                                "quantity",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </td>
-                                <td className="p-2 border">
-                                    <select
-                                        className="border px-2 py-1"
-                                        value={item.gst || "No GST"}
-                                        onChange={(e) => handleGST(e, index)}
-                                        required
-                                    >
-                                        <option value="No GST">No GST</option>
-                                        <option value="Inclusive">
-                                            Inclusive
-                                        </option>
-                                        <option value="Exclusive">
-                                            Exclusive
-                                        </option>
-                                    </select>
-                                </td>
-                                <td className="p-2 border">
-                                    <div className="flex flex-col items-center space-y-1">
-                                        <div className="flex items-center border rounded overflow-hidden bg-white focus-within:ring-2 focus-within:ring-[#52B788]">
-                                            <select
-                                                className="px-2 py-[6px] text-sm bg-gray-100 border-none focus:outline-none cursor-pointer font-semibold text-gray-700"
-                                                value={
-                                                    item.discountType ||
-                                                    "percentage"
-                                                }
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        index,
-                                                        "discountType",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            >
-                                                <option value="fixed">₹</option>
-                                            </select>
-                                            <input
-                                                type="number"
-                                                className="w-16 px-2 py-[6px] text-center text-sm border-l focus:outline-none"
-                                                placeholder="0"
-                                                min="0"
-                                                max={
-                                                    item.discountType ===
-                                                    "percentage"
-                                                        ? "100"
-                                                        : ""
-                                                }
-                                                value={item.discountValue || ""}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        index,
-                                                        "discountValue",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                        </div>
-
-                                        {item.discountValue && (
-                                            <div className="text-xs text-gray-600">
-                                                {item.discountType ===
-                                                "percentage" ? (
-                                                    <>
-                                                        ₹
-                                                        {calculateDiscountAmount(
-                                                            item
-                                                        ).toFixed(2)}{" "}
-                                                        off
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        {(
-                                                            (item.discountValue /
-                                                                ((item.price ||
-                                                                    0) *
-                                                                    (item.quantity ||
-                                                                        1))) *
-                                                            100
-                                                        ).toFixed(1)}
-                                                        % off
-                                                    </>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </td>
-
-                                <td
-                                    className="p-2 border"
-                                    onClick={fetchStaffData}
-                                >
-                                    {" "}
-                                    <div
-                                        className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
-                                        onClick={() => openModal(index)}
-                                    >
-                                        {item.staff && item.staff.length > 0 ? (
-                                            <span>
-                                                {item.staff
-                                                    .map((staff) => staff.label)
-                                                    .join(", ")}
-                                            </span>
-                                        ) : selectedList.includes(item) ? (
-                                            <span className="text-red-500">
-                                                Select Staff *
-                                            </span>
-                                        ) : (
-                                            <span>Select Staff (Optional)</span>
-                                        )}
-                                    </div>
-                                    {isModalOpen === index && (
-                                        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-                                            <div className="bg-white w-96 p-4 rounded-[2.5rem] shadow-lg">
-                                                <h3 className="text-lg font-bold mb-4">
-                                                    Select Staff
-                                                </h3>
-                                                <Select
-                                                    isMulti
-                                                    isSearchable={false}
-                                                    options={staffData}
-                                                    placeholder="Select Served By"
-                                                    className="rounded-[2.5rem] font-semibold"
-                                                    value={item.staff || []}
-                                                    onChange={(selected) => {
-                                                        handleServedSelect(
-                                                            selected,
-                                                            index
-                                                        );
-                                                    }}
-                                                    styles={{
-                                                        control: (base) => ({
-                                                            ...base,
-                                                            borderRadius:
-                                                                "2.5rem",
-                                                            padding: "2px",
-                                                        }),
-                                                    }}
-                                                />
-                                                <div className="flex justify-end mt-4">
-                                                    <button
-                                                        type="button"
-                                                        className="px-4 py-2 bg-gray-300 text-black rounded-[2.5rem] mr-2"
-                                                        onClick={closeModal}
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="px-4 py-2 bg-blue-500 text-white rounded-[2.5rem]"
-                                                        onClick={closeModal}
-                                                    >
-                                                        Done
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                    <tfoot>
-                        <tr className="bg-gray-100 font-semibold">
-                            <td className="p-2 border text-left" colSpan="2">
-                                Subtotal
-                            </td>
-                            <td className="p-2 border text-center">
-                                {totals.subtotal}
-                            </td>
-                            <td className="p-2 border text-center">
-                                {combinedList.reduce(
-                                    (sum, item) =>
-                                        sum + (Number(item.quantity) || 1),
-                                    0
-                                )}
-                            </td>
-                            <td className="p-2 border text-center">
-                                {totals.totalGST}
-                            </td>
-                            <td className="p-2 border text-center">
-                                {totals.totalDiscount}
-                            </td>
-                            <td className="p-2 border"></td>
-                        </tr>
-                        <tr className="bg-gray-50 font-bold">
-                            <td className="p-2 border text-left" colSpan="6">
-                                Grand Total (After Discount)
-                            </td>
-                            <td className="p-2 border text-center">
-                                {totals.grandTotal}
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            ) : (
-                <p className="text-center text-gray-500">No items added</p>
-            )}
-        </div>
-    );
 
     return (
         <>
@@ -2092,7 +1788,377 @@ function GenerateInvoice() {
                                         </button>
                                     </div>
                                     <div className="my-4" id="service-table">
-                                        {renderServiceTable()}
+                                        {combinedList.length > 0 ? (
+                                            <table className="w-full border border-gray-200">
+                                                <thead>
+                                                    <tr className="bg-gray-100">
+                                                        <th className="border px-4 py-2">
+                                                            Category
+                                                        </th>
+                                                        <th className="border px-4 py-2">
+                                                            Name
+                                                        </th>
+                                                        <th className="border px-4 py-2">
+                                                            Price
+                                                        </th>
+                                                        <th className="border px-4 py-2">
+                                                            Quantity
+                                                        </th>
+                                                        <th className="border px-4 py-2">
+                                                            GST
+                                                        </th>
+                                                        <th className="border px-4 py-2">
+                                                            Staff
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="text-center">
+                                                    {combinedList.map(
+                                                        (combine, index) => (
+                                                            <tr
+                                                                key={index}
+                                                                className="border"
+                                                            >
+                                                                <td className="p-2 border">
+                                                                    {combine.category ||
+                                                                        "Uncategorized"}
+                                                                </td>
+                                                                <td className="p-2 border">
+                                                                    {combine.name ||
+                                                                        combine.Description}
+                                                                </td>
+                                                                <td className="p-2 border">
+                                                                    <input
+                                                                        type="number"
+                                                                        className="border w-20 px-2 py-1 text-center"
+                                                                        placeholder="Price"
+                                                                        min="0"
+                                                                        value={
+                                                                            combine.gst ===
+                                                                            "Inclusive"
+                                                                                ? (
+                                                                                      combine.price /
+                                                                                      1.18
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                                : combine.price ||
+                                                                                  ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            handleInputChange(
+                                                                                index,
+                                                                                "price",
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </td>
+
+                                                                <td className="p-2 border">
+                                                                    {combine.stock ? ( // This is a product with stock information
+                                                                        <div className="flex flex-col items-center">
+                                                                            <input
+                                                                                type="number"
+                                                                                className="border w-20 px-2 py-1 text-center"
+                                                                                placeholder="Qty"
+                                                                                min="1"
+                                                                                max={
+                                                                                    combine.stock
+                                                                                }
+                                                                                value={
+                                                                                    combine.quantity ||
+                                                                                    ""
+                                                                                }
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    const value =
+                                                                                        parseInt(
+                                                                                            e
+                                                                                                .target
+                                                                                                .value
+                                                                                        ) ||
+                                                                                        0;
+                                                                                    if (
+                                                                                        value >
+                                                                                        combine.stock
+                                                                                    ) {
+                                                                                        alert(
+                                                                                            `Only ${combine.stock} available in stock`
+                                                                                        );
+                                                                                        return;
+                                                                                    }
+                                                                                    handleInputChange(
+                                                                                        index,
+                                                                                        "quantity",
+                                                                                        value
+                                                                                    );
+                                                                                }}
+                                                                                style={{
+                                                                                    borderColor:
+                                                                                        !combine.quantity ||
+                                                                                        combine.quantity ===
+                                                                                            "0" ||
+                                                                                        (combine.stock &&
+                                                                                            combine.quantity >
+                                                                                                combine.stock)
+                                                                                            ? "red"
+                                                                                            : "black",
+                                                                                }}
+                                                                            />
+                                                                            <span className="text-xs text-gray-500 mt-1">
+                                                                                Available:{" "}
+                                                                                {
+                                                                                    combine.stock
+                                                                                }{" "}
+                                                                            </span>
+                                                                        </div>
+                                                                    ) : (
+                                                                        // This is a service
+                                                                        <input
+                                                                            type="number"
+                                                                            className="border w-20 px-2 py-1 text-center"
+                                                                            placeholder="Qty"
+                                                                            min="1"
+                                                                            value={
+                                                                                combine.quantity ||
+                                                                                1
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                handleInputChange(
+                                                                                    index,
+                                                                                    "quantity",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                </td>
+
+                                                                <td className="p-2 border">
+                                                                    <select
+                                                                        className="border px-2 py-1"
+                                                                        value={
+                                                                            combine.gst ||
+                                                                            "No GST"
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            handleGST(
+                                                                                e,
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                        required
+                                                                    >
+                                                                        <option value="No GST">
+                                                                            No
+                                                                            GST
+                                                                        </option>
+                                                                        <option value="Inclusive">
+                                                                            Inclusive
+                                                                        </option>
+                                                                        <option value="Exclusive">
+                                                                            Exclusive
+                                                                        </option>
+                                                                    </select>
+                                                                </td>
+                                                                <td
+                                                                    className="p-2 border"
+                                                                    onClick={
+                                                                        fetchStaffData
+                                                                    }
+                                                                >
+                                                                    <div
+                                                                        className="border px-2 py-1 bg-white text-black rounded cursor-pointer"
+                                                                        onClick={() =>
+                                                                            openModal(
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {combine &&
+                                                                        combine.staff &&
+                                                                        combine
+                                                                            .staff
+                                                                            .length >
+                                                                            0 ? (
+                                                                            <span>
+                                                                                {combine.staff
+                                                                                    .map(
+                                                                                        (
+                                                                                            staff
+                                                                                        ) =>
+                                                                                            staff.label
+                                                                                    )
+                                                                                    .join(
+                                                                                        ", "
+                                                                                    )}
+                                                                            </span>
+                                                                        ) : selectedList.includes(
+                                                                              combine
+                                                                          ) ? ( // Check if service exists in selectedList
+                                                                            <span className="text-red-500">
+                                                                                Select
+                                                                                Staff
+                                                                                *
+                                                                            </span> // Required for services
+                                                                        ) : (
+                                                                            <span>
+                                                                                Select
+                                                                                Staff
+                                                                                (Optional)
+                                                                            </span> // Optional for products
+                                                                        )}
+                                                                    </div>
+
+                                                                    {isModalOpen ===
+                                                                        index && (
+                                                                        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+                                                                            <div className="bg-white w-96 p-4 rounded-[2.5rem] shadow-lg">
+                                                                                <h3 className="text-lg font-bold mb-4">
+                                                                                    Select
+                                                                                    Staff
+                                                                                </h3>
+                                                                                <Select
+                                                                                    isMulti
+                                                                                    isSearchable={
+                                                                                        false
+                                                                                    }
+                                                                                    options={
+                                                                                        staffData
+                                                                                    }
+                                                                                    placeholder="Select Served By"
+                                                                                    className="rounded-[2.5rem] font-semibold"
+                                                                                    value={
+                                                                                        combine.staff ||
+                                                                                        []
+                                                                                    }
+                                                                                    onChange={(
+                                                                                        selected
+                                                                                    ) =>
+                                                                                        handleServedSelect(
+                                                                                            selected,
+                                                                                            index
+                                                                                        )
+                                                                                    }
+                                                                                    styles={{
+                                                                                        control:
+                                                                                            (
+                                                                                                base
+                                                                                            ) => ({
+                                                                                                ...base,
+                                                                                                borderRadius:
+                                                                                                    "2.5rem",
+                                                                                                padding:
+                                                                                                    "2px",
+                                                                                            }),
+                                                                                    }}
+                                                                                />
+
+                                                                                <div className="flex justify-end mt-4">
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="px-4 py-2 bg-gray-300 text-black rounded-[2.5rem] mr-2"
+                                                                                        onClick={
+                                                                                            closeModal
+                                                                                        }
+                                                                                    >
+                                                                                        Cancel
+                                                                                    </button>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="px-4 py-2 bg-blue-500 text-white rounded-[2.5rem]"
+                                                                                        onClick={
+                                                                                            closeModal
+                                                                                        }
+                                                                                    >
+                                                                                        Done
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    )}
+                                                </tbody>
+                                                {/* Table Footer for Grand Total */}
+                                                <tfoot>
+                                                    <tr className="bg-gray-100 font-semibold">
+                                                        <td
+                                                            className="p-2 border text-left"
+                                                            colSpan="2"
+                                                        >
+                                                            Grand Total
+                                                        </td>
+                                                        <td className="p-2 border text-center">
+                                                            {/* Total Price Calculation */}
+                                                            {combinedList
+                                                                .reduce(
+                                                                    (
+                                                                        sum,
+                                                                        service
+                                                                    ) =>
+                                                                        sum +
+                                                                        (service.price ||
+                                                                            0) *
+                                                                            (service.quantity ||
+                                                                                1),
+                                                                    0
+                                                                )
+                                                                .toFixed(2)}
+                                                        </td>
+                                                        <td className="p-2 border text-center">
+                                                            {/* Total Quantity Calculation */}
+                                                            {combinedList.reduce(
+                                                                (
+                                                                    sum,
+                                                                    service
+                                                                ) =>
+                                                                    sum +
+                                                                    (Number(
+                                                                        service.quantity
+                                                                    ) || 1), // Convert to number
+                                                                0
+                                                            )}
+                                                        </td>
+                                                        <td className="p-2 border text-center">
+                                                            {/* Total GST Calculation */}
+                                                            {combinedList
+                                                                .reduce(
+                                                                    (
+                                                                        sum,
+                                                                        service
+                                                                    ) =>
+                                                                        sum +
+                                                                        (service.gst ===
+                                                                        "Inclusive"
+                                                                            ? service.price *
+                                                                              0.18
+                                                                            : 0),
+                                                                    0
+                                                                )
+                                                                .toFixed(2)}
+                                                        </td>
+                                                        <td className="p-2 border"></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        ) : (
+                                            <p className="text-center text-gray-500"></p>
+                                        )}
                                     </div>
 
                                     <div className="my-4" id="product-tabel">
@@ -2950,21 +3016,6 @@ function GenerateInvoice() {
                                     )}
 
                                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold items-start flex mb-4">
-                                            Mode of Payment
-                                        </span>
-                                        <Select
-                                            isMulti
-                                            isSearchable={false}
-                                            options={options}
-                                            className="col-span-1 p-1 rounded-full font-semibold placeholder-gray-400 z-0"
-                                            onChange={handleSelectChange}
-                                            placeholder="Select Payment Mode"
-                                            required
-                                        />
-                                    </div>
-
                                     {/* <div className='form-groups'>
                     <label>Discount</label>
                     <input type="number" placeholder='Enter Discount' onChange={(e) => setDiscount(e.target.value)} />
@@ -2981,79 +3032,6 @@ function GenerateInvoice() {
                                         />
                                     </div>
                                 </div>
-                                {/* Payment Amount Table */}
-                                {Object.keys(paymentModes).length > 0 && (
-                                    <div className="mt-4">
-                                        <table className="sm:w-full md:w-1/3 border-collapse border border-gray-300">
-                                            <thead>
-                                                <tr className="bg-gray-100">
-                                                    <th className="border border-gray-300 p-2">
-                                                        Payment Mode
-                                                    </th>
-                                                    <th className="border border-gray-300 p-2">
-                                                        Amount
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {Object.keys(paymentModes).map(
-                                                    (mode) => (
-                                                        <tr key={mode}>
-                                                            <td className="border border-gray-300 p-2">
-                                                                {mode}
-                                                            </td>
-                                                            <td className="border border-gray-300 p-2">
-                                                                <input
-                                                                    type="digit"
-                                                                    placeholder="Enter Amount"
-                                                                    value={
-                                                                        paymentModes[
-                                                                            mode
-                                                                        ]
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        handleAmountChange(
-                                                                            mode,
-                                                                            parseFloat(
-                                                                                e
-                                                                                    .target
-                                                                                    .value
-                                                                            ) ||
-                                                                                0
-                                                                        )
-                                                                    }
-                                                                    className="w-full border border-gray-300 rounded-[2.5rem] p-2"
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                )}
-                                            </tbody>
-                                            <tfoot>
-                                                <tr className="bg-gray-100 font-semibold">
-                                                    <td className="p-2 border text-left">
-                                                        Total Payment
-                                                    </td>
-                                                    <td className="p-2 border">
-                                                        {grandTotalFormatted}
-                                                    </td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-
-                                        {/* Error Message if amounts don't match */}
-                                        {totalPayment !== grandTotal && (
-                                            <p className="text-red-500 mt-2">
-                                                Error: Payment total (
-                                                {totalPayment.toFixed(2)}) does
-                                                not match the Grand Total (
-                                                {grandTotal.toFixed(2)})!
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
                             </div>
 
                             {isGST && (
@@ -3095,12 +3073,7 @@ function GenerateInvoice() {
                             <div className="flex items-center justify-center m-12 mt-24 ">
                                 <button
                                     type="submit"
-                                    disabled={totalPayment !== grandTotal} // Disable if totals don't match
-                                    className={`py-2 px-12 bg-blue-500 text-xl text-white font-semibold rounded-[2.5rem] ${
-                                        totalPayment !== grandTotal
-                                            ? "opacity-50 cursor-not-allowed"
-                                            : ""
-                                    }`}
+                                    className={`py-2 px-12 bg-blue-500 text-xl text-white font-semibold rounded-[2.5rem]`}
                                     onClick={handleInvoiceSubmit}
                                 >
                                     {loading ? (
