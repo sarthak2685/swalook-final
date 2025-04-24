@@ -251,7 +251,6 @@ function Header() {
                             {profile ? (
                                 <img
                                     src={`${config.apiUrl}${profile}`}
-                                    src={`${config.apiUrl}${profile}`}
                                     alt="Profile"
                                     className="w-16 h-16 rounded-full object-contain"
                                 />
