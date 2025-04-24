@@ -317,7 +317,7 @@ const Scheduler = () => {
             <div className="col-span-1 sm:col-span-2 md:col-span-3 bg-white p-4 rounded-[2.5rem]">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold text-gray-600">
-                        {selectedStaff || "staff"}'s Schedule
+                        {selectedStaff || "Staff"}'s Schedule
                     </h3>
                     <div className="flex flex-row gap-4">
                         <select
