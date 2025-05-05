@@ -14,10 +14,7 @@ import AdminDashboard from "./components/Pages/AdminDashboard/AdminDashboard.jsx
 import Settings from "./components/Pages/Settings";
 import PersonalInformation from "./components/Pages/PersonalInformation";
 import Appointment from "./components/Pages/Appointement/Appointment.jsx";
-import GenerateInvoice from "./components/Pages/GenerateInvoice";
-import Invoice from "./components/Pages/Invoice";
 import ForgetPassword from "./components/Pages/ForgetPassword";
-import ViewInvoice from "./components/Pages/ViewInvoice";
 import Branch from "./components/Pages/Branch";
 import PrivateRoute from "./utils/PrivateRoute";
 import OwnerDashboard from "./components/Pages/OwnerDashboard";
@@ -37,7 +34,6 @@ import ExpensesManagement from "./components/Pages/ExpenseMnt";
 import ExpenseSetting from "./components/Pages/ExpenseSetting";
 import Damo from "./components/Pages/Damo";
 import CustomerLoyality from "./components/Pages/CustomerLoyality";
-import ViewAllInvoices from "./components/Pages/ViewAllInvoice";
 import AllAppointment from "./components/Pages/Appointement/AllAppointment";
 import Inquiries from "./components/Pages/Inquery/Inquires.jsx";
 import NewInquiry from "./components/Pages/Inquery/NewInquiry.jsx";
@@ -47,6 +43,10 @@ import Templates from "./components/Pages/Templates.jsx";
 import MessageDetails from "./components/Pages/MessageDetails.jsx";
 import WhatsappTemplates from "./components/Pages/WhatsappTemplates.jsx";
 import WhatsappDetail from "./components/Pages/WhatsappDetail.jsx";
+import GenerateInvoice from "./components/Pages/Invoice/GenerateInvoice.js";
+import ViewInvoice from "./components/Pages/Invoice/ViewInvoice.js";
+import Invoice from "./components/Pages/Invoice/Invoice.js";
+import ViewAllInvoices from "./components/Pages/Invoice/ViewAllInvoice.jsx";
 function App() {
     const isLoggedIn = Cookies.get("loggedIn") === "true";
     const salonName = Cookies.get("salonName");
@@ -179,15 +179,15 @@ function App() {
                         <Route
                             path="/:salon_name/:branchName/message-details"
                             element={<MessageDetails />}
-                            />
-                            <Route
+                        />
+                        <Route
                             path="/:salon_name/:branchName/whatsapp-templates"
                             element={<WhatsappTemplates />}
                         />
-                         <Route
+                        <Route
                             path="/:salon_name/:branchName/whatsapp-details"
                             element={<WhatsappDetail />}
-                            />
+                        />
                     </Route>
 
                     <Route path="*" element={<ErrorPage />} />
@@ -199,7 +199,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
