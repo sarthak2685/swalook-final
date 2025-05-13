@@ -820,8 +820,8 @@ function GenerateInvoice() {
                               },
                           ]
                         : [],
-                    d_o_b: dateOfBirth || "",
-                    d_o_a: anniversaryDate || "",
+                    d_o_b: dateOfBirth || "none",
+                    d_o_a: anniversaryDate || "none",
                     coupon:
                         selectedCoupons.map((coupon) => ({
                             coupon_name: coupon.id,
@@ -1144,10 +1144,10 @@ function GenerateInvoice() {
                         name: customer_name,
                         mobile_no,
                         email,
-                        membership: selectMembership || "",
-                        d_o_b: dateOfBirth || "",
-                        d_o_a: anniversaryDate || "",
-                        coupon: selectedCoupons || "",
+                        membership: selectMembership || [],
+                        d_o_b: dateOfBirth || "none",
+                        d_o_a: anniversaryDate || "none",
+                        coupon: selectedCoupons || [],
                     }),
                 }
             );
