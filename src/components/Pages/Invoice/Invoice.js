@@ -155,6 +155,38 @@ function Invoice() {
     const [productDiscounts, setProductDiscounts] = useState(
         productDiscountsvalue
     );
+    const [productDiscountPercentages, setProductDiscountPercentages] =
+        useState(
+            product.map((item) => {
+                const price = item.price;
+                const discount = parseFloat(
+                    item.discount || item.discountValue || 0
+                );
+                const percent = price
+                    ? ((discount / price) * 100).toFixed(2)
+                    : "";
+                return percent !== "0.00" ? percent : "";
+            })
+        );
+
+    // For Products
+    const handleProductDiscountPercentageChange = (index, value) => {
+        const percentValue = parseFloat(value) || 0;
+        const price =
+            productDetails[index]?.price || producData[index]?.price || 0;
+        const calculatedFlat = ((percentValue / 100) * price).toFixed(2);
+
+        // Update percentage discounts
+        const newPercentages = [...productDiscountPercentages];
+        newPercentages[index] = value;
+        setProductDiscountPercentages(newPercentages);
+
+        // Update flat discounts
+        const newDiscounts = [...productDiscounts];
+        newDiscounts[index] = parseFloat(calculatedFlat);
+        setProductDiscounts(newDiscounts);
+    };
+
 
     const staffNames = service_by
         .map(
@@ -188,7 +220,11 @@ function Invoice() {
             name: item.name,
             price: item.price,
             quantity: item.quantity,
-            discount: String(productDiscounts[index] || "0"), // Ensure discount is string
+            discount: String(productDiscounts[index] || "0"),
+            discountPercentage: String(
+                productDiscountPercentages[index] || "0"
+            ), // Add this line
+
             note: item.note || "No notes added",
             category: item.category,
             expiryDate: item.expiryDate,
@@ -204,14 +240,16 @@ function Invoice() {
                     .map((staffMember) =>
                         staffMember?.label ? String(staffMember.label) : ""
                     )
-                    .filter((name) => name) // Remove empty strings
-                    .join(", "), // Convert array to string
+                    .filter((name) => name)
+                    .join(", "),
+
             };
         }
 
         return {
             ...baseProduct,
-            staff: "", // Default empty string if no staff
+            staff: "",
+
         };
     });
 
@@ -272,10 +310,15 @@ function Invoice() {
                 return null;
             })
             .filter(Boolean);
-        console.log("productDetails", updatedDetails);
 
-        setProductDetails(updatedDetails); // ✅ always reflects latest discounts
-    }, [rawProductData, producData, productDiscounts]);
+        setProductDetails(updatedDetails);
+    }, [
+        rawProductData,
+        producData,
+        productDiscounts,
+        productDiscountPercentages,
+    ]); // Add productDiscountPercentages to dependencies
+
     // Removed token from dependencies as it’s defined inside useEffect
 
     // Add dependencies for useEffect
@@ -552,31 +595,61 @@ function Invoice() {
         newQuantities[index] = parseFloat(value);
         setQuantities(newQuantities);
     };
+    const [discountPercentages, setDiscountPercentages] = useState(
+        services.map((item) => {
+            const price = item.price;
+            const discount = parseFloat(item.discount || item.Discount || 0);
+            const percent = price ? ((discount / price) * 100).toFixed(2) : "";
+            return percent !== "0.00" ? percent : "";
+        })
+    );
 
     const handleDiscountBlur = (index, value) => {
-        // If the value is null or undefined, set it to 0
+
         const discountValue =
             value === null || value === undefined ? 0 : parseFloat(value);
         const newDiscounts = [...discounts];
         newDiscounts[index] = discountValue;
         setDiscounts(newDiscounts);
+
+        const price = services[index]?.price || 0;
+        const percent = price ? ((discountValue / price) * 100).toFixed(2) : "";
+        const newPercentages = [...discountPercentages];
+        newPercentages[index] = percent;
+        setDiscountPercentages(newPercentages);
+    };
+    // For Services
+    const handleDiscountPercentageChange = (index, value) => {
+        const percentValue = parseFloat(value) || 0;
+        const price = services[index]?.price || 0;
+        const calculatedFlat = ((percentValue / 100) * price).toFixed(2);
+
+        // Update percentage discounts
+        const newPercentages = [...discountPercentages];
+        newPercentages[index] = value;
+        setDiscountPercentages(newPercentages);
+
+        // Update flat discounts
+        const newDiscounts = [...discounts];
+        newDiscounts[index] = parseFloat(calculatedFlat);
+        setDiscounts(newDiscounts);
     };
     const handleDiscountProduct = (index, value) => {
-        const discountValue =
-            value === null || value === undefined ? 0 : parseFloat(value);
+        const discountValue = parseFloat(value) || 0;
+        const price =
+            productDetails[index]?.price || producData[index]?.price || 0;
+        const percent = price ? ((discountValue / price) * 100).toFixed(2) : "";
 
-        setProductDiscounts((prevDiscounts) => {
-            const newDiscounts = [...prevDiscounts];
-
-            // Fill missing indexes with 0
-            while (newDiscounts.length <= index) {
-                newDiscounts.push(0);
-            }
-
+        setProductDiscounts((prev) => {
+            const newDiscounts = [...prev];
             newDiscounts[index] = discountValue;
-            console.log("newDiscounts", newDiscounts);
-
             return newDiscounts;
+        });
+
+        setProductDiscountPercentages((prev) => {
+            const newPercentages = [...prev];
+            newPercentages[index] = percent;
+            return newPercentages;
         });
     };
 
@@ -664,6 +737,8 @@ function Invoice() {
             Price: prices[index],
             Quantity: quantities[index],
             Discount: discounts[index],
+            DiscountPercentage: discountPercentages[index] || 0, // Added discount percentage
+
             Tax_amt: taxes[index],
             Staff: staffNames[index],
             CGST: cgst[index],
@@ -672,11 +747,14 @@ function Invoice() {
         }));
 
         // Prepare products data
-        const productInvoice = productDetails.map((product) => ({
+        const productInvoice = productDetails.map((product, index) => ({
+
             Description: product.name,
             Price: product.price,
             Quantity: product.quantity,
             Discount: product.Discounts || 0,
+            DiscountPercentage: productDiscountPercentages[index] || 0, // Add this line
+
             Tax_amt: product.tax,
             CGST: product.cgst,
             SGST: product.sgst,
@@ -1092,24 +1170,92 @@ function Invoice() {
                     <View style={styles.table}>
                         {/* Table Header */}
                         <View style={[styles.tableRow, styles.tableHeader]}>
-                            <Text style={[styles.tableCell, { width: "10%" }]}>
+                            <Text style={[styles.tableCell, { width: "5%" }]}>
                                 S. No.
                             </Text>
-                            <Text style={[styles.tableCell, { width: "30%" }]}>
+                            <Text style={[styles.tableCell, { width: "25%" }]}>
                                 DESCRIPTION
                             </Text>
-                            <Text style={[styles.tableCell, { width: "15%" }]}>
+                            <Text style={[styles.tableCell, { width: "10%" }]}>
                                 PRICE
                             </Text>
-                            <Text style={[styles.tableCell, { width: "10%" }]}>
-                                QUANTITY
+                            <Text style={[styles.tableCell, { width: "5%" }]}>
+                                QTY
                             </Text>
                             <Text style={[styles.tableCell, { width: "10%" }]}>
-                                DISCOUNT
+                                DISCOUNT (RS.)
                             </Text>
-                            {isGST ||
-                                isMemGst ||
-                                (isCouponGst && (
+                            <Text style={[styles.tableCell, { width: "10%" }]}>
+                                DISCOUNT (%)
+                            </Text>
+                            {isGST || isMemGst || isCouponGst ? (
+                                <>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "10%" },
+                                        ]}
+                                    >
+                                        TAX AMT
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "10%" },
+                                        ]}
+                                    >
+                                        CGST
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "10%" },
+                                        ]}
+                                    >
+                                        SGST
+                                    </Text>
+                                </>
+                            ) : null}
+                            <Text style={[styles.tableCell, { width: "15%" }]}>
+                                TOTAL AMT
+                            </Text>
+                        </View>
+
+                        {/* Service Rows */}
+                        {services.map((service, index) => (
+                            <View style={styles.tableRow} key={index}>
+                                <Text
+                                    style={[styles.tableCell, { width: "5%" }]}
+                                >
+                                    {index + 1}
+                                </Text>
+                                <Text
+                                    style={[styles.tableCell, { width: "25%" }]}
+                                >
+                                    {service.category}: {service.name}
+                                </Text>
+                                <Text
+                                    style={[styles.tableCell, { width: "10%" }]}
+                                >
+                                    {service.price || "N/A"}
+                                </Text>
+                                <Text
+                                    style={[styles.tableCell, { width: "5%" }]}
+                                >
+                                    {service.inputFieldValue.quantity || "N/A"}
+                                </Text>
+
+                                <Text
+                                    style={[styles.tableCell, { width: "10%" }]}
+                                >
+                                    {discounts[index] || 0}
+                                </Text>
+                                <Text
+                                    style={[styles.tableCell, { width: "10%" }]}
+                                >
+                                    {discountPercentages[index] || 0}
+                                </Text>
+                                {isGST || isMemGst || isCouponGst ? (
                                     <>
                                         <Text
                                             style={[
@@ -1117,7 +1263,7 @@ function Invoice() {
                                                 { width: "10%" },
                                             ]}
                                         >
-                                            TAX AMT
+                                            {taxes[index] || "N/A"}
                                         </Text>
                                         <Text
                                             style={[
@@ -1125,7 +1271,7 @@ function Invoice() {
                                                 { width: "10%" },
                                             ]}
                                         >
-                                            CGST
+                                            {cgst[index] || "N/A"}
                                         </Text>
                                         <Text
                                             style={[
@@ -1133,85 +1279,11 @@ function Invoice() {
                                                 { width: "10%" },
                                             ]}
                                         >
-                                            SGST
+                                            {sgst[index] || "N/A"}
                                         </Text>
                                     </>
-                                ))}
-                            <Text style={[styles.tableCell, { width: "15%" }]}>
-                                TOTAL AMT
-                            </Text>
-                        </View>
-                        {/* Table Rows */}
-                        {services.map((service, index) => (
-                            <View style={styles.tableRow} key={index}>
-                                {/* Display Row Number */}
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    {index + 1}
-                                </Text>
+                                ) : null}
 
-                                {/* Display Category and Name */}
-                                <Text
-                                    style={[styles.tableCell, { width: "30%" }]}
-                                >
-                                    {service.category}: {service.name}
-                                </Text>
-
-                                {/* Display Price */}
-                                <Text
-                                    style={[styles.tableCell, { width: "15%" }]}
-                                >
-                                    {service.price ? service.price : "N/A"}
-                                </Text>
-
-                                {/* Display Input Field Value */}
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    {service.inputFieldValue.quantity || "N/A"}
-                                </Text>
-
-                                {/* Display Discount */}
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    {discounts[index] || 0}
-                                </Text>
-
-                                {/* Check if GST fields should be displayed */}
-                                {isGST ||
-                                    isMemGst ||
-                                    (isCouponGst && (
-                                        <>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {service.gst || "N/A"}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {service.cgst || "N/A"}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {service.sgst || "N/A"}
-                                            </Text>
-                                        </>
-                                    ))}
-
-                                {/* Display Total Amount */}
                                 <Text
                                     style={[styles.tableCell, { width: "15%" }]}
                                 >
@@ -1219,26 +1291,30 @@ function Invoice() {
                                 </Text>
                             </View>
                         ))}
+
                         {/* Membership Row */}
                         {membership_name && membership_name !== "None" && (
                             <View style={styles.tableRow}>
                                 <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
+                                    style={[styles.tableCell, { width: "5%" }]}
+
                                 >
                                     {services.length + 1}
                                 </Text>
                                 <Text
-                                    style={[styles.tableCell, { width: "30%" }]}
+                                    style={[styles.tableCell, { width: "25%" }]}
+
                                 >
                                     {membership_name}
                                 </Text>
                                 <Text
-                                    style={[styles.tableCell, { width: "15%" }]}
+                                    style={[styles.tableCell, { width: "10%" }]}
+
                                 >
                                     {membershipPrice}
                                 </Text>
                                 <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
+                                    style={[styles.tableCell, { width: "5%" }]}
                                 >
                                     1
                                 </Text>
@@ -1246,56 +1322,42 @@ function Invoice() {
                                     style={[styles.tableCell, { width: "10%" }]}
                                 >
                                     0
+
                                 </Text>
-                                {isGST ||
-                                    isMemGst ||
-                                    (isCouponGst && (
-                                        <>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {membershipTax}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {cgsts}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {sgsts}
-                                            </Text>
-                                        </>
-                                    ))}
+                                <Text
+                                    style={[styles.tableCell, { width: "10%" }]}
+                                >
+                                    0
+                                </Text>
                                 {isGST || isMemGst || isCouponGst ? (
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "15%" },
-                                        ]}
-                                    >
-                                        {membershipTotal}
-                                    </Text>
-                                ) : (
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "15%" },
-                                        ]}
-                                    >
-                                        {membershipTotal - membershipTax}
-                                    </Text>
-                                )}
+                                    <>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {membershipTax}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {cgsts}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {sgsts}
+                                        </Text>
+                                    </>
+                                ) : null}
+
                                 <Text
                                     style={[styles.tableCell, { width: "15%" }]}
                                 >
@@ -1303,57 +1365,66 @@ function Invoice() {
                                 </Text>
                             </View>
                         )}
-                        {coupon.map((coupon, index) => {
-                            const couponPrice = coupon.coupon_price || 0;
-                            const couponName = coupon.coupon_name;
-                            const isCouponExclusive =
-                                coupon.gst === "Exclusive";
 
-                            let couponCGST = 0,
-                                couponSGST = 0,
-                                couponTax = 0,
-                                couponTotal = couponPrice * quantity;
+                        {/* Coupon Rows */}
+                        {coupon.map((couponItem, index) => {
+                            const couponPrice = couponItem.coupon_price || 0;
+                            const isCouponExclusive =
+                                couponItem.gst === "Exclusive";
+
+                            // Calculate tax values if GST is exclusive
+                            let couponCGST = 0;
+                            let couponSGST = 0;
+                            let couponTax = 0;
+                            let couponTotal = couponPrice;
+
 
                             if (isCouponExclusive) {
                                 couponCGST = couponPrice * CGST_RATE;
                                 couponSGST = couponPrice * SGST_RATE;
                                 couponTax = couponCGST + couponSGST;
-                                couponTotal =
-                                    (couponPrice + couponTax) * quantity;
+                                couponTotal = couponPrice + couponTax;
                             }
+
+
                             return (
                                 <View style={styles.tableRow} key={index}>
                                     <Text
                                         style={[
                                             styles.tableCell,
-                                            { width: "10%" },
+                                            { width: "5%" },
                                         ]}
                                     >
-                                        {index + 1}
+                                        {services.length +
+                                            (membership_name ? 2 : 1) +
+                                            index}
                                     </Text>
                                     <Text
                                         style={[
                                             styles.tableCell,
-                                            { width: "30%" },
+                                            { width: "25%" },
                                         ]}
                                     >
-                                        {couponName}
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "15%" },
-                                        ]}
-                                    >
-                                        {couponPrice}
+                                        {couponItem.coupon_name}
+
                                     </Text>
                                     <Text
                                         style={[
                                             styles.tableCell,
                                             { width: "10%" },
+                                        ]}
+                                    >
+                                        {couponPrice.toFixed(2)}
+
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "5%" },
                                         ]}
                                     >
                                         {quantity}
+
                                     </Text>
                                     <Text
                                         style={[
@@ -1361,7 +1432,16 @@ function Invoice() {
                                             { width: "10%" },
                                         ]}
                                     >
-                                        0
+                                        0.00
+
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "10%" },
+                                        ]}
+                                    >
+                                        0.00
                                     </Text>
 
                                     {isGST || isMemGst || isCouponGst ? (
@@ -1399,122 +1479,115 @@ function Invoice() {
                                             { width: "15%" },
                                         ]}
                                     >
-                                        {isGST || isMemGst || isCouponGst
-                                            ? couponTotal.toFixed(2)
-                                            : (couponTotal - couponTax).toFixed(
-                                                  2
-                                              )}
+                                        {couponTotal.toFixed(2)}
+
                                     </Text>
                                 </View>
                             );
                         })}
-                        ;
+
+                        {/* Product Rows */}
                         {productDetails.map((product, index) => (
                             <View style={styles.tableRow} key={index}>
                                 <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
+                                    style={[styles.tableCell, { width: "5%" }]}
                                 >
-                                    {services.length + 1 + index}
+                                    {services.length +
+                                        (membership_name ? 1 : 0) +
+                                        coupon.length +
+                                        index +
+                                        1}
                                 </Text>
                                 <Text
-                                    style={[styles.tableCell, { width: "30%" }]}
+                                    style={[styles.tableCell, { width: "25%" }]}
+
                                 >
                                     {product.name}
                                 </Text>
                                 <Text
-                                    style={[styles.tableCell, { width: "15%" }]}
+                                    style={[styles.tableCell, { width: "10%" }]}
+
                                 >
                                     {product.price}
                                 </Text>
                                 <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
+                                    style={[styles.tableCell, { width: "5%" }]}
                                 >
                                     {product.quantity}
                                 </Text>
                                 <Text
                                     style={[styles.tableCell, { width: "10%" }]}
                                 >
-                                    {product.Discounts}
+                                    {productDiscounts[index] || 0}
+
                                 </Text>
-                                {isGST ||
-                                    isMemGst ||
-                                    (isCouponGst && (
-                                        <>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {product.tax}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {product.cgst}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {product.sgst}
-                                            </Text>
-                                        </>
-                                    ))}
+                                <Text
+                                    style={[styles.tableCell, { width: "10%" }]}
+                                >
+                                    {productDiscountPercentages[index] || 0}
+                                </Text>
                                 {isGST || isMemGst || isCouponGst ? (
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "15%" },
-                                        ]}
-                                    >
-                                        {product.total -
-                                            product.cgst -
-                                            product.sgst}
-                                    </Text>
-                                ) : (
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "15%" },
-                                        ]}
-                                    >
-                                        {product.total -
-                                            product.tax -
-                                            product.cgst -
-                                            product.sgst -
-                                            product.Discounts}
-                                    </Text>
-                                )}
+                                    <>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {product.tax}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {product.cgst}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {product.sgst}
+                                        </Text>
+                                    </>
+                                ) : null}
+                                <Text
+                                    style={[styles.tableCell, { width: "15%" }]}
+                                >
+                                    {product.total -
+                                        product.cgst -
+                                        product.sgst}
+                                </Text>
                             </View>
                         ))}
-                    </View>
-                    <View style={[styles.tableRow, styles.totalRow]}>
-                        <Text
-                            style={[styles.tableCell, { width: "40%" }]}
-                        ></Text>
-                        <Text style={[styles.tableCell, { width: "40%" }]}>
-                            TOTAL
-                        </Text>
-                        <Text style={[styles.tableCell, { width: "40%" }]}>
-                            {/* {total_prise} */}
-                        </Text>
-                        <Text style={[styles.tableCell, { width: "15%" }]}>
-                            {Memebrship
-                                ? total_quantity + quantity
-                                : total_quantity + quantity - 1}
-                        </Text>
-                        <Text style={[styles.tableCell, { width: "10%" }]}>
-                            {total_discount}
-                        </Text>
-                        {isGST ||
-                            isMemGst ||
-                            (isCouponGst && (
+
+                        {/* Total Row */}
+                        <View style={[styles.tableRow, styles.totalRow]}>
+                            <Text
+                                style={[styles.tableCell, { width: "5%" }]}
+                            ></Text>
+                            <Text style={[styles.tableCell, { width: "25%" }]}>
+                                TOTAL
+                            </Text>
+                            <Text
+                                style={[styles.tableCell, { width: "10%" }]}
+                            ></Text>
+                            <Text style={[styles.tableCell, { width: "5%" }]}>
+                                {total_quantity +
+                                    (membership_name ? 1 : 0) +
+                                    coupon.length}
+                            </Text>
+                            <Text style={[styles.tableCell, { width: "10%" }]}>
+                                {total_discount}
+                            </Text>
+                            <Text
+                                style={[styles.tableCell, { width: "10%" }]}
+                            ></Text>
+                            {isGST || isMemGst || isCouponGst ? (
+
                                 <>
                                     <Text
                                         style={[
@@ -1541,10 +1614,12 @@ function Invoice() {
                                         {total_sgst}
                                     </Text>
                                 </>
-                            ))}
-                        <Text style={[styles.tableCell, { width: "15%" }]}>
-                            {grand_total}
-                        </Text>
+                            ) : null}
+                            <Text style={[styles.tableCell, { width: "15%" }]}>
+                                {grand_total}
+                            </Text>
+                        </View>
+
                     </View>
                     {comments ? <Text>Comments: {comments}</Text> : null}
 
@@ -1812,23 +1887,93 @@ function Invoice() {
                                                         />
                                                     </td>
                                                     <td className="border p-3">
-                                                        <input
-                                                            type="number"
-                                                            className="w-full p-1 border rounded-full text-center"
-                                                            defaultValue={
-                                                                discounts[
-                                                                    index
-                                                                ] ?? 0
-                                                            }
-                                                            onBlur={(e) =>
-                                                                handleDiscountBlur(
-                                                                    index,
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
+                                                        <div className="flex gap-2">
+                                                            {/* Flat ₹ input */}
+                                                            <input
+                                                                type="number"
+                                                                className="w-full p-1 border rounded-full text-center"
+                                                                value={
+                                                                    discounts[
+                                                                        index
+                                                                    ] || ""
+                                                                }
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    const value =
+                                                                        e.target
+                                                                            .value;
+                                                                    const newDiscounts =
+                                                                        [
+                                                                            ...discounts,
+                                                                        ];
+                                                                    newDiscounts[
+                                                                        index
+                                                                    ] =
+                                                                        value ===
+                                                                        ""
+                                                                            ? 0
+                                                                            : parseFloat(
+                                                                                  value
+                                                                              );
+                                                                    setDiscounts(
+                                                                        newDiscounts
+                                                                    );
+
+                                                                    // Calculate percentage when flat value changes
+                                                                    const price =
+                                                                        services[
+                                                                            index
+                                                                        ]
+                                                                            ?.price ||
+                                                                        0;
+                                                                    const percent =
+                                                                        price
+                                                                            ? (
+                                                                                  (newDiscounts[
+                                                                                      index
+                                                                                  ] /
+                                                                                      price) *
+                                                                                  100
+                                                                              ).toFixed(
+                                                                                  2
+                                                                              )
+                                                                            : "0";
+                                                                    const newPercentages =
+                                                                        [
+                                                                            ...discountPercentages,
+                                                                        ];
+                                                                    newPercentages[
+                                                                        index
+                                                                    ] = percent;
+                                                                    setDiscountPercentages(
+                                                                        newPercentages
+                                                                    );
+                                                                }}
+                                                                placeholder="₹"
+                                                            />
+                                                            {/* Percentage input */}
+                                                            <input
+                                                                type="number"
+                                                                className="w-full p-1 border rounded-full text-center"
+                                                                value={
+                                                                    discountPercentages[
+                                                                        index
+                                                                    ] || ""
+                                                                }
+                                                                onChange={(e) =>
+                                                                    handleDiscountPercentageChange(
+                                                                        index,
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                placeholder="%"
+                                                            />
+                                                        </div>
                                                     </td>
+
+
                                                     {(isGST ||
                                                         isMemGst ||
                                                         isCouponGst) && (
@@ -2020,22 +2165,100 @@ function Invoice() {
                                                             {product.quantity}
                                                         </td>
                                                         <td className="border p-3">
-                                                            <input
-                                                                type="number"
-                                                                className="w-full p-1 border rounded-full text-center"
-                                                                defaultValue={
-                                                                    productDiscounts[
-                                                                        index
-                                                                    ] ?? 0
-                                                                }
-                                                                onBlur={(e) =>
-                                                                    handleDiscountProduct(
-                                                                        index,
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            />
+                                                            <div className="flex gap-2">
+                                                                {/* Flat ₹ input */}
+                                                                <input
+                                                                    type="number"
+                                                                    className="w-full p-1 border rounded-full text-center"
+                                                                    value={
+                                                                        productDiscounts[
+                                                                            index
+                                                                        ] || ""
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {
+                                                                        const value =
+                                                                            e
+                                                                                .target
+                                                                                .value;
+                                                                        const newDiscounts =
+                                                                            [
+                                                                                ...productDiscounts,
+                                                                            ];
+                                                                        newDiscounts[
+                                                                            index
+                                                                        ] =
+                                                                            value ===
+                                                                            ""
+                                                                                ? 0
+                                                                                : parseFloat(
+                                                                                      value
+                                                                                  );
+                                                                        setProductDiscounts(
+                                                                            newDiscounts
+                                                                        );
+
+                                                                        // Calculate percentage when flat value changes
+                                                                        const price =
+                                                                            productDetails[
+                                                                                index
+                                                                            ]
+                                                                                ?.price ||
+                                                                            producData[
+                                                                                index
+                                                                            ]
+                                                                                ?.price ||
+                                                                            0;
+                                                                        const percent =
+                                                                            price
+                                                                                ? (
+                                                                                      (newDiscounts[
+                                                                                          index
+                                                                                      ] /
+                                                                                          price) *
+                                                                                      100
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                                : "0";
+                                                                        const newPercentages =
+                                                                            [
+                                                                                ...productDiscountPercentages,
+                                                                            ];
+                                                                        newPercentages[
+                                                                            index
+                                                                        ] =
+                                                                            percent;
+                                                                        setProductDiscountPercentages(
+                                                                            newPercentages
+                                                                        );
+                                                                    }}
+                                                                    placeholder="₹"
+                                                                />
+                                                                {/* Percentage input */}
+                                                                <input
+                                                                    type="number"
+                                                                    className="w-full p-1 border rounded-full text-center"
+                                                                    value={
+                                                                        productDiscountPercentages[
+                                                                            index
+                                                                        ] || ""
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        handleProductDiscountPercentageChange(
+                                                                            index,
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                    placeholder="%"
+                                                                />
+                                                            </div>
+
                                                         </td>
                                                         {(isGST ||
                                                             isMemGst ||
