@@ -187,6 +187,7 @@ function Invoice() {
         setProductDiscounts(newDiscounts);
     };
 
+
     const staffNames = service_by
         .map(
             (service) => service.staff.map((staffMember) => staffMember.label) // Returns an array of staff names
@@ -212,6 +213,7 @@ function Invoice() {
     const apipoint = `${config.apiUrl}/api/swalook/inventory/product/?branch_name=${bid}`;
 
     const [rawProductData, setRawProductData] = useState([]);
+
     const productsWithStaff = product.map((item, index) => {
         const baseProduct = {
             id: item.id,
@@ -222,6 +224,7 @@ function Invoice() {
             discountPercentage: String(
                 productDiscountPercentages[index] || "0"
             ), // Add this line
+
             note: item.note || "No notes added",
             category: item.category,
             expiryDate: item.expiryDate,
@@ -239,12 +242,14 @@ function Invoice() {
                     )
                     .filter((name) => name)
                     .join(", "),
+
             };
         }
 
         return {
             ...baseProduct,
             staff: "",
+
         };
     });
 
@@ -313,6 +318,7 @@ function Invoice() {
         productDiscounts,
         productDiscountPercentages,
     ]); // Add productDiscountPercentages to dependencies
+
     // Removed token from dependencies as it’s defined inside useEffect
 
     // Add dependencies for useEffect
@@ -599,6 +605,7 @@ function Invoice() {
     );
 
     const handleDiscountBlur = (index, value) => {
+
         const discountValue =
             value === null || value === undefined ? 0 : parseFloat(value);
         const newDiscounts = [...discounts];
@@ -645,6 +652,7 @@ function Invoice() {
             return newPercentages;
         });
     };
+
     console.log("productDiscounts", productDiscounts);
 
     const handleTaxBlur = (index, value) => {
@@ -730,6 +738,7 @@ function Invoice() {
             Quantity: quantities[index],
             Discount: discounts[index],
             DiscountPercentage: discountPercentages[index] || 0, // Added discount percentage
+
             Tax_amt: taxes[index],
             Staff: staffNames[index],
             CGST: cgst[index],
@@ -739,11 +748,13 @@ function Invoice() {
 
         // Prepare products data
         const productInvoice = productDetails.map((product, index) => ({
+
             Description: product.name,
             Price: product.price,
             Quantity: product.quantity,
             Discount: product.Discounts || 0,
             DiscountPercentage: productDiscountPercentages[index] || 0, // Add this line
+
             Tax_amt: product.tax,
             CGST: product.cgst,
             SGST: product.sgst,
@@ -1233,6 +1244,7 @@ function Invoice() {
                                 >
                                     {service.inputFieldValue.quantity || "N/A"}
                                 </Text>
+
                                 <Text
                                     style={[styles.tableCell, { width: "10%" }]}
                                 >
@@ -1271,6 +1283,7 @@ function Invoice() {
                                         </Text>
                                     </>
                                 ) : null}
+
                                 <Text
                                     style={[styles.tableCell, { width: "15%" }]}
                                 >
@@ -1284,16 +1297,19 @@ function Invoice() {
                             <View style={styles.tableRow}>
                                 <Text
                                     style={[styles.tableCell, { width: "5%" }]}
+
                                 >
                                     {services.length + 1}
                                 </Text>
                                 <Text
                                     style={[styles.tableCell, { width: "25%" }]}
+
                                 >
                                     {membership_name}
                                 </Text>
                                 <Text
                                     style={[styles.tableCell, { width: "10%" }]}
+
                                 >
                                     {membershipPrice}
                                 </Text>
@@ -1306,6 +1322,7 @@ function Invoice() {
                                     style={[styles.tableCell, { width: "10%" }]}
                                 >
                                     0
+
                                 </Text>
                                 <Text
                                     style={[styles.tableCell, { width: "10%" }]}
@@ -1340,6 +1357,7 @@ function Invoice() {
                                         </Text>
                                     </>
                                 ) : null}
+
                                 <Text
                                     style={[styles.tableCell, { width: "15%" }]}
                                 >
@@ -1360,12 +1378,14 @@ function Invoice() {
                             let couponTax = 0;
                             let couponTotal = couponPrice;
 
+
                             if (isCouponExclusive) {
                                 couponCGST = couponPrice * CGST_RATE;
                                 couponSGST = couponPrice * SGST_RATE;
                                 couponTax = couponCGST + couponSGST;
                                 couponTotal = couponPrice + couponTax;
                             }
+
 
                             return (
                                 <View style={styles.tableRow} key={index}>
@@ -1386,6 +1406,7 @@ function Invoice() {
                                         ]}
                                     >
                                         {couponItem.coupon_name}
+
                                     </Text>
                                     <Text
                                         style={[
@@ -1394,6 +1415,7 @@ function Invoice() {
                                         ]}
                                     >
                                         {couponPrice.toFixed(2)}
+
                                     </Text>
                                     <Text
                                         style={[
@@ -1402,6 +1424,16 @@ function Invoice() {
                                         ]}
                                     >
                                         {quantity}
+
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "10%" },
+                                        ]}
+                                    >
+                                        0.00
+
                                     </Text>
                                     <Text
                                         style={[
@@ -1411,14 +1443,7 @@ function Invoice() {
                                     >
                                         0.00
                                     </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    >
-                                        0.00
-                                    </Text>
+
                                     {isGST || isMemGst || isCouponGst ? (
                                         <>
                                             <Text
@@ -1447,6 +1472,7 @@ function Invoice() {
                                             </Text>
                                         </>
                                     ) : null}
+
                                     <Text
                                         style={[
                                             styles.tableCell,
@@ -1454,6 +1480,7 @@ function Invoice() {
                                         ]}
                                     >
                                         {couponTotal.toFixed(2)}
+
                                     </Text>
                                 </View>
                             );
@@ -1473,11 +1500,13 @@ function Invoice() {
                                 </Text>
                                 <Text
                                     style={[styles.tableCell, { width: "25%" }]}
+
                                 >
                                     {product.name}
                                 </Text>
                                 <Text
                                     style={[styles.tableCell, { width: "10%" }]}
+
                                 >
                                     {product.price}
                                 </Text>
@@ -1490,6 +1519,7 @@ function Invoice() {
                                     style={[styles.tableCell, { width: "10%" }]}
                                 >
                                     {productDiscounts[index] || 0}
+
                                 </Text>
                                 <Text
                                     style={[styles.tableCell, { width: "10%" }]}
@@ -1557,6 +1587,7 @@ function Invoice() {
                                 style={[styles.tableCell, { width: "10%" }]}
                             ></Text>
                             {isGST || isMemGst || isCouponGst ? (
+
                                 <>
                                     <Text
                                         style={[
@@ -1588,6 +1619,7 @@ function Invoice() {
                                 {grand_total}
                             </Text>
                         </View>
+
                     </View>
                     {comments ? <Text>Comments: {comments}</Text> : null}
 
@@ -1941,6 +1973,7 @@ function Invoice() {
                                                         </div>
                                                     </td>
 
+
                                                     {(isGST ||
                                                         isMemGst ||
                                                         isCouponGst) && (
@@ -2225,6 +2258,7 @@ function Invoice() {
                                                                     placeholder="%"
                                                                 />
                                                             </div>
+
                                                         </td>
                                                         {(isGST ||
                                                             isMemGst ||
