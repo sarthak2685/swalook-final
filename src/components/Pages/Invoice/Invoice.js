@@ -36,6 +36,8 @@ function Invoice() {
     const [popupMessage, setPopupMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const bid = localStorage.getItem("branch_id");
+    const User_mobile_no = localStorage.getItem("mobile_no");
+
     const user = JSON.parse(localStorage.getItem("user"));
     const userType = user.type;
 
@@ -187,7 +189,6 @@ function Invoice() {
         setProductDiscounts(newDiscounts);
     };
 
-
     const staffNames = service_by
         .map(
             (service) => service.staff.map((staffMember) => staffMember.label) // Returns an array of staff names
@@ -242,14 +243,12 @@ function Invoice() {
                     )
                     .filter((name) => name)
                     .join(", "),
-
             };
         }
 
         return {
             ...baseProduct,
             staff: "",
-
         };
     });
 
@@ -605,7 +604,6 @@ function Invoice() {
     );
 
     const handleDiscountBlur = (index, value) => {
-
         const discountValue =
             value === null || value === undefined ? 0 : parseFloat(value);
         const newDiscounts = [...discounts];
@@ -748,7 +746,6 @@ function Invoice() {
 
         // Prepare products data
         const productInvoice = productDetails.map((product, index) => ({
-
             Description: product.name,
             Price: product.price,
             Quantity: product.quantity,
@@ -860,8 +857,8 @@ function Invoice() {
     // Calculate taxes and totals for the membership
     let membershipTotal = Memebrship.price;
     let membershipTax = 0;
-    let cgsts = 0;
-    let sgsts = 0;
+    let cgsts = 9;
+    let sgsts = 9;
     const isMemGst = membergst === "Exclusive";
 
     // Calculate GST values only if GST is applied
@@ -983,117 +980,104 @@ function Invoice() {
             console.error("Error saving PDF:", error);
         }
     };
+    const formatPrice = (price) => {
+        const num = Number(price) || 0;
+        return num.toFixed(2);
+    };
 
-    const handlePrint = async () => {
+    const handlePrint = async (paperSize = "A4") => {
         const styles = StyleSheet.create({
             invoiceContainer: {
-                padding: 20,
-                margin: 15,
+                padding: paperSize === "A4" ? 20 : 4,
+                margin: paperSize === "A4" ? 15 : 0,
                 backgroundColor: "#fff",
+                fontSize: paperSize === "A4" ? 11 : 6,
+                width: paperSize === "A4" ? "100%" : "80mm", // match thermal width
+                flexGrow: 1,
             },
 
             section: {
-                marginBottom: 20,
+                marginBottom: paperSize === "A4" ? 20 : 3,
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "flex-start",
             },
-
             sectionColumn: {
                 flex: 1,
-                marginHorizontal: 10,
-                gap: 5,
-                fontSize: 14,
+                marginHorizontal: paperSize === "A4" ? 10 : 1,
+                gap: paperSize === "A4" ? 5 : 1,
             },
-
             invoiceHeader: {
                 textAlign: "center",
-                fontSize: 26,
+                fontSize: paperSize === "A4" ? 26 : 8,
                 fontWeight: "bold",
-                marginBottom: 20,
+                marginBottom: paperSize === "A4" ? 20 : 4,
             },
-
             table: {
                 width: "100%",
-                marginTop: 20,
-                borderWidth: 1, // Border for the entire table
+                marginTop: paperSize === "A4" ? 20 : 3,
+                borderWidth: paperSize === "A4" ? 1 : 0.3,
                 borderColor: "#ccc",
-                borderRadius: 5,
+                borderRadius: 3,
             },
-
             tableHeader: {
                 flexDirection: "row",
                 backgroundColor: "#ddd",
-                borderBottomWidth: 1,
+                borderBottomWidth: paperSize === "A4" ? 1 : 0.3,
                 borderBottomColor: "#bbb",
-                fontSize: 11,
                 fontWeight: "bold",
-                paddingVertical: 8,
-                paddingHorizontal: 5,
+                paddingVertical: paperSize === "A4" ? 8 : 2,
+                paddingHorizontal: paperSize === "A4" ? 5 : 1,
             },
-
             tableRow: {
                 flexDirection: "row",
-                borderBottomWidth: 1,
+                borderBottomWidth: paperSize === "A4" ? 1 : 0.3,
                 borderBottomColor: "#eee",
-                fontSize: 11,
-                paddingVertical: 10,
+                paddingVertical: paperSize === "A4" ? 10 : 2,
             },
-
             tableCell: {
                 flex: 1,
                 textAlign: "center",
-                padding: 6,
-                borderRightWidth: 1, // Add borders to table cells for structure
+                padding: paperSize === "A4" ? 6 : 1,
+                borderRightWidth: paperSize === "A4" ? 1 : 0.3,
                 borderRightColor: "#ddd",
             },
-
             totalRow: {
                 flexDirection: "row",
                 backgroundColor: "#eaeaea",
-                borderTopWidth: 1,
+                borderTopWidth: paperSize === "A4" ? 1 : 0.3,
                 borderTopColor: "#ccc",
                 fontWeight: "bold",
-                paddingVertical: 12,
-                fontSize: 12,
-                marginTop: 10,
+                paddingVertical: paperSize === "A4" ? 12 : 2,
+                marginTop: paperSize === "A4" ? 10 : 3,
             },
-
             footer: {
-                marginTop: 20,
-                paddingHorizontal: 10,
+                marginTop: paperSize === "A4" ? 20 : 3,
+                paddingHorizontal: paperSize === "A4" ? 10 : 2,
             },
-
             footerRow: {
                 flexDirection: "column",
             },
-
             footerText: {
                 fontWeight: "bold",
-                fontSize: 13,
                 flexDirection: "row",
                 justifyContent: "space-between",
-                marginBottom: 5,
+                marginBottom: paperSize === "A4" ? 5 : 1,
+                fontSize: paperSize === "A4" ? 11 : 5.5,
             },
-
             footerValue: {
                 fontWeight: "600",
                 textAlign: "right",
             },
-
-            paymentTitle: {
-                fontWeight: "bold",
-                fontSize: 15,
-                marginBottom: 6,
+            centerText: {
+                textAlign: "center",
+                fontSize: paperSize === "A4" ? 10 : 5.5,
             },
-
-            paymentText: {
-                fontSize: 12,
-                marginBottom: 3,
-            },
-
-            bold: {
-                fontWeight: "bold",
+            bottomNote: {
+                marginTop: paperSize === "A4" ? 5 : 2,
+                textAlign: "center",
+                fontSize: paperSize === "A4" ? 10 : 5,
+                color: "#555",
             },
         });
 
@@ -1109,7 +1093,6 @@ function Invoice() {
             isGST,
             gst_number,
             services,
-            // staff,
             membership_name,
             membershipTax,
             cgsts,
@@ -1134,270 +1117,553 @@ function Invoice() {
             user,
         };
 
+        // Ensure all prices are numbers before using toFixed()
+        const formatPrice = (price) => {
+            const num = Number(price) || 0;
+            return num.toFixed(2);
+        };
+
+        const calculateDiscountedPrice = (price, discount) => {
+            const priceNum = Number(price) || 0;
+            const discountNum = Number(discount) || 0;
+            return priceNum - priceNum * (discountNum / 100);
+        };
+
         const InvoiceDocument = () => (
             <Document>
-                <Page style={styles.invoiceContainer}>
-                    <Text style={styles.invoiceHeader}>{sname}</Text>
-
-                    {/* Header and Customer Section */}
-                    <View style={styles.section}>
-                        <View style={styles.sectionColumn}>
-                            <Text style={styles.fieldName}>
-                                Invoice To: {customer_name}
-                            </Text>
-                            <Text>{address}</Text>
-                            <Text>{email}</Text>
-                            <Text>{mobile_no}</Text>
-                            <Text style={styles.paymentTitle}>
-                                Payment Mode:
-                            </Text>
-                            {Object.keys(paymentModes).map((mode) => (
-                                <Text key={mode} style={styles.paymentText}>
-                                    <Text style={styles.bold}>{mode}:</Text>{" "}
-                                    {paymentModes[mode]}
-                                </Text>
-                            ))}
-                        </View>
-                        <View style={styles.sectionColumn}>
-                            <Text>Date of Invoice: {invoiceDate}</Text>
-                            <Text>Invoice Id: {getInvoiceId}</Text>
-                            {isGST && <Text>GST Number: {gst_number}</Text>}
-                            <Text>Contact Number: {user.user}</Text>
-                        </View>
-                    </View>
-
-                    {/* Table */}
-                    <View style={styles.table}>
-                        {/* Table Header */}
-                        <View style={[styles.tableRow, styles.tableHeader]}>
-                            <Text style={[styles.tableCell, { width: "5%" }]}>
-                                S. No.
-                            </Text>
-                            <Text style={[styles.tableCell, { width: "25%" }]}>
-                                DESCRIPTION
-                            </Text>
-                            <Text style={[styles.tableCell, { width: "10%" }]}>
-                                PRICE
-                            </Text>
-                            <Text style={[styles.tableCell, { width: "5%" }]}>
-                                QTY
-                            </Text>
-                            <Text style={[styles.tableCell, { width: "10%" }]}>
-                                DISCOUNT (RS.)
-                            </Text>
-                            <Text style={[styles.tableCell, { width: "10%" }]}>
-                                DISCOUNT (%)
-                            </Text>
-                            {isGST || isMemGst || isCouponGst ? (
-                                <>
+                <Page
+                    size={paperSize === "thermal" ? [80, undefined] : paperSize}
+                    style={[
+                        styles.invoiceContainer,
+                        paperSize === "thermal" && {
+                            width: "80mm",
+                            height: "auto",
+                            flexGrow: 1,
+                        },
+                    ]}
+                >
+                    {paperSize === "thermal" ? (
+                        <View
+                            style={{
+                                paddingHorizontal: 4, // adds space left and right
+                                paddingVertical: 4, // adds space top and bottom
+                            }}
+                        >
+                            <>
+                                {/* Header */}
+                                <View
+                                    style={{
+                                        textAlign: "center",
+                                        marginBottom: 2,
+                                    }}
+                                >
                                     <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
+                                        style={{
+                                            fontSize: 6,
+                                            fontWeight: "bold",
+                                        }}
                                     >
-                                        TAX AMT
+                                        INVOICE
+                                    </Text>
+                                    <Text style={{ fontSize: 4 }}>
+                                        ORIGINAL FOR RECIPIENT
+                                    </Text>
+                                </View>
+
+                                {/* Business Info */}
+                                <View style={{ marginBottom: 2 }}>
+                                    <Text
+                                        style={{
+                                            fontSize: 5.5,
+                                            fontWeight: "bold",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        {sname}
                                     </Text>
                                     <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
+                                        style={{
+                                            fontSize: 4,
+                                            textAlign: "center",
+                                        }}
                                     >
-                                        CGST
+                                        {address}
                                     </Text>
                                     <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
+                                        style={{
+                                            fontSize: 4,
+                                            textAlign: "center",
+                                        }}
                                     >
-                                        SGST
+                                        Phone: {User_mobile_no}
                                     </Text>
-                                </>
-                            ) : null}
-                            <Text style={[styles.tableCell, { width: "15%" }]}>
-                                TOTAL AMT
-                            </Text>
+                                </View>
+
+                                {/* Invoice Meta */}
+                                <View
+                                    style={{
+                                        flexDirection: "column",
+                                        marginBottom: 2,
+                                        fontSize: 4,
+                                        gap: 0.5,
+                                    }}
+                                >
+                                    {[
+                                        {
+                                            label: "Date",
+                                            value: getCurrentDate(),
+                                        },
+                                        {
+                                            label: "Bill No",
+                                            value: getInvoiceId,
+                                        },
+                                        {
+                                            label: "Client",
+                                            value: customer_name,
+                                        },
+                                        {
+                                            label: "Points",
+                                            value: membership_points || 0,
+                                        },
+                                    ].map((item, index) => (
+                                        <View
+                                            key={index}
+                                            style={{
+                                                flexDirection: "row",
+                                                justifyContent: "space-between",
+                                            }}
+                                        >
+                                            <Text>{item.label}:</Text>
+                                            <Text>{item.value}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+
+                                {/* Item Table */}
+                                <View
+                                    style={{ width: "100%", marginBottom: 2 }}
+                                >
+                                    {/* Table Header */}
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            borderBottomWidth: 0.3,
+                                            paddingBottom: 0.5,
+                                            marginBottom: 1,
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                                flex: 3,
+                                                fontSize: 4.5,
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            Particulars
+                                        </Text>
+                                        <Text
+                                            style={{
+                                                flex: 1,
+                                                fontSize: 4.5,
+                                                fontWeight: "bold",
+                                                textAlign: "right",
+                                            }}
+                                        >
+                                            Price
+                                        </Text>
+                                    </View>
+
+                                    {/* Products */}
+                                    {productDetails.length > 0 && (
+                                        <>
+                                            <Text
+                                                style={{
+                                                    fontSize: 4.5,
+                                                    fontWeight: "bold",
+                                                }}
+                                            >
+                                                Products
+                                            </Text>
+                                            {productDetails.map(
+                                                (product, index) => {
+                                                    const discountPercent =
+                                                        productDiscountPercentages[
+                                                            index
+                                                        ] || 0;
+                                                    const discountedPrice =
+                                                        calculateDiscountedPrice(
+                                                            product.price,
+                                                            discountPercent
+                                                        );
+
+                                                    return (
+                                                        <View
+                                                            key={index}
+                                                            style={{
+                                                                marginTop: 1,
+                                                            }}
+                                                        >
+                                                            <View
+                                                                style={{
+                                                                    flexDirection:
+                                                                        "row",
+                                                                }}
+                                                            >
+                                                                <Text
+                                                                    style={{
+                                                                        flex: 3,
+                                                                        fontSize: 4,
+                                                                    }}
+                                                                >
+                                                                    {
+                                                                        product.name
+                                                                    }
+                                                                </Text>
+                                                                <Text
+                                                                    style={{
+                                                                        flex: 1,
+                                                                        fontSize: 4,
+                                                                        textAlign:
+                                                                            "right",
+                                                                    }}
+                                                                >
+                                                                    {formatPrice(
+                                                                        product.price
+                                                                    )}
+                                                                </Text>
+                                                            </View>
+
+                                                            {discountPercent >
+                                                                0 && (
+                                                                <View
+                                                                    style={{
+                                                                        flexDirection:
+                                                                            "row",
+                                                                    }}
+                                                                >
+                                                                    <Text
+                                                                        style={{
+                                                                            flex: 2,
+                                                                            fontSize: 3.5,
+                                                                        }}
+                                                                    >
+                                                                        -
+                                                                        {
+                                                                            discountPercent
+                                                                        }
+                                                                        %
+                                                                    </Text>
+                                                                    <Text
+                                                                        style={{
+                                                                            flex: 1,
+                                                                            fontSize: 3.5,
+                                                                            textAlign:
+                                                                                "right",
+                                                                        }}
+                                                                    >
+                                                                        {formatPrice(
+                                                                            discountedPrice
+                                                                        )}
+                                                                    </Text>
+                                                                </View>
+                                                            )}
+                                                        </View>
+                                                    );
+                                                }
+                                            )}
+                                        </>
+                                    )}
+
+                                    {/* Services */}
+                                    {services.length > 0 && (
+                                        <>
+                                            <Text
+                                                style={{
+                                                    fontSize: 4.5,
+                                                    fontWeight: "bold",
+                                                    marginTop: 2,
+                                                }}
+                                            >
+                                                Services
+                                            </Text>
+                                            {services.map((service, index) => {
+                                                const discountPercent =
+                                                    discountPercentages[
+                                                        index
+                                                    ] || 0;
+                                                const discountedPrice =
+                                                    calculateDiscountedPrice(
+                                                        service.price,
+                                                        discountPercent
+                                                    );
+
+                                                return (
+                                                    <View
+                                                        key={index}
+                                                        style={{ marginTop: 1 }}
+                                                    >
+                                                        <View
+                                                            style={{
+                                                                flexDirection:
+                                                                    "row",
+                                                            }}
+                                                        >
+                                                            <Text
+                                                                style={{
+                                                                    flex: 3,
+                                                                    fontSize: 4,
+                                                                }}
+                                                            >
+                                                                {service.name}
+                                                            </Text>
+                                                            <Text
+                                                                style={{
+                                                                    flex: 1,
+                                                                    fontSize: 4,
+                                                                    textAlign:
+                                                                        "right",
+                                                                }}
+                                                            >
+                                                                {formatPrice(
+                                                                    service.price
+                                                                )}
+                                                            </Text>
+                                                        </View>
+
+                                                        {discountPercent >
+                                                            0 && (
+                                                            <View
+                                                                style={{
+                                                                    flexDirection:
+                                                                        "row",
+                                                                }}
+                                                            >
+                                                                <Text
+                                                                    style={{
+                                                                        flex: 2,
+                                                                        fontSize: 3.5,
+                                                                    }}
+                                                                >
+                                                                    -
+                                                                    {
+                                                                        discountPercent
+                                                                    }
+                                                                    %
+                                                                </Text>
+                                                                <Text
+                                                                    style={{
+                                                                        flex: 1,
+                                                                        fontSize: 3.5,
+                                                                        textAlign:
+                                                                            "right",
+                                                                    }}
+                                                                >
+                                                                    {formatPrice(
+                                                                        discountedPrice
+                                                                    )}
+                                                                </Text>
+                                                            </View>
+                                                        )}
+                                                    </View>
+                                                );
+                                            })}
+                                        </>
+                                    )}
+                                </View>
+
+                                {/* Totals */}
+                                <View
+                                    style={{
+                                        borderTopWidth: 0.3,
+                                        paddingTop: 1.5,
+                                        marginBottom: 2,
+                                    }}
+                                >
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            Gross Total:
+                                        </Text>
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            {formatPrice(total_prise)}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            Less Discount:
+                                        </Text>
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            -{formatPrice(total_discount)}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            Net Total:
+                                        </Text>
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            {formatPrice(
+                                                total_prise - total_discount
+                                            )}
+                                        </Text>
+                                    </View>
+
+                                    {isGST && (
+                                        <>
+                                            <View
+                                                style={{
+                                                    flexDirection: "row",
+                                                    justifyContent:
+                                                        "space-between",
+                                                }}
+                                            >
+                                                <Text style={{ fontSize: 4.5 }}>
+                                                    CGST @ {cgsts}%:
+                                                </Text>
+                                                <Text style={{ fontSize: 4.5 }}>
+                                                    {formatPrice(total_cgst)}
+                                                </Text>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    flexDirection: "row",
+                                                    justifyContent:
+                                                        "space-between",
+                                                }}
+                                            >
+                                                <Text style={{ fontSize: 4.5 }}>
+                                                    SGST @ {sgsts}%:
+                                                </Text>
+                                                <Text style={{ fontSize: 4.5 }}>
+                                                    {formatPrice(total_sgst)}
+                                                </Text>
+                                            </View>
+                                        </>
+                                    )}
+
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                            marginTop: 1,
+                                            borderTopWidth: 0.3,
+                                            paddingTop: 1,
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                                fontSize: 5.5,
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            Total Payable:
+                                        </Text>
+                                        <Text
+                                            style={{
+                                                fontSize: 5.5,
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            {formatPrice(grand_total)}
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                {/* Receipt Note */}
+                                <View
+                                    style={{
+                                        borderTopWidth: 0.3,
+                                        paddingTop: 1,
+                                        marginBottom: 1,
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontSize: 4,
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        Payment Receipt: Total Received
+                                    </Text>
+                                </View>
+
+                                {/* GST Info */}
+                                {isGST && (
+                                    <Text
+                                        style={{
+                                            fontSize: 3.5,
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        GSTN: {gst_number}
+                                    </Text>
+                                )}
+
+                                {/* Footer */}
+                                <Text
+                                    style={{
+                                        fontSize: 3.5,
+                                        textAlign: "center",
+                                        marginTop: 1,
+                                    }}
+                                >
+                                    Powered by Swalook Pvt. Ltd.
+                                </Text>
+                            </>
                         </View>
+                    ) : (
+                        // Original A4 Design (unchanged)
+                        <>
+                            <Text style={styles.invoiceHeader}>{sname}</Text>
 
-                        {/* Service Rows */}
-                        {services.map((service, index) => (
-                            <View style={styles.tableRow} key={index}>
-                                <Text
-                                    style={[styles.tableCell, { width: "5%" }]}
-                                >
-                                    {index + 1}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "25%" }]}
-                                >
-                                    {service.category}: {service.name}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    {service.price || "N/A"}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "5%" }]}
-                                >
-                                    {service.inputFieldValue.quantity || "N/A"}
-                                </Text>
-
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    {discounts[index] || 0}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    {discountPercentages[index] || 0}
-                                </Text>
-                                {isGST || isMemGst || isCouponGst ? (
-                                    <>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {taxes[index] || "N/A"}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {cgst[index] || "N/A"}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {sgst[index] || "N/A"}
-                                        </Text>
-                                    </>
-                                ) : null}
-
-                                <Text
-                                    style={[styles.tableCell, { width: "15%" }]}
-                                >
-                                    {totalAmts[index] || "N/A"}
-                                </Text>
+                            {/* Header and Customer Section */}
+                            <View style={styles.section}>
+                                <View style={styles.sectionColumn}>
+                                    <Text style={styles.fieldName}>
+                                        Invoice To: {customer_name}
+                                    </Text>
+                                    <Text>{address}</Text>
+                                    <Text>{email}</Text>
+                                    <Text>{mobile_no}</Text>
+                                </View>
+                                <View style={styles.sectionColumn}>
+                                    <Text>Date of Invoice: {invoiceDate}</Text>
+                                    <Text>Invoice Id: {getInvoiceId}</Text>
+                                    {isGST && (
+                                        <Text>GST Number: {gst_number}</Text>
+                                    )}
+                                </View>
                             </View>
-                        ))}
 
-                        {/* Membership Row */}
-                        {membership_name && membership_name !== "None" && (
-                            <View style={styles.tableRow}>
-                                <Text
-                                    style={[styles.tableCell, { width: "5%" }]}
-
+                            {/* Table */}
+                            <View style={styles.table}>
+                                {/* Table Header */}
+                                <View
+                                    style={[
+                                        styles.tableRow,
+                                        styles.tableHeader,
+                                    ]}
                                 >
-                                    {services.length + 1}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "25%" }]}
-
-                                >
-                                    {membership_name}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-
-                                >
-                                    {membershipPrice}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "5%" }]}
-                                >
-                                    1
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    0
-
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    0
-                                </Text>
-                                {isGST || isMemGst || isCouponGst ? (
-                                    <>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {membershipTax}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {cgsts}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {sgsts}
-                                        </Text>
-                                    </>
-                                ) : null}
-
-                                <Text
-                                    style={[styles.tableCell, { width: "15%" }]}
-                                >
-                                    {membershipTotal}
-                                </Text>
-                            </View>
-                        )}
-
-                        {/* Coupon Rows */}
-                        {coupon.map((couponItem, index) => {
-                            const couponPrice = couponItem.coupon_price || 0;
-                            const isCouponExclusive =
-                                couponItem.gst === "Exclusive";
-
-                            // Calculate tax values if GST is exclusive
-                            let couponCGST = 0;
-                            let couponSGST = 0;
-                            let couponTax = 0;
-                            let couponTotal = couponPrice;
-
-
-                            if (isCouponExclusive) {
-                                couponCGST = couponPrice * CGST_RATE;
-                                couponSGST = couponPrice * SGST_RATE;
-                                couponTax = couponCGST + couponSGST;
-                                couponTotal = couponPrice + couponTax;
-                            }
-
-
-                            return (
-                                <View style={styles.tableRow} key={index}>
                                     <Text
                                         style={[
                                             styles.tableCell,
                                             { width: "5%" },
                                         ]}
                                     >
-                                        {services.length +
-                                            (membership_name ? 2 : 1) +
-                                            index}
+                                        S. No.
                                     </Text>
                                     <Text
                                         style={[
@@ -1405,8 +1671,7 @@ function Invoice() {
                                             { width: "25%" },
                                         ]}
                                     >
-                                        {couponItem.coupon_name}
-
+                                        DESC
                                     </Text>
                                     <Text
                                         style={[
@@ -1414,8 +1679,7 @@ function Invoice() {
                                             { width: "10%" },
                                         ]}
                                     >
-                                        {couponPrice.toFixed(2)}
-
+                                        PRICE
                                     </Text>
                                     <Text
                                         style={[
@@ -1423,8 +1687,7 @@ function Invoice() {
                                             { width: "5%" },
                                         ]}
                                     >
-                                        {quantity}
-
+                                        QTY
                                     </Text>
                                     <Text
                                         style={[
@@ -1432,8 +1695,7 @@ function Invoice() {
                                             { width: "10%" },
                                         ]}
                                     >
-                                        0.00
-
+                                        DISC (₹)
                                     </Text>
                                     <Text
                                         style={[
@@ -1441,10 +1703,9 @@ function Invoice() {
                                             { width: "10%" },
                                         ]}
                                     >
-                                        0.00
+                                        DISC (%)
                                     </Text>
-
-                                    {isGST || isMemGst || isCouponGst ? (
+                                    {(isGST || isMemGst || isCouponGst) && (
                                         <>
                                             <Text
                                                 style={[
@@ -1452,7 +1713,7 @@ function Invoice() {
                                                     { width: "10%" },
                                                 ]}
                                             >
-                                                {couponTax.toFixed(2)}
+                                                TAX
                                             </Text>
                                             <Text
                                                 style={[
@@ -1460,7 +1721,7 @@ function Invoice() {
                                                     { width: "10%" },
                                                 ]}
                                             >
-                                                {couponCGST.toFixed(2)}
+                                                CGST
                                             </Text>
                                             <Text
                                                 style={[
@@ -1468,73 +1729,38 @@ function Invoice() {
                                                     { width: "10%" },
                                                 ]}
                                             >
-                                                {couponSGST.toFixed(2)}
+                                                SGST
                                             </Text>
                                         </>
-                                    ) : null}
-
+                                    )}
                                     <Text
                                         style={[
                                             styles.tableCell,
                                             { width: "15%" },
                                         ]}
                                     >
-                                        {couponTotal.toFixed(2)}
-
+                                        TOTAL
                                     </Text>
                                 </View>
-                            );
-                        })}
 
-                        {/* Product Rows */}
-                        {productDetails.map((product, index) => (
-                            <View style={styles.tableRow} key={index}>
-                                <Text
-                                    style={[styles.tableCell, { width: "5%" }]}
-                                >
-                                    {services.length +
-                                        (membership_name ? 1 : 0) +
-                                        coupon.length +
-                                        index +
-                                        1}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "25%" }]}
-
-                                >
-                                    {product.name}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-
-                                >
-                                    {product.price}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "5%" }]}
-                                >
-                                    {product.quantity}
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    {productDiscounts[index] || 0}
-
-                                </Text>
-                                <Text
-                                    style={[styles.tableCell, { width: "10%" }]}
-                                >
-                                    {productDiscountPercentages[index] || 0}
-                                </Text>
-                                {isGST || isMemGst || isCouponGst ? (
-                                    <>
+                                {/* Service Rows */}
+                                {services.map((service, index) => (
+                                    <View style={styles.tableRow} key={index}>
                                         <Text
                                             style={[
                                                 styles.tableCell,
-                                                { width: "10%" },
+                                                { width: "5%" },
                                             ]}
                                         >
-                                            {product.tax}
+                                            {index + 1}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "25%" },
+                                            ]}
+                                        >
+                                            {`${service.category}: ${service.name}`}
                                         </Text>
                                         <Text
                                             style={[
@@ -1542,7 +1768,16 @@ function Invoice() {
                                                 { width: "10%" },
                                             ]}
                                         >
-                                            {product.cgst}
+                                            {formatPrice(service.price)}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "5%" },
+                                            ]}
+                                        >
+                                            {service.inputFieldValue.quantity ||
+                                                "N/A"}
                                         </Text>
                                         <Text
                                             style={[
@@ -1550,178 +1785,563 @@ function Invoice() {
                                                 { width: "10%" },
                                             ]}
                                         >
-                                            {product.sgst}
+                                            {discounts[index] || 0}
                                         </Text>
-                                    </>
-                                ) : null}
-                                <Text
-                                    style={[styles.tableCell, { width: "15%" }]}
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {discountPercentages[index] || 0}
+                                        </Text>
+                                        {(isGST || isMemGst || isCouponGst) && (
+                                            <>
+                                                <Text
+                                                    style={[
+                                                        styles.tableCell,
+                                                        { width: "10%" },
+                                                    ]}
+                                                >
+                                                    {taxes[index] || "N/A"}
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        styles.tableCell,
+                                                        { width: "10%" },
+                                                    ]}
+                                                >
+                                                    {cgst[index] || "N/A"}
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        styles.tableCell,
+                                                        { width: "10%" },
+                                                    ]}
+                                                >
+                                                    {sgst[index] || "N/A"}
+                                                </Text>
+                                            </>
+                                        )}
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "15%" },
+                                            ]}
+                                        >
+                                            {totalAmts[index] || "N/A"}
+                                        </Text>
+                                    </View>
+                                ))}
+
+                                {/* Membership Row */}
+                                {membership_name &&
+                                    membership_name !== "None" && (
+                                        <View style={styles.tableRow}>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "5%" },
+                                                ]}
+                                            >
+                                                {services.length + 1}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "25%" },
+                                                ]}
+                                            >
+                                                {membership_name}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                {formatPrice(membershipPrice)}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "5%" },
+                                                ]}
+                                            >
+                                                1
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                0
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                0
+                                            </Text>
+                                            {(isGST ||
+                                                isMemGst ||
+                                                isCouponGst) && (
+                                                <>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCell,
+                                                            { width: "10%" },
+                                                        ]}
+                                                    >
+                                                        {formatPrice(
+                                                            membershipTax
+                                                        )}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCell,
+                                                            { width: "10%" },
+                                                        ]}
+                                                    >
+                                                        {formatPrice(cgsts)}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCell,
+                                                            { width: "10%" },
+                                                        ]}
+                                                    >
+                                                        {formatPrice(sgsts)}
+                                                    </Text>
+                                                </>
+                                            )}
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "15%" },
+                                                ]}
+                                            >
+                                                {formatPrice(membershipTotal)}
+                                            </Text>
+                                        </View>
+                                    )}
+
+                                {/* Coupon Rows */}
+                                {coupon.map((couponItem, index) => {
+                                    const couponPrice =
+                                        couponItem.coupon_price || 0;
+                                    const isCouponExclusive =
+                                        couponItem.gst === "Exclusive";
+
+                                    let couponCGST = 0;
+                                    let couponSGST = 0;
+                                    let couponTax = 0;
+                                    let couponTotal = couponPrice;
+
+                                    if (isCouponExclusive) {
+                                        couponCGST = couponPrice * CGST_RATE;
+                                        couponSGST = couponPrice * SGST_RATE;
+                                        couponTax = couponCGST + couponSGST;
+                                        couponTotal = couponPrice + couponTax;
+                                    }
+
+                                    return (
+                                        <View
+                                            style={styles.tableRow}
+                                            key={index}
+                                        >
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "5%" },
+                                                ]}
+                                            >
+                                                {services.length +
+                                                    (membership_name ? 2 : 1) +
+                                                    index}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "25%" },
+                                                ]}
+                                            >
+                                                {couponItem.coupon_name}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                {formatPrice(couponPrice)}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "5%" },
+                                                ]}
+                                            >
+                                                {quantity}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                0.00
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                0.00
+                                            </Text>
+                                            {(isGST ||
+                                                isMemGst ||
+                                                isCouponGst) && (
+                                                <>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCell,
+                                                            { width: "10%" },
+                                                        ]}
+                                                    >
+                                                        {formatPrice(couponTax)}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCell,
+                                                            { width: "10%" },
+                                                        ]}
+                                                    >
+                                                        {formatPrice(
+                                                            couponCGST
+                                                        )}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCell,
+                                                            { width: "10%" },
+                                                        ]}
+                                                    >
+                                                        {formatPrice(
+                                                            couponSGST
+                                                        )}
+                                                    </Text>
+                                                </>
+                                            )}
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "15%" },
+                                                ]}
+                                            >
+                                                {formatPrice(couponTotal)}
+                                            </Text>
+                                        </View>
+                                    );
+                                })}
+
+                                {/* Product Rows */}
+                                {productDetails.map((product, index) => (
+                                    <View style={styles.tableRow} key={index}>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "5%" },
+                                            ]}
+                                        >
+                                            {services.length +
+                                                (membership_name ? 1 : 0) +
+                                                coupon.length +
+                                                index +
+                                                1}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "25%" },
+                                            ]}
+                                        >
+                                            {product.name}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {formatPrice(product.price)}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "5%" },
+                                            ]}
+                                        >
+                                            {product.quantity}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {productDiscounts[index] || 0}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "10%" },
+                                            ]}
+                                        >
+                                            {productDiscountPercentages[
+                                                index
+                                            ] || 0}
+                                        </Text>
+                                        {(isGST || isMemGst || isCouponGst) && (
+                                            <>
+                                                <Text
+                                                    style={[
+                                                        styles.tableCell,
+                                                        { width: "10%" },
+                                                    ]}
+                                                >
+                                                    {formatPrice(product.tax)}
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        styles.tableCell,
+                                                        { width: "10%" },
+                                                    ]}
+                                                >
+                                                    {formatPrice(product.cgst)}
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        styles.tableCell,
+                                                        { width: "10%" },
+                                                    ]}
+                                                >
+                                                    {formatPrice(product.sgst)}
+                                                </Text>
+                                            </>
+                                        )}
+                                        <Text
+                                            style={[
+                                                styles.tableCell,
+                                                { width: "15%" },
+                                            ]}
+                                        >
+                                            {formatPrice(
+                                                product.total -
+                                                    product.cgst -
+                                                    product.sgst
+                                            )}
+                                        </Text>
+                                    </View>
+                                ))}
+
+                                {/* Total Row */}
+                                <View
+                                    style={[styles.tableRow, styles.totalRow]}
                                 >
-                                    {product.total -
-                                        product.cgst -
-                                        product.sgst}
-                                </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "5%" },
+                                        ]}
+                                    ></Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "25%" },
+                                        ]}
+                                    >
+                                        TOTAL
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "10%" },
+                                        ]}
+                                    ></Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "5%" },
+                                        ]}
+                                    >
+                                        {total_quantity +
+                                            (membership_name ? 1 : 0) +
+                                            coupon.length}
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "10%" },
+                                        ]}
+                                    >
+                                        {formatPrice(total_discount)}
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "10%" },
+                                        ]}
+                                    ></Text>
+                                    {(isGST || isMemGst || isCouponGst) && (
+                                        <>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                {formatPrice(total_tax)}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                {formatPrice(total_cgst)}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCell,
+                                                    { width: "10%" },
+                                                ]}
+                                            >
+                                                {formatPrice(total_sgst)}
+                                            </Text>
+                                        </>
+                                    )}
+                                    <Text
+                                        style={[
+                                            styles.tableCell,
+                                            { width: "15%" },
+                                        ]}
+                                    >
+                                        {formatPrice(grand_total)}
+                                    </Text>
+                                </View>
                             </View>
-                        ))}
 
-                        {/* Total Row */}
-                        <View style={[styles.tableRow, styles.totalRow]}>
-                            <Text
-                                style={[styles.tableCell, { width: "5%" }]}
-                            ></Text>
-                            <Text style={[styles.tableCell, { width: "25%" }]}>
-                                TOTAL
-                            </Text>
-                            <Text
-                                style={[styles.tableCell, { width: "10%" }]}
-                            ></Text>
-                            <Text style={[styles.tableCell, { width: "5%" }]}>
-                                {total_quantity +
-                                    (membership_name ? 1 : 0) +
-                                    coupon.length}
-                            </Text>
-                            <Text style={[styles.tableCell, { width: "10%" }]}>
-                                {total_discount}
-                            </Text>
-                            <Text
-                                style={[styles.tableCell, { width: "10%" }]}
-                            ></Text>
-                            {isGST || isMemGst || isCouponGst ? (
+                            {comments && <Text>Comments: {comments}</Text>}
 
-                                <>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    >
-                                        {total_tax}
+                            {/* Footer */}
+                            <View style={styles.footer}>
+                                <View style={styles.footerRow}>
+                                    {membership_points > 0 && (
+                                        <Text style={styles.footerText}>
+                                            Membership Discount:
+                                            <Text style={styles.footerValue}>
+                                                {" "}
+                                                {membership_points} ₹
+                                            </Text>
+                                        </Text>
+                                    )}
+                                    {coupon_points > 0 && (
+                                        <Text style={styles.footerText}>
+                                            Coupon Discount:
+                                            <Text style={styles.footerValue}>
+                                                {" "}
+                                                {coupon_points} ₹
+                                            </Text>
+                                        </Text>
+                                    )}
+                                    <Text style={styles.footerText}>
+                                        Amount in Words:
+                                        <Text style={styles.footerValue}>
+                                            {" "}
+                                            {grandTotalInWords} ₹
+                                        </Text>
                                     </Text>
                                     <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
+                                        style={{
+                                            ...styles.footerText,
+                                            fontSize: 13,
+                                        }}
                                     >
-                                        {total_cgst}
+                                        FINAL VALUE:
+                                        <Text
+                                            style={{
+                                                ...styles.footerValue,
+                                                fontSize: 13,
+                                            }}
+                                        >
+                                            {" "}
+                                            Rs {formatPrice(final_price)}
+                                        </Text>
                                     </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    >
-                                        {total_sgst}
-                                    </Text>
-                                </>
-                            ) : null}
-                            <Text style={[styles.tableCell, { width: "15%" }]}>
-                                {grand_total}
-                            </Text>
-                        </View>
-
-                    </View>
-                    {comments ? <Text>Comments: {comments}</Text> : null}
-
-                    {/* Footer */}
-                    <View style={styles.footer}>
-                        <View style={styles.footerRow}>
-                            {membership_points > 0 && (
-                                <Text style={styles.footerText}>
-                                    Membership Discount:
-                                    <Text style={styles.footerValue}>
-                                        {" "}
-                                        {membership_points} Rupees Only
-                                    </Text>
-                                </Text>
-                            )}
-                            {coupon_points > 0 && (
-                                <Text style={styles.footerText}>
-                                    Coupon Discount:
-                                    <Text style={styles.footerValue}>
-                                        {" "}
-                                        {coupon_points} Rupees Only
-                                    </Text>
-                                </Text>
-                            )}
-                            <Text style={styles.footerText}>
-                                Amount in Words:
-                                <Text style={styles.footerValue}>
-                                    {" "}
-                                    {grandTotalInWords} Rupees Only
-                                </Text>
-                            </Text>
-                            <Text style={styles.footerText}>
-                                FINAL VALUE:
-                                <Text style={styles.footerValue}>
-                                    {" "}
-                                    Rs {final_price}
-                                </Text>
-                            </Text>
-                        </View>
-                    </View>
+                                </View>
+                            </View>
+                        </>
+                    )}
                 </Page>
             </Document>
         );
+
         try {
             const blob = await pdf(<InvoiceDocument />).toBlob();
+            const fileName = `Invoice-${invoiceData.getInvoiceId}-${paperSize}.pdf`;
 
             if (blob) {
                 // Save PDF locally
-                saveAs(blob, `Invoice-${invoiceData.getInvoiceId}.pdf`);
+                saveAs(blob, fileName);
 
                 // Upload to Firebase Storage
-                const pdfRef = ref(
-                    storage,
-                    `invoices/Invoice-${invoiceData.getInvoiceId}.pdf`
-                );
+                const pdfRef = ref(storage, `invoices/${fileName}`);
                 await uploadBytes(pdfRef, blob);
 
                 // Get download URL
                 const downloadURL = await getDownloadURL(pdfRef);
 
-                // Create WhatsApp link
-                const phoneNumber = `+91${mobile_no}`;
-                const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${sname}.\nYour total bill amount is: *Rs.${final_price}*\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${sname}\n\nClick on the link to download:: ${downloadURL}`;
-                const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-                    message
-                )}`;
+                // Create WhatsApp link only for A4 size (main invoice)
+                if (paperSize === "A4") {
+                    const phoneNumber = `+91${mobile_no}`;
+                    const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${sname}.\nYour total bill amount is: *Rs.${final_price}*\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${sname}\n\nClick on the link to download:: ${downloadURL}`;
+                    const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+                        message
+                    )}`;
 
-                // Open WhatsApp link
-                window.open(whatsappLink, "_blank");
+                    // Open WhatsApp link
+                    window.open(whatsappLink, "_blank");
 
-                // Prepare formData with only essential details
-                const formData = new FormData();
-                formData.append(
-                    "file",
-                    blob,
-                    `Invoice-${invoiceData.getInvoiceId}.pdf`
-                );
-                formData.append("invoice", invoiceData.getInvoiceId);
-                formData.append("customer_name", customer_name);
-                formData.append("mobile_no", mobile_no);
-                formData.append("email", email);
-                formData.append("branch_name", sname);
-                formData.append("pdf_url", downloadURL);
-                formData.append("whatsapp_link", whatsappLink);
-                formData.append("grand_total", grand_total);
-                formData.append("invoice_date", invoiceData.getCurrentDate());
+                    // Prepare formData with only essential details
+                    const formData = new FormData();
+                    formData.append("file", blob, fileName);
+                    formData.append("invoice", invoiceData.getInvoiceId);
+                    formData.append("customer_name", customer_name);
+                    formData.append("mobile_no", mobile_no);
+                    formData.append("email", email);
+                    formData.append("branch_name", sname);
+                    formData.append("pdf_url", downloadURL);
+                    formData.append("whatsapp_link", whatsappLink);
+                    formData.append("grand_total", grand_total);
+                    formData.append(
+                        "invoice_date",
+                        invoiceData.getCurrentDate()
+                    );
 
-                // Call handleSendInvoice with essential data only
-                await handleSendInvoice(formData);
+                    // Call handleSendInvoice with essential data only
+                    await handleSendInvoice(formData);
+                }
             } else {
                 console.error("Failed to create PDF blob");
             }
         } catch (error) {
             console.error("Error generating PDF:", error);
         }
-
-        // const blob = await pdf(<InvoiceDocument />).toBlob();
-
-        // // Save PDF locally
-        // saveAs(blob, `Invoice-${invoiceData.getInvoiceId}.pdf`);
-
-        // // Initialize formData for uploading the PDF
     };
 
     return (
@@ -1777,7 +2397,7 @@ function Invoice() {
                                 <p className="font-semibold">
                                     Date of Invoice:
                                 </p>
-                                {userType !== "staff" && (
+                                {userType !== "staff" ? (
                                     <>
                                         <input
                                             type="date"
@@ -1786,6 +2406,18 @@ function Invoice() {
                                                 setInvoiceDate(e.target.value)
                                             }
                                             className="border border-gray-300 rounded-full px-4 py-2 w-full"
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <input
+                                            type="date"
+                                            value={invoiceDate}
+                                            onChange={(e) =>
+                                                setInvoiceDate(e.target.value)
+                                            }
+                                            className="border border-gray-300 rounded-full px-4 py-2 w-full"
+                                            readOnly
                                         />
                                     </>
                                 )}
@@ -1887,92 +2519,161 @@ function Invoice() {
                                                         />
                                                     </td>
                                                     <td className="border p-3">
-                                                        <div className="flex gap-2">
+                                                        <div className="flex gap-2 w-full">
                                                             {/* Flat ₹ input */}
-                                                            <input
-                                                                type="number"
-                                                                className="w-full p-1 border rounded-full text-center"
-                                                                value={
-                                                                    discounts[
-                                                                        index
-                                                                    ] || ""
-                                                                }
-                                                                onChange={(
-                                                                    e
-                                                                ) => {
-                                                                    const value =
-                                                                        e.target
-                                                                            .value;
-                                                                    const newDiscounts =
-                                                                        [
-                                                                            ...discounts,
-                                                                        ];
-                                                                    newDiscounts[
-                                                                        index
-                                                                    ] =
-                                                                        value ===
-                                                                        ""
-                                                                            ? 0
-                                                                            : parseFloat(
-                                                                                  value
-                                                                              );
-                                                                    setDiscounts(
-                                                                        newDiscounts
-                                                                    );
-
-                                                                    // Calculate percentage when flat value changes
-                                                                    const price =
-                                                                        services[
+                                                            <div className="relative w-full">
+                                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                                                                    ₹
+                                                                </span>
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.01"
+                                                                    min="0"
+                                                                    className="w-full pl-7 p-1 border rounded-full text-center"
+                                                                    value={
+                                                                        discounts[
                                                                             index
-                                                                        ]
-                                                                            ?.price ||
-                                                                        0;
-                                                                    const percent =
-                                                                        price
-                                                                            ? (
-                                                                                  (newDiscounts[
-                                                                                      index
-                                                                                  ] /
-                                                                                      price) *
-                                                                                  100
-                                                                              ).toFixed(
-                                                                                  2
-                                                                              )
-                                                                            : "0";
-                                                                    const newPercentages =
-                                                                        [
-                                                                            ...discountPercentages,
-                                                                        ];
-                                                                    newPercentages[
-                                                                        index
-                                                                    ] = percent;
-                                                                    setDiscountPercentages(
-                                                                        newPercentages
-                                                                    );
-                                                                }}
-                                                                placeholder="₹"
-                                                            />
+                                                                        ] ?? ""
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {
+                                                                        let value =
+                                                                            e
+                                                                                .target
+                                                                                .value;
+
+                                                                        // 🧹 Limit to 2 decimal places
+                                                                        if (
+                                                                            value.includes(
+                                                                                "."
+                                                                            )
+                                                                        ) {
+                                                                            const [
+                                                                                intPart,
+                                                                                decimalPart,
+                                                                            ] =
+                                                                                value.split(
+                                                                                    "."
+                                                                                );
+                                                                            value =
+                                                                                intPart +
+                                                                                "." +
+                                                                                decimalPart.slice(
+                                                                                    0,
+                                                                                    2
+                                                                                );
+                                                                        }
+
+                                                                        const newDiscounts =
+                                                                            [
+                                                                                ...discounts,
+                                                                            ];
+                                                                        newDiscounts[
+                                                                            index
+                                                                        ] =
+                                                                            value ===
+                                                                            ""
+                                                                                ? 0
+                                                                                : parseFloat(
+                                                                                      value
+                                                                                  );
+                                                                        setDiscounts(
+                                                                            newDiscounts
+                                                                        );
+
+                                                                        // 🧠 Calculate percentage based on price
+                                                                        const price =
+                                                                            services[
+                                                                                index
+                                                                            ]
+                                                                                ?.price ??
+                                                                            0;
+                                                                        const percent =
+                                                                            price
+                                                                                ? (
+                                                                                      (newDiscounts[
+                                                                                          index
+                                                                                      ] /
+                                                                                          price) *
+                                                                                      100
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                                : "0";
+
+                                                                        const newPercentages =
+                                                                            [
+                                                                                ...discountPercentages,
+                                                                            ];
+                                                                        newPercentages[
+                                                                            index
+                                                                        ] =
+                                                                            percent;
+                                                                        setDiscountPercentages(
+                                                                            newPercentages
+                                                                        );
+                                                                    }}
+                                                                    placeholder="Flat"
+                                                                />
+                                                            </div>
+
                                                             {/* Percentage input */}
-                                                            <input
-                                                                type="number"
-                                                                className="w-full p-1 border rounded-full text-center"
-                                                                value={
-                                                                    discountPercentages[
-                                                                        index
-                                                                    ] || ""
-                                                                }
-                                                                onChange={(e) =>
-                                                                    handleDiscountPercentageChange(
-                                                                        index,
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                                placeholder="%"
-                                                            />
+                                                            <div className="relative w-full">
+                                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                                                                    %
+                                                                </span>
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.01"
+                                                                    min="0"
+                                                                    max="100"
+                                                                    className="w-full pl-7 p-1 border rounded-full text-center"
+                                                                    value={
+                                                                        discountPercentages[
+                                                                            index
+                                                                        ] ?? ""
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {
+                                                                        let value =
+                                                                            e
+                                                                                .target
+                                                                                .value;
+
+                                                                        // 🧹 Limit to 2 decimal places
+                                                                        if (
+                                                                            value.includes(
+                                                                                "."
+                                                                            )
+                                                                        ) {
+                                                                            const [
+                                                                                intPart,
+                                                                                decimalPart,
+                                                                            ] =
+                                                                                value.split(
+                                                                                    "."
+                                                                                );
+                                                                            value =
+                                                                                intPart +
+                                                                                "." +
+                                                                                decimalPart.slice(
+                                                                                    0,
+                                                                                    2
+                                                                                );
+                                                                        }
+
+                                                                        handleDiscountPercentageChange(
+                                                                            index,
+                                                                            value
+                                                                        );
+                                                                    }}
+                                                                    placeholder="Percent"
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </td>
-
 
                                                     {(isGST ||
                                                         isMemGst ||
@@ -2165,100 +2866,164 @@ function Invoice() {
                                                             {product.quantity}
                                                         </td>
                                                         <td className="border p-3">
-                                                            <div className="flex gap-2">
-                                                                {/* Flat ₹ input */}
-                                                                <input
-                                                                    type="number"
-                                                                    className="w-full p-1 border rounded-full text-center"
-                                                                    value={
-                                                                        productDiscounts[
-                                                                            index
-                                                                        ] || ""
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) => {
-                                                                        const value =
-                                                                            e
-                                                                                .target
-                                                                                .value;
-                                                                        const newDiscounts =
-                                                                            [
-                                                                                ...productDiscounts,
-                                                                            ];
-                                                                        newDiscounts[
-                                                                            index
-                                                                        ] =
-                                                                            value ===
+                                                            <div className="flex gap-2 relative w-full">
+                                                                {/* Flat Discount Input (₹) */}
+                                                                <div className="relative w-full">
+                                                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                                                        ₹
+                                                                    </span>
+                                                                    <input
+                                                                        type="number"
+                                                                        step="0.01"
+                                                                        min="0"
+                                                                        className="w-full pl-7 p-1 border rounded-full text-center"
+                                                                        value={
+                                                                            productDiscounts[
+                                                                                index
+                                                                            ] ??
                                                                             ""
-                                                                                ? 0
-                                                                                : parseFloat(
-                                                                                      value
-                                                                                  );
-                                                                        setProductDiscounts(
-                                                                            newDiscounts
-                                                                        );
-
-                                                                        // Calculate percentage when flat value changes
-                                                                        const price =
-                                                                            productDetails[
-                                                                                index
-                                                                            ]
-                                                                                ?.price ||
-                                                                            producData[
-                                                                                index
-                                                                            ]
-                                                                                ?.price ||
-                                                                            0;
-                                                                        const percent =
-                                                                            price
-                                                                                ? (
-                                                                                      (newDiscounts[
-                                                                                          index
-                                                                                      ] /
-                                                                                          price) *
-                                                                                      100
-                                                                                  ).toFixed(
-                                                                                      2
-                                                                                  )
-                                                                                : "0";
-                                                                        const newPercentages =
-                                                                            [
-                                                                                ...productDiscountPercentages,
-                                                                            ];
-                                                                        newPercentages[
-                                                                            index
-                                                                        ] =
-                                                                            percent;
-                                                                        setProductDiscountPercentages(
-                                                                            newPercentages
-                                                                        );
-                                                                    }}
-                                                                    placeholder="₹"
-                                                                />
-                                                                {/* Percentage input */}
-                                                                <input
-                                                                    type="number"
-                                                                    className="w-full p-1 border rounded-full text-center"
-                                                                    value={
-                                                                        productDiscountPercentages[
-                                                                            index
-                                                                        ] || ""
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        handleProductDiscountPercentageChange(
-                                                                            index,
+                                                                        }
+                                                                        onChange={(
                                                                             e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                    placeholder="%"
-                                                                />
-                                                            </div>
+                                                                        ) => {
+                                                                            let value =
+                                                                                e
+                                                                                    .target
+                                                                                    .value;
 
+                                                                            if (
+                                                                                value.includes(
+                                                                                    "."
+                                                                                )
+                                                                            ) {
+                                                                                const [
+                                                                                    intPart,
+                                                                                    decimalPart,
+                                                                                ] =
+                                                                                    value.split(
+                                                                                        "."
+                                                                                    );
+                                                                                value =
+                                                                                    intPart +
+                                                                                    "." +
+                                                                                    decimalPart.slice(
+                                                                                        0,
+                                                                                        2
+                                                                                    );
+                                                                            }
+
+                                                                            const newDiscounts =
+                                                                                [
+                                                                                    ...productDiscounts,
+                                                                                ];
+                                                                            newDiscounts[
+                                                                                index
+                                                                            ] =
+                                                                                value ===
+                                                                                ""
+                                                                                    ? 0
+                                                                                    : parseFloat(
+                                                                                          value
+                                                                                      );
+                                                                            setProductDiscounts(
+                                                                                newDiscounts
+                                                                            );
+
+                                                                            const price =
+                                                                                productDetails[
+                                                                                    index
+                                                                                ]
+                                                                                    ?.price ??
+                                                                                producData[
+                                                                                    index
+                                                                                ]
+                                                                                    ?.price ??
+                                                                                0;
+
+                                                                            const percent =
+                                                                                price
+                                                                                    ? (
+                                                                                          (newDiscounts[
+                                                                                              index
+                                                                                          ] /
+                                                                                              price) *
+                                                                                          100
+                                                                                      ).toFixed(
+                                                                                          2
+                                                                                      )
+                                                                                    : "0";
+
+                                                                            const newPercentages =
+                                                                                [
+                                                                                    ...productDiscountPercentages,
+                                                                                ];
+                                                                            newPercentages[
+                                                                                index
+                                                                            ] =
+                                                                                percent;
+                                                                            setProductDiscountPercentages(
+                                                                                newPercentages
+                                                                            );
+                                                                        }}
+                                                                        placeholder="Flat"
+                                                                    />
+                                                                </div>
+
+                                                                {/* Percentage Discount Input (%) */}
+                                                                <div className="relative w-full">
+                                                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                                                        %
+                                                                    </span>
+                                                                    <input
+                                                                        type="number"
+                                                                        step="0.01"
+                                                                        min="0"
+                                                                        max="100"
+                                                                        className="w-full pl-7 p-1 border rounded-full text-center"
+                                                                        value={
+                                                                            productDiscountPercentages[
+                                                                                index
+                                                                            ] ??
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            let value =
+                                                                                e
+                                                                                    .target
+                                                                                    .value;
+
+                                                                            if (
+                                                                                value.includes(
+                                                                                    "."
+                                                                                )
+                                                                            ) {
+                                                                                const [
+                                                                                    intPart,
+                                                                                    decimalPart,
+                                                                                ] =
+                                                                                    value.split(
+                                                                                        "."
+                                                                                    );
+                                                                                value =
+                                                                                    intPart +
+                                                                                    "." +
+                                                                                    decimalPart.slice(
+                                                                                        0,
+                                                                                        2
+                                                                                    );
+                                                                            }
+
+                                                                            handleProductDiscountPercentageChange(
+                                                                                index,
+                                                                                value
+                                                                            );
+                                                                        }}
+                                                                        placeholder="%" // optional, visual symbol already shown
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         </td>
                                                         {(isGST ||
                                                             isMemGst ||
@@ -2320,8 +3085,11 @@ function Invoice() {
                                                           1}
                                                 </td>
                                                 <td className="border p-3 text-center">
-                                                    {total_discount}
+                                                    {Number(
+                                                        total_discount
+                                                    ).toFixed(2)}
                                                 </td>
+
                                                 {(isGST ||
                                                     isMemGst ||
                                                     isCouponGst) && (
@@ -2481,11 +3249,18 @@ function Invoice() {
                     )}
                 </form>
             </div>
+            <div className="flex items-center justify-center mt-8 gap-4">
+                {/* <button
+                    type="button"
+                    onClick={() => handlePrint("thermal")}
+                    className="py-2 px-6 bg-gray-500 text-white font-semibold rounded-[2.5rem]"
+                >
+                    Print Invoice
+                </button> */}
 
-            <div className="flex items-center justify-center mt-8">
                 <button
                     type="submit"
-                    onClick={handleGenerateInvoice}
+                    onClick={() => handlePrint("thermal")}
                     disabled={
                         totalPayment !== final_price ||
                         loading ||

@@ -1186,19 +1186,17 @@ function Appointment() {
                                     </select>
                                 </div>
                             </div>
-
-                            <div>
-                                <label className="text-lg text-start font-bold text-gray-800 my-4 block">
-                                    Comments:
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder="Comments"
-                                    onChange={(e) =>
-                                        setComments(e.target.value)
-                                    }
-                                    className="sm:w-full md:w-1/4 h-10 p-3 border border-gray-300 rounded-full"
-                                />
+                            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
+                                <div className="flex flex-col">
+                                    <span className="font-semibold items-start flex mb-4">
+                                        Comments
+                                    </span>
+                                    <input
+                                        type="text"
+                                        className="text-black p-3 rounded-[2.5rem]  border border-gray-300 col-span-1 font-semibold placeholder-gray-400"
+                                        placeholder="Enter Comments"
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex items-center justify-center m-12 mt-24 ">
