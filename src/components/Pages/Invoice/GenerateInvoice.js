@@ -10,6 +10,7 @@ import config from "../../../config";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useLocation } from "react-router-dom";
 import CustomerSummary from "./CustomerSummary";
+import { toast, ToastContainer } from "react-toastify";
 
 function getCurrentDate() {
     const currentDate = new Date();
@@ -21,6 +22,7 @@ function getCurrentDate() {
 
 function GenerateInvoice() {
     const navigate = useNavigate();
+
     const [categoryServices, setCategoryServices] = useState([]);
     const [productCategory, setProductCategory] = useState([]);
     const [customer_name, setCustomer_Name] = useState("");
@@ -47,6 +49,7 @@ function GenerateInvoice() {
     const [isServiceModalOpen, setServiceModalOpen] = useState(false);
     const [isProductModalOpen, setProductModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery2, setSearchQuery2] = useState("");
 
     const [selectedServices, setSelectedServices] = useState([]);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -349,13 +352,33 @@ function GenerateInvoice() {
                 service.name?.toLowerCase().includes(searchQuery.toLowerCase())
             )
     );
-    const filteredproduct = productCategory.filter(
-        (category) =>
-            category.value?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            category.product.some((product) =>
-                product.name?.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-    );
+    const filteredproduct = productCategory.filter((category, index) => {
+        console.log(`🔎 Checking category at index ${index}:`, category);
+
+        const search = searchQuery2.toLowerCase();
+
+        const valueMatch = category?.value?.toLowerCase().includes(search);
+
+        if (!Array.isArray(category?.products)) {
+            console.warn(
+                `⚠️ category.products is not an array or is undefined at index ${index}`,
+                category.products
+            );
+        }
+
+        const productMatch =
+            Array.isArray(category?.products) &&
+            category.products.some((product, pIndex) => {
+                console.log(
+                    `  🧪 Checking product at index ${pIndex}:`,
+                    product
+                );
+                return product?.name?.toLowerCase().includes(search);
+            });
+
+        return valueMatch || productMatch;
+    });
+
     // toggleProductSelection
     const toggleServiceSelection = (service) => {
         const isSelected = selectedList.some((s) => s.id === service.id);
@@ -591,114 +614,92 @@ function GenerateInvoice() {
 
     console.log(servicesTableData, "servicesTableData");
     // Modified handleGenerateInvoice function
+
     const handleGenerateInvoice = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            // For edit mode, use existing invoice ID
-            const generatedInvoiceId = isEditMode
-                ? invoiceData.slno
-                : await fetchSpecificSerial();
+            const errors = [];
 
-            console.log("✅ Generated Invoice ID:", generatedInvoiceId);
+            // 1. Validate Customer Name
+            if (!customer_name || customer_name.trim() === "") {
+                errors.push("Customer name is required");
+            }
 
-            // Extra safety chec
-            // Update state with the generated InvoiceId
-            setInvoiceId(generatedInvoiceId);
-            // Validate mobile number
+            // 2. Validate Mobile Number (exactly 10 digits)
             const mobileNoPattern = /^[0-9]{10}$/;
             if (!mobileNoPattern.test(mobile_no)) {
-                setDialogTitle("Error");
-                setDialogMessage(
-                    "Please enter a valid 10-digit mobile number!"
-                );
-                setDialogOpen(true);
-                setLoading(false);
-                return;
+                errors.push("Please enter a valid 10-digit mobile number");
             }
 
-            // Validate at least one service or product is selected
-            if (
-                (!selectedList || selectedList.length === 0) &&
-                (!productList || productList.length === 0)
-            ) {
-                setDialogTitle("Error");
-                setDialogMessage(
-                    "Please select at least one service or product!"
-                );
-                setDialogOpen(true);
-                setLoading(false);
-                return;
+            // 3. Validate Email (if provided)
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errors.push("Please enter a valid email address");
             }
 
-            // Validate services
-            const serviceErrors = [];
+            // 4. Validate at least one service or product is selected
+            if (selectedList.length === 0 && productList.length === 0) {
+                errors.push("Please select at least one service or product");
+            }
+
+            // 5. Validate services
             selectedList.forEach((service) => {
                 if (!service.staff || service.staff.length === 0) {
-                    serviceErrors.push(
+                    errors.push(
                         `Please select staff for service: ${service.name}`
                     );
                 }
                 if (!service.quantity || service.quantity <= 0) {
-                    serviceErrors.push(
+                    errors.push(
                         `Please enter valid quantity for service: ${service.name}`
                     );
                 }
-                if (!service.gst) {
-                    serviceErrors.push(
-                        `Please select GST type for service: ${service.name}`
-                    );
-                }
                 if (service.price === undefined || service.price <= 0) {
-                    serviceErrors.push(
+                    errors.push(
                         `Please enter valid price for service: ${service.name}`
                     );
                 }
             });
 
-            // Validate products
-            const productErrors = [];
+            // 6. Validate products
             productList.forEach((product) => {
                 if (!product.quantity || product.quantity <= 0) {
-                    productErrors.push(
+                    errors.push(
                         `Please enter quantity for product: ${product.name}`
                     );
                 }
                 if (product.stock && product.quantity > product.stock) {
-                    productErrors.push(
+                    errors.push(
                         `Only ${product.stock} available for product: ${product.name}`
                     );
                 }
                 if (product.price === undefined || product.price <= 0) {
-                    productErrors.push(
+                    errors.push(
                         `Please enter valid price for product: ${product.name}`
                     );
                 }
             });
 
-            // If any errors found
-            // if (serviceErrors.length > 0 || productErrors.length > 0) {
-            //     console.log("🧪 Service Errors:", serviceErrors);
-            //     console.log("🧪 Product Errors:", productErrors);
+            // 7. Validate GST number if GST is selected
+            if (isGST && (!gst_number || gst_number.trim() === "")) {
+                errors.push("GST number is required when GST is selected");
+            }
 
-            //     console.log(
-            //         "🛑 Validation failed. Blocking invoice generation."
-            //     );
-            //     setDialogTitle("Validation Errors");
-            //     setDialogMessage(
-            //         [...serviceErrors, ...productErrors].join("\n")
-            //     );
-            //     setDialogOpen(true);
-            //     setLoading(false);
-            //     return;
-            // }
+            // 🔔 Show all errors via Toastify
+            if (errors.length > 0) {
+                errors.forEach((err) => toast.error(err));
+                return;
+            }
 
-            // console.log("235658521065986236598623ram");
+            // 📄 Proceed with invoice generation
+            const generatedInvoiceId = isEditMode
+                ? invoiceData.slno
+                : await fetchSpecificSerial();
 
-            // Submit user details if needed
+            setInvoiceId(generatedInvoiceId);
+
             let submitResult = null;
-
             const shouldUpdateCustomer =
                 userExists &&
                 (selectMembership ||
@@ -707,62 +708,12 @@ function GenerateInvoice() {
                     anniversaryDate);
 
             if (shouldUpdateCustomer) {
-                try {
-                    submitResult = await handleUpdateCustomer(e, customerId);
-                } catch (error) {
-                    console.error("Error during user update:", error);
-                    setDialogTitle("Error");
-                    setDialogMessage(
-                        "An error occurred while updating user details. Please try again."
-                    );
-                    setDialogOpen(true);
-                    setLoading(false);
-                    return;
-                }
+                submitResult = await handleUpdateCustomer(e, customerId);
             } else if (!userExists) {
-                try {
-                    submitResult = await handleSubmit(e);
-                } catch (error) {
-                    console.error("Error during user submission:", error);
-                    setDialogTitle("Error");
-                    setDialogMessage(
-                        "An error occurred while adding user details. Please try again."
-                    );
-                    setDialogOpen(true);
-                    setLoading(false);
-                    return;
-                }
+                submitResult = await handleSubmit(e);
             }
 
-            // Calculate totals
-            const serviceTotal = selectedList.reduce(
-                (sum, service) =>
-                    sum + (service.price || 0) * (service.quantity || 1),
-                0
-            );
-
-            const productTotal = productList.reduce(
-                (sum, product) =>
-                    sum + (product.price || 0) * (product.quantity || 1),
-                0
-            );
-
-            const membershipPrice = selectMembership?.price || 0;
-            const couponDiscount = selectedCoupons.reduce(
-                (sum, coupon) => sum + (coupon.coupon_price || 0),
-                0
-            );
-
-            const grandTotal =
-                serviceTotal +
-                productTotal +
-                membershipPrice -
-                couponDiscount -
-                deductedPoints -
-                valueDeductedPoints;
-
-            console.log("services 1000000", servicesTableData);
-            // Navigate to invoice page with all data
+            // 🧾 Navigate to invoice preview
             await navigate(
                 `/${sname}/${branchName}/${generatedInvoiceId}/invoice`,
                 {
@@ -789,13 +740,11 @@ function GenerateInvoice() {
                     },
                 }
             );
+
+            toast.success("Invoice generated successfully!");
         } catch (error) {
             console.error("Error during invoice generation:", error);
-            setDialogTitle("Error");
-            setDialogMessage(
-                "An error occurred while generating the invoice. Please try again."
-            );
-            setDialogOpen(true);
+            toast.error("Something went wrong while generating the invoice.");
         } finally {
             setLoading(false);
         }
@@ -1149,7 +1098,6 @@ function GenerateInvoice() {
                         d_o_b: dateOfBirth || "none",
                         d_o_a: anniversaryDate || "none",
                         coupon: selectedCoupons || [],
-
                     }),
                 }
             );
@@ -1272,7 +1220,7 @@ function GenerateInvoice() {
             console.log("Form submitted");
         } else {
             e.preventDefault();
-            alert("Total payment does not match the grand total.");
+            alert("Required field not selected ");
         }
     };
     useEffect(() => {
@@ -2238,9 +2186,9 @@ function GenerateInvoice() {
                                                         type="text"
                                                         placeholder="Search products or categories..."
                                                         className="border border-gray-300 rounded-[2.5rem] px-4 py-2 w-full md:w-1/3"
-                                                        value={searchQuery}
+                                                        value={searchQuery2}
                                                         onChange={(e) =>
-                                                            setSearchQuery(
+                                                            setSearchQuery2(
                                                                 e.target.value
                                                             )
                                                         }
@@ -2834,7 +2782,7 @@ function GenerateInvoice() {
                                 <button
                                     type="submit"
                                     className={`py-2 px-12 bg-blue-500 text-xl text-white font-semibold rounded-[2.5rem]`}
-                                    onClick={handleInvoiceSubmit}
+                                    // onClick={handleInvoiceSubmit}
                                 >
                                     {loading ? (
                                         <CircularProgress
@@ -2849,6 +2797,8 @@ function GenerateInvoice() {
                                 </button>
                             </div>
                         </form>
+                        {/* Toastify Container goes here */}
+                        <ToastContainer />
                     </div>
                 </div>
             </div>
