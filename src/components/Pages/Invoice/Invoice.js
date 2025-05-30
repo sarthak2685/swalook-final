@@ -452,8 +452,7 @@ function Invoice() {
         }
         // Aggregate totals for services and products
         const totalServicePrices = prices.reduce(
-            (acc, price, index) =>
-                acc + (price * quantities[index] - discounts[index]),
+            (acc, price, index) => acc + price * quantities[index],
             0
         );
         const totalServiceQuantity = quantities.reduce(
@@ -713,6 +712,9 @@ function Invoice() {
     const [invoiceGenerated, setInvoiceGenerated] = useState(false);
 
     const handleGenerateInvoice = async (e) => {
+        console.log(
+            "qwertyuiop[[zcxvbnm,.aesrdtjfhygkl;esrdtyfguhijozxcvbmnm,..esrdtfyguhijoksdfghjkldszzfxgcvhmjbknmesdgfhjkvbn,cfgvhbjncvbnm,"
+        );
         e.preventDefault();
 
         // Prevent duplicate submissions
@@ -980,106 +982,1367 @@ function Invoice() {
             console.error("Error saving PDF:", error);
         }
     };
-    const formatPrice = (price) => {
-        const num = Number(price) || 0;
-        return num.toFixed(2);
-    };
 
-    const handlePrint = async (paperSize = "A4") => {
-        const styles = StyleSheet.create({
-            invoiceContainer: {
-                padding: paperSize === "A4" ? 20 : 4,
-                margin: paperSize === "A4" ? 15 : 0,
-                backgroundColor: "#fff",
-                fontSize: paperSize === "A4" ? 11 : 6,
-                width: paperSize === "A4" ? "100%" : "80mm", // match thermal width
-                flexGrow: 1,
-            },
+    // const handlePrint = async (paperSize = "thermal") => {
+    //     // const styles = StyleSheet.create({
+    //     //     invoiceContainer: {
+    //     //         padding: paperSize === "A4" ? 20 : 4,
+    //     //         margin: paperSize === "A4" ? 15 : 0,
+    //     //         backgroundColor: "#fff",
+    //     //         fontSize: paperSize === "A4" ? 11 : 6,
+    //     //         width: paperSize === "A4" ? "100%" : "80mm", // match thermal width
+    //     //         flexGrow: 1,
+    //     //     },
 
-            section: {
-                marginBottom: paperSize === "A4" ? 20 : 3,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-            },
-            sectionColumn: {
-                flex: 1,
-                marginHorizontal: paperSize === "A4" ? 10 : 1,
-                gap: paperSize === "A4" ? 5 : 1,
-            },
-            invoiceHeader: {
-                textAlign: "center",
-                fontSize: paperSize === "A4" ? 26 : 8,
-                fontWeight: "bold",
-                marginBottom: paperSize === "A4" ? 20 : 4,
-            },
-            table: {
-                width: "100%",
-                marginTop: paperSize === "A4" ? 20 : 3,
-                borderWidth: paperSize === "A4" ? 1 : 0.3,
-                borderColor: "#ccc",
-                borderRadius: 3,
-            },
-            tableHeader: {
-                flexDirection: "row",
-                backgroundColor: "#ddd",
-                borderBottomWidth: paperSize === "A4" ? 1 : 0.3,
-                borderBottomColor: "#bbb",
-                fontWeight: "bold",
-                paddingVertical: paperSize === "A4" ? 8 : 2,
-                paddingHorizontal: paperSize === "A4" ? 5 : 1,
-            },
-            tableRow: {
-                flexDirection: "row",
-                borderBottomWidth: paperSize === "A4" ? 1 : 0.3,
-                borderBottomColor: "#eee",
-                paddingVertical: paperSize === "A4" ? 10 : 2,
-            },
-            tableCell: {
-                flex: 1,
-                textAlign: "center",
-                padding: paperSize === "A4" ? 6 : 1,
-                borderRightWidth: paperSize === "A4" ? 1 : 0.3,
-                borderRightColor: "#ddd",
-            },
-            totalRow: {
-                flexDirection: "row",
-                backgroundColor: "#eaeaea",
-                borderTopWidth: paperSize === "A4" ? 1 : 0.3,
-                borderTopColor: "#ccc",
-                fontWeight: "bold",
-                paddingVertical: paperSize === "A4" ? 12 : 2,
-                marginTop: paperSize === "A4" ? 10 : 3,
-            },
-            footer: {
-                marginTop: paperSize === "A4" ? 20 : 3,
-                paddingHorizontal: paperSize === "A4" ? 10 : 2,
-            },
-            footerRow: {
-                flexDirection: "column",
-            },
-            footerText: {
-                fontWeight: "bold",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: paperSize === "A4" ? 5 : 1,
-                fontSize: paperSize === "A4" ? 11 : 5.5,
-            },
-            footerValue: {
-                fontWeight: "600",
-                textAlign: "right",
-            },
-            centerText: {
-                textAlign: "center",
-                fontSize: paperSize === "A4" ? 10 : 5.5,
-            },
-            bottomNote: {
-                marginTop: paperSize === "A4" ? 5 : 2,
-                textAlign: "center",
-                fontSize: paperSize === "A4" ? 10 : 5,
-                color: "#555",
-            },
-        });
+    //     //     section: {
+    //     //         marginBottom: paperSize === "A4" ? 20 : 3,
+    //     //         flexDirection: "row",
+    //     //         justifyContent: "space-between",
+    //     //         alignItems: "flex-start",
+    //     //     },
+    //     //     sectionColumn: {
+    //     //         flex: 1,
+    //     //         marginHorizontal: paperSize === "A4" ? 10 : 1,
+    //     //         gap: paperSize === "A4" ? 5 : 1,
+    //     //     },
+    //     //     invoiceHeader: {
+    //     //         textAlign: "center",
+    //     //         fontSize: paperSize === "A4" ? 26 : 8,
+    //     //         fontWeight: "bold",
+    //     //         marginBottom: paperSize === "A4" ? 20 : 4,
+    //     //     },
+    //     //     table: {
+    //     //         width: "100%",
+    //     //         marginTop: paperSize === "A4" ? 20 : 3,
+    //     //         borderWidth: paperSize === "A4" ? 1 : 0.3,
+    //     //         borderColor: "#ccc",
+    //     //         borderRadius: 3,
+    //     //     },
+    //     //     tableHeader: {
+    //     //         flexDirection: "row",
+    //     //         backgroundColor: "#ddd",
+    //     //         borderBottomWidth: paperSize === "A4" ? 1 : 0.3,
+    //     //         borderBottomColor: "#bbb",
+    //     //         fontWeight: "bold",
+    //     //         paddingVertical: paperSize === "A4" ? 8 : 2,
+    //     //         paddingHorizontal: paperSize === "A4" ? 5 : 1,
+    //     //     },
+    //     //     tableRow: {
+    //     //         flexDirection: "row",
+    //     //         borderBottomWidth: paperSize === "A4" ? 1 : 0.3,
+    //     //         borderBottomColor: "#eee",
+    //     //         paddingVertical: paperSize === "A4" ? 10 : 2,
+    //     //     },
+    //     //     tableCell: {
+    //     //         flex: 1,
+    //     //         textAlign: "center",
+    //     //         padding: paperSize === "A4" ? 6 : 1,
+    //     //         borderRightWidth: paperSize === "A4" ? 1 : 0.3,
+    //     //         borderRightColor: "#ddd",
+    //     //     },
+    //     //     totalRow: {
+    //     //         flexDirection: "row",
+    //     //         backgroundColor: "#eaeaea",
+    //     //         borderTopWidth: paperSize === "A4" ? 1 : 0.3,
+    //     //         borderTopColor: "#ccc",
+    //     //         fontWeight: "bold",
+    //     //         paddingVertical: paperSize === "A4" ? 12 : 2,
+    //     //         marginTop: paperSize === "A4" ? 10 : 3,
+    //     //     },
+    //     //     footer: {
+    //     //         marginTop: paperSize === "A4" ? 20 : 3,
+    //     //         paddingHorizontal: paperSize === "A4" ? 10 : 2,
+    //     //     },
+    //     //     footerRow: {
+    //     //         flexDirection: "column",
+    //     //     },
+    //     //     footerText: {
+    //     //         fontWeight: "bold",
+    //     //         flexDirection: "row",
+    //     //         justifyContent: "space-between",
+    //     //         marginBottom: paperSize === "A4" ? 5 : 1,
+    //     //         fontSize: paperSize === "A4" ? 11 : 5.5,
+    //     //     },
+    //     //     footerValue: {
+    //     //         fontWeight: "600",
+    //     //         textAlign: "right",
+    //     //     },
+    //     //     centerText: {
+    //     //         textAlign: "center",
+    //     //         fontSize: paperSize === "A4" ? 10 : 5.5,
+    //     //     },
+    //     //     bottomNote: {
+    //     //         marginTop: paperSize === "A4" ? 5 : 2,
+    //     //         textAlign: "center",
+    //     //         fontSize: paperSize === "A4" ? 10 : 5,
+    //     //         color: "#555",
+    //     //     },
+    //     // });
+
+    //     const invoiceData = {
+    //         sname,
+    //         customer_name,
+    //         address,
+    //         email,
+    //         mobile_no,
+    //         paymentModes,
+    //         getInvoiceId,
+    //         getCurrentDate,
+    //         isGST,
+    //         gst_number,
+    //         services,
+    //         membership_name,
+    //         membershipTax,
+    //         cgsts,
+    //         sgsts,
+    //         membershipTotal,
+    //         total_prise,
+    //         total_quantity,
+    //         total_discount,
+    //         total_tax,
+    //         total_cgst,
+    //         total_sgst,
+    //         grand_total,
+    //         grandTotalInWords,
+    //         final_price,
+    //         comments,
+    //         membership_points,
+    //         coupon_points,
+    //         isCouponGst,
+    //         isMemGst,
+    //         coupon,
+    //         quantity,
+    //         user,
+    //     };
+
+    //     // Ensure all prices are numbers before using toFixed()
+    //     const formatPrice = (price) => {
+    //         const num = Number(price) || 0;
+    //         return num.toFixed(2);
+    //     };
+
+    //     const calculateDiscountedPrice = (price, discount) => {
+    //         const priceNum = Number(price) || 0;
+    //         const discountNum = Number(discount) || 0;
+    //         return priceNum - priceNum * (discountNum / 100);
+    //     };
+
+    //     const InvoiceDocument = () => (
+    //         <Document>
+    //             <Page
+    //                 size={paperSize === "thermal" ? [80, undefined] : paperSize}
+    //                 style={[
+    //                     styles.invoiceContainer,
+    //                     paperSize === "thermal" && {
+    //                         width: "80mm",
+    //                         height: "auto",
+    //                         flexGrow: 1,
+    //                     },
+    //                 ]}
+    //             >
+    //                 {paperSize === "thermal" ? (
+    //                     <View
+    //                         style={{
+    //                             paddingHorizontal: 4, // adds space left and right
+    //                             paddingVertical: 4, // adds space top and bottom
+    //                         }}
+    //                     >
+    //                         <>
+    //                             {/* Header */}
+    //                             <View
+    //                                 style={{
+    //                                     textAlign: "center",
+    //                                     marginBottom: 2,
+    //                                 }}
+    //                             >
+    //                                 <Text
+    //                                     style={{
+    //                                         fontSize: 6,
+    //                                         fontWeight: "bold",
+    //                                     }}
+    //                                 >
+    //                                     INVOICE
+    //                                 </Text>
+    //                                 <Text style={{ fontSize: 4 }}>
+    //                                     ORIGINAL FOR RECIPIENT
+    //                                 </Text>
+    //                             </View>
+
+    //                             {/* Business Info */}
+    //                             <View style={{ marginBottom: 2 }}>
+    //                                 <Text
+    //                                     style={{
+    //                                         fontSize: 5.5,
+    //                                         fontWeight: "bold",
+    //                                         textAlign: "center",
+    //                                     }}
+    //                                 >
+    //                                     {sname}
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={{
+    //                                         fontSize: 4,
+    //                                         textAlign: "center",
+    //                                     }}
+    //                                 >
+    //                                     {address}
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={{
+    //                                         fontSize: 4,
+    //                                         textAlign: "center",
+    //                                     }}
+    //                                 >
+    //                                     Phone: {User_mobile_no}
+    //                                 </Text>
+    //                             </View>
+
+    //                             {/* Invoice Meta */}
+    //                             <View
+    //                                 style={{
+    //                                     flexDirection: "column",
+    //                                     marginBottom: 2,
+    //                                     fontSize: 4,
+    //                                     gap: 0.5,
+    //                                 }}
+    //                             >
+    //                                 {[
+    //                                     {
+    //                                         label: "Date",
+    //                                         value: getCurrentDate(),
+    //                                     },
+    //                                     {
+    //                                         label: "Bill No",
+    //                                         value: getInvoiceId,
+    //                                     },
+    //                                     {
+    //                                         label: "Client",
+    //                                         value: customer_name,
+    //                                     },
+    //                                     {
+    //                                         label: "Points",
+    //                                         value: membership_points || 0,
+    //                                     },
+    //                                 ].map((item, index) => (
+    //                                     <View
+    //                                         key={index}
+    //                                         style={{
+    //                                             flexDirection: "row",
+    //                                             justifyContent: "space-between",
+    //                                         }}
+    //                                     >
+    //                                         <Text>{item.label}:</Text>
+    //                                         <Text>{item.value}</Text>
+    //                                     </View>
+    //                                 ))}
+    //                             </View>
+
+    //                             {/* Item Table */}
+    //                             <View
+    //                                 style={{ width: "100%", marginBottom: 2 }}
+    //                             >
+    //                                 {/* Table Header */}
+    //                                 <View
+    //                                     style={{
+    //                                         flexDirection: "row",
+    //                                         borderBottomWidth: 0.3,
+    //                                         paddingBottom: 0.5,
+    //                                         marginBottom: 1,
+    //                                     }}
+    //                                 >
+    //                                     <Text
+    //                                         style={{
+    //                                             flex: 3,
+    //                                             fontSize: 4.5,
+    //                                             fontWeight: "bold",
+    //                                         }}
+    //                                     >
+    //                                         Particulars
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={{
+    //                                             flex: 1,
+    //                                             fontSize: 4.5,
+    //                                             fontWeight: "bold",
+    //                                             textAlign: "right",
+    //                                         }}
+    //                                     >
+    //                                         Price
+    //                                     </Text>
+    //                                 </View>
+
+    //                                 {/* Products */}
+    //                                 {productDetails.length > 0 && (
+    //                                     <>
+    //                                         <Text
+    //                                             style={{
+    //                                                 fontSize: 4.5,
+    //                                                 fontWeight: "bold",
+    //                                             }}
+    //                                         >
+    //                                             Products
+    //                                         </Text>
+    //                                         {productDetails.map(
+    //                                             (product, index) => {
+    //                                                 const discountPercent =
+    //                                                     productDiscountPercentages[
+    //                                                         index
+    //                                                     ] || 0;
+    //                                                 const discountedPrice =
+    //                                                     calculateDiscountedPrice(
+    //                                                         product.price,
+    //                                                         discountPercent
+    //                                                     );
+
+    //                                                 return (
+    //                                                     <View
+    //                                                         key={index}
+    //                                                         style={{
+    //                                                             marginTop: 1,
+    //                                                         }}
+    //                                                     >
+    //                                                         <View
+    //                                                             style={{
+    //                                                                 flexDirection:
+    //                                                                     "row",
+    //                                                             }}
+    //                                                         >
+    //                                                             <Text
+    //                                                                 style={{
+    //                                                                     flex: 3,
+    //                                                                     fontSize: 4,
+    //                                                                 }}
+    //                                                             >
+    //                                                                 {
+    //                                                                     product.name
+    //                                                                 }
+    //                                                             </Text>
+    //                                                             <Text
+    //                                                                 style={{
+    //                                                                     flex: 1,
+    //                                                                     fontSize: 4,
+    //                                                                     textAlign:
+    //                                                                         "right",
+    //                                                                 }}
+    //                                                             >
+    //                                                                 {formatPrice(
+    //                                                                     product.price
+    //                                                                 )}
+    //                                                             </Text>
+    //                                                         </View>
+
+    //                                                         {discountPercent >
+    //                                                             0 && (
+    //                                                             <View
+    //                                                                 style={{
+    //                                                                     flexDirection:
+    //                                                                         "row",
+    //                                                                 }}
+    //                                                             >
+    //                                                                 <Text
+    //                                                                     style={{
+    //                                                                         flex: 2,
+    //                                                                         fontSize: 3.5,
+    //                                                                     }}
+    //                                                                 >
+    //                                                                     -
+    //                                                                     {
+    //                                                                         discountPercent
+    //                                                                     }
+    //                                                                     %
+    //                                                                 </Text>
+    //                                                                 <Text
+    //                                                                     style={{
+    //                                                                         flex: 1,
+    //                                                                         fontSize: 3.5,
+    //                                                                         textAlign:
+    //                                                                             "right",
+    //                                                                     }}
+    //                                                                 >
+    //                                                                     {formatPrice(
+    //                                                                         discountedPrice
+    //                                                                     )}
+    //                                                                 </Text>
+    //                                                             </View>
+    //                                                         )}
+    //                                                     </View>
+    //                                                 );
+    //                                             }
+    //                                         )}
+    //                                     </>
+    //                                 )}
+
+    //                                 {/* Services */}
+    //                                 {services.length > 0 && (
+    //                                     <>
+    //                                         <Text
+    //                                             style={{
+    //                                                 fontSize: 4.5,
+    //                                                 fontWeight: "bold",
+    //                                                 marginTop: 2,
+    //                                             }}
+    //                                         >
+    //                                             Services
+    //                                         </Text>
+    //                                         {services.map((service, index) => {
+    //                                             const discountPercent =
+    //                                                 discountPercentages[
+    //                                                     index
+    //                                                 ] || 0;
+    //                                             const discountedPrice =
+    //                                                 calculateDiscountedPrice(
+    //                                                     service.price,
+    //                                                     discountPercent
+    //                                                 );
+
+    //                                             return (
+    //                                                 <View
+    //                                                     key={index}
+    //                                                     style={{ marginTop: 1 }}
+    //                                                 >
+    //                                                     <View
+    //                                                         style={{
+    //                                                             flexDirection:
+    //                                                                 "row",
+    //                                                         }}
+    //                                                     >
+    //                                                         <Text
+    //                                                             style={{
+    //                                                                 flex: 3,
+    //                                                                 fontSize: 4,
+    //                                                             }}
+    //                                                         >
+    //                                                             {service.name}
+    //                                                         </Text>
+    //                                                         <Text
+    //                                                             style={{
+    //                                                                 flex: 1,
+    //                                                                 fontSize: 4,
+    //                                                                 textAlign:
+    //                                                                     "right",
+    //                                                             }}
+    //                                                         >
+    //                                                             {formatPrice(
+    //                                                                 service.price
+    //                                                             )}
+    //                                                         </Text>
+    //                                                     </View>
+
+    //                                                     {discountPercent >
+    //                                                         0 && (
+    //                                                         <View
+    //                                                             style={{
+    //                                                                 flexDirection:
+    //                                                                     "row",
+    //                                                             }}
+    //                                                         >
+    //                                                             <Text
+    //                                                                 style={{
+    //                                                                     flex: 2,
+    //                                                                     fontSize: 3.5,
+    //                                                                 }}
+    //                                                             >
+    //                                                                 -
+    //                                                                 {
+    //                                                                     discountPercent
+    //                                                                 }
+    //                                                                 %
+    //                                                             </Text>
+    //                                                             <Text
+    //                                                                 style={{
+    //                                                                     flex: 1,
+    //                                                                     fontSize: 3.5,
+    //                                                                     textAlign:
+    //                                                                         "right",
+    //                                                                 }}
+    //                                                             >
+    //                                                                 {formatPrice(
+    //                                                                     discountedPrice
+    //                                                                 )}
+    //                                                             </Text>
+    //                                                         </View>
+    //                                                     )}
+    //                                                 </View>
+    //                                             );
+    //                                         })}
+    //                                     </>
+    //                                 )}
+    //                             </View>
+
+    //                             {/* Totals */}
+    //                             <View
+    //                                 style={{
+    //                                     borderTopWidth: 0.3,
+    //                                     paddingTop: 1.5,
+    //                                     marginBottom: 2,
+    //                                 }}
+    //                             >
+    //                                 <View
+    //                                     style={{
+    //                                         flexDirection: "row",
+    //                                         justifyContent: "space-between",
+    //                                     }}
+    //                                 >
+    //                                     <Text style={{ fontSize: 4.5 }}>
+    //                                         Gross Total:
+    //                                     </Text>
+    //                                     <Text style={{ fontSize: 4.5 }}>
+    //                                         {formatPrice(total_prise)}
+    //                                     </Text>
+    //                                 </View>
+    //                                 <View
+    //                                     style={{
+    //                                         flexDirection: "row",
+    //                                         justifyContent: "space-between",
+    //                                     }}
+    //                                 >
+    //                                     <Text style={{ fontSize: 4.5 }}>
+    //                                         Less Discount:
+    //                                     </Text>
+    //                                     <Text style={{ fontSize: 4.5 }}>
+    //                                         -{formatPrice(total_discount)}
+    //                                     </Text>
+    //                                 </View>
+    //                                 <View
+    //                                     style={{
+    //                                         flexDirection: "row",
+    //                                         justifyContent: "space-between",
+    //                                     }}
+    //                                 >
+    //                                     <Text style={{ fontSize: 4.5 }}>
+    //                                         Net Total:
+    //                                     </Text>
+    //                                     <Text style={{ fontSize: 4.5 }}>
+    //                                         {formatPrice(
+    //                                             total_prise - total_discount
+    //                                         )}
+    //                                     </Text>
+    //                                 </View>
+
+    //                                 {isGST && (
+    //                                     <>
+    //                                         <View
+    //                                             style={{
+    //                                                 flexDirection: "row",
+    //                                                 justifyContent:
+    //                                                     "space-between",
+    //                                             }}
+    //                                         >
+    //                                             <Text style={{ fontSize: 4.5 }}>
+    //                                                 CGST @ {cgsts}%:
+    //                                             </Text>
+    //                                             <Text style={{ fontSize: 4.5 }}>
+    //                                                 {formatPrice(total_cgst)}
+    //                                             </Text>
+    //                                         </View>
+    //                                         <View
+    //                                             style={{
+    //                                                 flexDirection: "row",
+    //                                                 justifyContent:
+    //                                                     "space-between",
+    //                                             }}
+    //                                         >
+    //                                             <Text style={{ fontSize: 4.5 }}>
+    //                                                 SGST @ {sgsts}%:
+    //                                             </Text>
+    //                                             <Text style={{ fontSize: 4.5 }}>
+    //                                                 {formatPrice(total_sgst)}
+    //                                             </Text>
+    //                                         </View>
+    //                                     </>
+    //                                 )}
+
+    //                                 <View
+    //                                     style={{
+    //                                         flexDirection: "row",
+    //                                         justifyContent: "space-between",
+    //                                         marginTop: 1,
+    //                                         borderTopWidth: 0.3,
+    //                                         paddingTop: 1,
+    //                                     }}
+    //                                 >
+    //                                     <Text
+    //                                         style={{
+    //                                             fontSize: 5.5,
+    //                                             fontWeight: "bold",
+    //                                         }}
+    //                                     >
+    //                                         Total Payable:
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={{
+    //                                             fontSize: 5.5,
+    //                                             fontWeight: "bold",
+    //                                         }}
+    //                                     >
+    //                                         {formatPrice(grand_total)}
+    //                                     </Text>
+    //                                 </View>
+    //                             </View>
+
+    //                             {/* Receipt Note */}
+    //                             <View
+    //                                 style={{
+    //                                     borderTopWidth: 0.3,
+    //                                     paddingTop: 1,
+    //                                     marginBottom: 1,
+    //                                 }}
+    //                             >
+    //                                 <Text
+    //                                     style={{
+    //                                         fontSize: 4,
+    //                                         textAlign: "center",
+    //                                     }}
+    //                                 >
+    //                                     Payment Receipt: Total Received
+    //                                 </Text>
+    //                             </View>
+
+    //                             {/* GST Info */}
+    //                             {isGST && (
+    //                                 <Text
+    //                                     style={{
+    //                                         fontSize: 3.5,
+    //                                         textAlign: "center",
+    //                                     }}
+    //                                 >
+    //                                     GSTN: {gst_number}
+    //                                 </Text>
+    //                             )}
+
+    //                             {/* Footer */}
+    //                             <Text
+    //                                 style={{
+    //                                     fontSize: 3.5,
+    //                                     textAlign: "center",
+    //                                     marginTop: 1,
+    //                                 }}
+    //                             >
+    //                                 Powered by Swalook Pvt. Ltd.
+    //                             </Text>
+    //                         </>
+    //                     </View>
+    //                 ) : (
+    //                     // Original A4 Design (unchanged)
+    //                     <>
+    //                         <Text style={styles.invoiceHeader}>{sname}</Text>
+
+    //                         {/* Header and Customer Section */}
+    //                         <View style={styles.section}>
+    //                             <View style={styles.sectionColumn}>
+    //                                 <Text style={styles.fieldName}>
+    //                                     Invoice To: {customer_name}
+    //                                 </Text>
+    //                                 <Text>{address}</Text>
+    //                                 <Text>{email}</Text>
+    //                                 <Text>{mobile_no}</Text>
+    //                             </View>
+    //                             <View style={styles.sectionColumn}>
+    //                                 <Text>Date of Invoice: {invoiceDate}</Text>
+    //                                 <Text>Invoice Id: {getInvoiceId}</Text>
+    //                                 {isGST && (
+    //                                     <Text>GST Number: {gst_number}</Text>
+    //                                 )}
+    //                             </View>
+    //                         </View>
+
+    //                         {/* Table */}
+    //                         <View style={styles.table}>
+    //                             {/* Table Header */}
+    //                             <View
+    //                                 style={[
+    //                                     styles.tableRow,
+    //                                     styles.tableHeader,
+    //                                 ]}
+    //                             >
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "5%" },
+    //                                     ]}
+    //                                 >
+    //                                     S. No.
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "25%" },
+    //                                     ]}
+    //                                 >
+    //                                     DESC
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "10%" },
+    //                                     ]}
+    //                                 >
+    //                                     PRICE
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "5%" },
+    //                                     ]}
+    //                                 >
+    //                                     QTY
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "10%" },
+    //                                     ]}
+    //                                 >
+    //                                     DISC (₹)
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "10%" },
+    //                                     ]}
+    //                                 >
+    //                                     DISC (%)
+    //                                 </Text>
+    //                                 {(isGST || isMemGst || isCouponGst) && (
+    //                                     <>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             TAX
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             CGST
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             SGST
+    //                                         </Text>
+    //                                     </>
+    //                                 )}
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "15%" },
+    //                                     ]}
+    //                                 >
+    //                                     TOTAL
+    //                                 </Text>
+    //                             </View>
+
+    //                             {/* Service Rows */}
+    //                             {services.map((service, index) => (
+    //                                 <View style={styles.tableRow} key={index}>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "5%" },
+    //                                         ]}
+    //                                     >
+    //                                         {index + 1}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "25%" },
+    //                                         ]}
+    //                                     >
+    //                                         {`${service.category}: ${service.name}`}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "10%" },
+    //                                         ]}
+    //                                     >
+    //                                         {formatPrice(service.price)}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "5%" },
+    //                                         ]}
+    //                                     >
+    //                                         {service.inputFieldValue.quantity ||
+    //                                             "N/A"}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "10%" },
+    //                                         ]}
+    //                                     >
+    //                                         {discounts[index] || 0}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "10%" },
+    //                                         ]}
+    //                                     >
+    //                                         {discountPercentages[index] || 0}
+    //                                     </Text>
+    //                                     {(isGST || isMemGst || isCouponGst) && (
+    //                                         <>
+    //                                             <Text
+    //                                                 style={[
+    //                                                     styles.tableCell,
+    //                                                     { width: "10%" },
+    //                                                 ]}
+    //                                             >
+    //                                                 {taxes[index] || "N/A"}
+    //                                             </Text>
+    //                                             <Text
+    //                                                 style={[
+    //                                                     styles.tableCell,
+    //                                                     { width: "10%" },
+    //                                                 ]}
+    //                                             >
+    //                                                 {cgst[index] || "N/A"}
+    //                                             </Text>
+    //                                             <Text
+    //                                                 style={[
+    //                                                     styles.tableCell,
+    //                                                     { width: "10%" },
+    //                                                 ]}
+    //                                             >
+    //                                                 {sgst[index] || "N/A"}
+    //                                             </Text>
+    //                                         </>
+    //                                     )}
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "15%" },
+    //                                         ]}
+    //                                     >
+    //                                         {totalAmts[index] || "N/A"}
+    //                                     </Text>
+    //                                 </View>
+    //                             ))}
+
+    //                             {/* Membership Row */}
+    //                             {membership_name &&
+    //                                 membership_name !== "None" && (
+    //                                     <View style={styles.tableRow}>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "5%" },
+    //                                             ]}
+    //                                         >
+    //                                             {services.length + 1}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "25%" },
+    //                                             ]}
+    //                                         >
+    //                                             {membership_name}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             {formatPrice(membershipPrice)}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "5%" },
+    //                                             ]}
+    //                                         >
+    //                                             1
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             0
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             0
+    //                                         </Text>
+    //                                         {(isGST ||
+    //                                             isMemGst ||
+    //                                             isCouponGst) && (
+    //                                             <>
+    //                                                 <Text
+    //                                                     style={[
+    //                                                         styles.tableCell,
+    //                                                         { width: "10%" },
+    //                                                     ]}
+    //                                                 >
+    //                                                     {formatPrice(
+    //                                                         membershipTax
+    //                                                     )}
+    //                                                 </Text>
+    //                                                 <Text
+    //                                                     style={[
+    //                                                         styles.tableCell,
+    //                                                         { width: "10%" },
+    //                                                     ]}
+    //                                                 >
+    //                                                     {formatPrice(cgsts)}
+    //                                                 </Text>
+    //                                                 <Text
+    //                                                     style={[
+    //                                                         styles.tableCell,
+    //                                                         { width: "10%" },
+    //                                                     ]}
+    //                                                 >
+    //                                                     {formatPrice(sgsts)}
+    //                                                 </Text>
+    //                                             </>
+    //                                         )}
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "15%" },
+    //                                             ]}
+    //                                         >
+    //                                             {formatPrice(membershipTotal)}
+    //                                         </Text>
+    //                                     </View>
+    //                                 )}
+
+    //                             {/* Coupon Rows */}
+    //                             {coupon.map((couponItem, index) => {
+    //                                 const couponPrice =
+    //                                     couponItem.coupon_price || 0;
+    //                                 const isCouponExclusive =
+    //                                     couponItem.gst === "Exclusive";
+
+    //                                 let couponCGST = 0;
+    //                                 let couponSGST = 0;
+    //                                 let couponTax = 0;
+    //                                 let couponTotal = couponPrice;
+
+    //                                 if (isCouponExclusive) {
+    //                                     couponCGST = couponPrice * CGST_RATE;
+    //                                     couponSGST = couponPrice * SGST_RATE;
+    //                                     couponTax = couponCGST + couponSGST;
+    //                                     couponTotal = couponPrice + couponTax;
+    //                                 }
+
+    //                                 return (
+    //                                     <View
+    //                                         style={styles.tableRow}
+    //                                         key={index}
+    //                                     >
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "5%" },
+    //                                             ]}
+    //                                         >
+    //                                             {services.length +
+    //                                                 (membership_name ? 2 : 1) +
+    //                                                 index}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "25%" },
+    //                                             ]}
+    //                                         >
+    //                                             {couponItem.coupon_name}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             {formatPrice(couponPrice)}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "5%" },
+    //                                             ]}
+    //                                         >
+    //                                             {quantity}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             0.00
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             0.00
+    //                                         </Text>
+    //                                         {(isGST ||
+    //                                             isMemGst ||
+    //                                             isCouponGst) && (
+    //                                             <>
+    //                                                 <Text
+    //                                                     style={[
+    //                                                         styles.tableCell,
+    //                                                         { width: "10%" },
+    //                                                     ]}
+    //                                                 >
+    //                                                     {formatPrice(couponTax)}
+    //                                                 </Text>
+    //                                                 <Text
+    //                                                     style={[
+    //                                                         styles.tableCell,
+    //                                                         { width: "10%" },
+    //                                                     ]}
+    //                                                 >
+    //                                                     {formatPrice(
+    //                                                         couponCGST
+    //                                                     )}
+    //                                                 </Text>
+    //                                                 <Text
+    //                                                     style={[
+    //                                                         styles.tableCell,
+    //                                                         { width: "10%" },
+    //                                                     ]}
+    //                                                 >
+    //                                                     {formatPrice(
+    //                                                         couponSGST
+    //                                                     )}
+    //                                                 </Text>
+    //                                             </>
+    //                                         )}
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "15%" },
+    //                                             ]}
+    //                                         >
+    //                                             {formatPrice(couponTotal)}
+    //                                         </Text>
+    //                                     </View>
+    //                                 );
+    //                             })}
+
+    //                             {/* Product Rows */}
+    //                             {productDetails.map((product, index) => (
+    //                                 <View style={styles.tableRow} key={index}>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "5%" },
+    //                                         ]}
+    //                                     >
+    //                                         {services.length +
+    //                                             (membership_name ? 1 : 0) +
+    //                                             coupon.length +
+    //                                             index +
+    //                                             1}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "25%" },
+    //                                         ]}
+    //                                     >
+    //                                         {product.name}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "10%" },
+    //                                         ]}
+    //                                     >
+    //                                         {formatPrice(product.price)}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "5%" },
+    //                                         ]}
+    //                                     >
+    //                                         {product.quantity}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "10%" },
+    //                                         ]}
+    //                                     >
+    //                                         {productDiscounts[index] || 0}
+    //                                     </Text>
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "10%" },
+    //                                         ]}
+    //                                     >
+    //                                         {productDiscountPercentages[
+    //                                             index
+    //                                         ] || 0}
+    //                                     </Text>
+    //                                     {(isGST || isMemGst || isCouponGst) && (
+    //                                         <>
+    //                                             <Text
+    //                                                 style={[
+    //                                                     styles.tableCell,
+    //                                                     { width: "10%" },
+    //                                                 ]}
+    //                                             >
+    //                                                 {formatPrice(product.tax)}
+    //                                             </Text>
+    //                                             <Text
+    //                                                 style={[
+    //                                                     styles.tableCell,
+    //                                                     { width: "10%" },
+    //                                                 ]}
+    //                                             >
+    //                                                 {formatPrice(product.cgst)}
+    //                                             </Text>
+    //                                             <Text
+    //                                                 style={[
+    //                                                     styles.tableCell,
+    //                                                     { width: "10%" },
+    //                                                 ]}
+    //                                             >
+    //                                                 {formatPrice(product.sgst)}
+    //                                             </Text>
+    //                                         </>
+    //                                     )}
+    //                                     <Text
+    //                                         style={[
+    //                                             styles.tableCell,
+    //                                             { width: "15%" },
+    //                                         ]}
+    //                                     >
+    //                                         {formatPrice(
+    //                                             product.total -
+    //                                                 product.cgst -
+    //                                                 product.sgst
+    //                                         )}
+    //                                     </Text>
+    //                                 </View>
+    //                             ))}
+
+    //                             {/* Total Row */}
+    //                             <View
+    //                                 style={[styles.tableRow, styles.totalRow]}
+    //                             >
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "5%" },
+    //                                     ]}
+    //                                 ></Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "25%" },
+    //                                     ]}
+    //                                 >
+    //                                     TOTAL
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "10%" },
+    //                                     ]}
+    //                                 ></Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "5%" },
+    //                                     ]}
+    //                                 >
+    //                                     {total_quantity +
+    //                                         (membership_name ? 1 : 0) +
+    //                                         coupon.length}
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "10%" },
+    //                                     ]}
+    //                                 >
+    //                                     {formatPrice(total_discount)}
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "10%" },
+    //                                     ]}
+    //                                 ></Text>
+    //                                 {(isGST || isMemGst || isCouponGst) && (
+    //                                     <>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             {formatPrice(total_tax)}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             {formatPrice(total_cgst)}
+    //                                         </Text>
+    //                                         <Text
+    //                                             style={[
+    //                                                 styles.tableCell,
+    //                                                 { width: "10%" },
+    //                                             ]}
+    //                                         >
+    //                                             {formatPrice(total_sgst)}
+    //                                         </Text>
+    //                                     </>
+    //                                 )}
+    //                                 <Text
+    //                                     style={[
+    //                                         styles.tableCell,
+    //                                         { width: "15%" },
+    //                                     ]}
+    //                                 >
+    //                                     {formatPrice(grand_total)}
+    //                                 </Text>
+    //                             </View>
+    //                         </View>
+
+    //                         {comments && <Text>Comments: {comments}</Text>}
+
+    //                         {/* Footer */}
+    //                         <View style={styles.footer}>
+    //                             <View style={styles.footerRow}>
+    //                                 {membership_points > 0 && (
+    //                                     <Text style={styles.footerText}>
+    //                                         Membership Discount:
+    //                                         <Text style={styles.footerValue}>
+    //                                             {" "}
+    //                                             {membership_points} ₹
+    //                                         </Text>
+    //                                     </Text>
+    //                                 )}
+    //                                 {coupon_points > 0 && (
+    //                                     <Text style={styles.footerText}>
+    //                                         Coupon Discount:
+    //                                         <Text style={styles.footerValue}>
+    //                                             {" "}
+    //                                             {coupon_points} ₹
+    //                                         </Text>
+    //                                     </Text>
+    //                                 )}
+    //                                 <Text style={styles.footerText}>
+    //                                     Amount in Words:
+    //                                     <Text style={styles.footerValue}>
+    //                                         {" "}
+    //                                         {grandTotalInWords} ₹
+    //                                     </Text>
+    //                                 </Text>
+    //                                 <Text
+    //                                     style={{
+    //                                         ...styles.footerText,
+    //                                         fontSize: 13,
+    //                                     }}
+    //                                 >
+    //                                     FINAL VALUE:
+    //                                     <Text
+    //                                         style={{
+    //                                             ...styles.footerValue,
+    //                                             fontSize: 13,
+    //                                         }}
+    //                                     >
+    //                                         {" "}
+    //                                         Rs {formatPrice(final_price)}
+    //                                     </Text>
+    //                                 </Text>
+    //                             </View>
+    //                         </View>
+    //                     </>
+    //                 )}
+    //             </Page>
+    //         </Document>
+    //     );
+
+    //     try {
+    //         const blob = await pdf(<InvoiceDocument />).toBlob();
+    //         const fileName = `Invoice-${invoiceData.getInvoiceId}-${paperSize}.pdf`;
+
+    //         if (blob) {
+    //             // Save PDF locally
+    //             saveAs(blob, fileName);
+
+    //             // Upload to Firebase Storage
+    //             const pdfRef = ref(storage, `invoices/${fileName}`);
+    //             await uploadBytes(pdfRef, blob);
+
+    //             // Get download URL
+    //             const downloadURL = await getDownloadURL(pdfRef);
+
+    //             // Create WhatsApp link only for A4 size (main invoice)
+    //             if (paperSize === "thermal") {
+    //                 const phoneNumber = `+91${mobile_no}`;
+    //                 const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${sname}.\nYour total bill amount is: *Rs.${final_price}*\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${sname}\n\nClick on the link to download:: ${downloadURL}`;
+    //                 const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+    //                     message
+    //                 )}`;
+
+    //                 // Open WhatsApp link
+    //                 window.open(whatsappLink, "_blank");
+
+    //                 // Prepare formData with only essential details
+    //                 const formData = new FormData();
+    //                 formData.append("file", blob, fileName);
+    //                 formData.append("invoice", invoiceData.getInvoiceId);
+    //                 formData.append("customer_name", customer_name);
+    //                 formData.append("mobile_no", mobile_no);
+    //                 formData.append("email", email);
+    //                 formData.append("branch_name", sname);
+    //                 formData.append("pdf_url", downloadURL);
+    //                 formData.append("whatsapp_link", whatsappLink);
+    //                 formData.append("grand_total", grand_total);
+    //                 formData.append(
+    //                     "invoice_date",
+    //                     invoiceData.getCurrentDate()
+    //                 );
+
+    //                 // Call handleSendInvoice with essential data only
+    //                 await handleSendInvoice(formData);
+    //             }
+    //         } else {
+    //             console.error("Failed to create PDF blob");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error generating PDF:", error);
+    //     }
+    // };
+    const handlePrint = async () => {
+        const paperSize = "thermal"; // Hardcoded to only use thermal size
 
         const invoiceData = {
             sname,
@@ -1117,7 +2380,6 @@ function Invoice() {
             user,
         };
 
-        // Ensure all prices are numbers before using toFixed()
         const formatPrice = (price) => {
             const num = Number(price) || 0;
             return num.toFixed(2);
@@ -1132,1168 +2394,458 @@ function Invoice() {
         const InvoiceDocument = () => (
             <Document>
                 <Page
-                    size={paperSize === "thermal" ? [80, undefined] : paperSize}
-                    style={[
-                        styles.invoiceContainer,
-                        paperSize === "thermal" && {
-                            width: "80mm",
-                            height: "auto",
-                            flexGrow: 1,
-                        },
-                    ]}
+                    size={[80, undefined]}
+                    style={{
+                        width: "80mm",
+                        height: "auto",
+                        flexGrow: 1,
+                        padding: 4,
+                        margin: 0,
+                        backgroundColor: "#fff",
+                        fontSize: 6,
+                    }}
                 >
-                    {paperSize === "thermal" ? (
+                    <View style={{ paddingHorizontal: 4, paddingVertical: 4 }}>
+                        {/* Header */}
+                        <View style={{ textAlign: "center", marginBottom: 2 }}>
+                            <Text style={{ fontSize: 6, fontWeight: "bold" }}>
+                                INVOICE
+                            </Text>
+                            <Text style={{ fontSize: 4 }}>
+                                ORIGINAL FOR RECIPIENT
+                            </Text>
+                        </View>
+
+                        {/* Business Info */}
+                        <View style={{ marginBottom: 2 }}>
+                            <Text
+                                style={{
+                                    fontSize: 5.5,
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                }}
+                            >
+                                {sname}
+                            </Text>
+                            <Text style={{ fontSize: 4, textAlign: "center" }}>
+                                {address}
+                            </Text>
+                            <Text style={{ fontSize: 4, textAlign: "center" }}>
+                                Phone: {User_mobile_no}
+                            </Text>
+                        </View>
+
+                        {/* Invoice Meta */}
                         <View
                             style={{
-                                paddingHorizontal: 4, // adds space left and right
-                                paddingVertical: 4, // adds space top and bottom
+                                flexDirection: "column",
+                                marginBottom: 2,
+                                fontSize: 4,
+                                gap: 0.5,
                             }}
                         >
-                            <>
-                                {/* Header */}
+                            {[
+                                { label: "Date", value: getCurrentDate() },
+                                { label: "Bill No", value: getInvoiceId },
+                                { label: "Client", value: customer_name },
+                                {
+                                    label: "Points",
+                                    value: membership_points || 0,
+                                },
+                            ].map((item, index) => (
                                 <View
+                                    key={index}
                                     style={{
-                                        textAlign: "center",
-                                        marginBottom: 2,
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
                                     }}
                                 >
-                                    <Text
-                                        style={{
-                                            fontSize: 6,
-                                            fontWeight: "bold",
-                                        }}
-                                    >
-                                        INVOICE
-                                    </Text>
-                                    <Text style={{ fontSize: 4 }}>
-                                        ORIGINAL FOR RECIPIENT
-                                    </Text>
+                                    <Text>{item.label}:</Text>
+                                    <Text>{item.value}</Text>
                                 </View>
+                            ))}
+                        </View>
 
-                                {/* Business Info */}
-                                <View style={{ marginBottom: 2 }}>
-                                    <Text
-                                        style={{
-                                            fontSize: 5.5,
-                                            fontWeight: "bold",
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        {sname}
-                                    </Text>
-                                    <Text
-                                        style={{
-                                            fontSize: 4,
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        {address}
-                                    </Text>
-                                    <Text
-                                        style={{
-                                            fontSize: 4,
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        Phone: {User_mobile_no}
-                                    </Text>
-                                </View>
-
-                                {/* Invoice Meta */}
-                                <View
-                                    style={{
-                                        flexDirection: "column",
-                                        marginBottom: 2,
-                                        fontSize: 4,
-                                        gap: 0.5,
-                                    }}
-                                >
-                                    {[
-                                        {
-                                            label: "Date",
-                                            value: getCurrentDate(),
-                                        },
-                                        {
-                                            label: "Bill No",
-                                            value: getInvoiceId,
-                                        },
-                                        {
-                                            label: "Client",
-                                            value: customer_name,
-                                        },
-                                        {
-                                            label: "Points",
-                                            value: membership_points || 0,
-                                        },
-                                    ].map((item, index) => (
-                                        <View
-                                            key={index}
-                                            style={{
-                                                flexDirection: "row",
-                                                justifyContent: "space-between",
-                                            }}
-                                        >
-                                            <Text>{item.label}:</Text>
-                                            <Text>{item.value}</Text>
-                                        </View>
-                                    ))}
-                                </View>
-
-                                {/* Item Table */}
-                                <View
-                                    style={{ width: "100%", marginBottom: 2 }}
-                                >
-                                    {/* Table Header */}
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            borderBottomWidth: 0.3,
-                                            paddingBottom: 0.5,
-                                            marginBottom: 1,
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                flex: 3,
-                                                fontSize: 4.5,
-                                                fontWeight: "bold",
-                                            }}
-                                        >
-                                            Particulars
-                                        </Text>
-                                        <Text
-                                            style={{
-                                                flex: 1,
-                                                fontSize: 4.5,
-                                                fontWeight: "bold",
-                                                textAlign: "right",
-                                            }}
-                                        >
-                                            Price
-                                        </Text>
-                                    </View>
-
-                                    {/* Products */}
-                                    {productDetails.length > 0 && (
-                                        <>
-                                            <Text
-                                                style={{
-                                                    fontSize: 4.5,
-                                                    fontWeight: "bold",
-                                                }}
-                                            >
-                                                Products
-                                            </Text>
-                                            {productDetails.map(
-                                                (product, index) => {
-                                                    const discountPercent =
-                                                        productDiscountPercentages[
-                                                            index
-                                                        ] || 0;
-                                                    const discountedPrice =
-                                                        calculateDiscountedPrice(
-                                                            product.price,
-                                                            discountPercent
-                                                        );
-
-                                                    return (
-                                                        <View
-                                                            key={index}
-                                                            style={{
-                                                                marginTop: 1,
-                                                            }}
-                                                        >
-                                                            <View
-                                                                style={{
-                                                                    flexDirection:
-                                                                        "row",
-                                                                }}
-                                                            >
-                                                                <Text
-                                                                    style={{
-                                                                        flex: 3,
-                                                                        fontSize: 4,
-                                                                    }}
-                                                                >
-                                                                    {
-                                                                        product.name
-                                                                    }
-                                                                </Text>
-                                                                <Text
-                                                                    style={{
-                                                                        flex: 1,
-                                                                        fontSize: 4,
-                                                                        textAlign:
-                                                                            "right",
-                                                                    }}
-                                                                >
-                                                                    {formatPrice(
-                                                                        product.price
-                                                                    )}
-                                                                </Text>
-                                                            </View>
-
-                                                            {discountPercent >
-                                                                0 && (
-                                                                <View
-                                                                    style={{
-                                                                        flexDirection:
-                                                                            "row",
-                                                                    }}
-                                                                >
-                                                                    <Text
-                                                                        style={{
-                                                                            flex: 2,
-                                                                            fontSize: 3.5,
-                                                                        }}
-                                                                    >
-                                                                        -
-                                                                        {
-                                                                            discountPercent
-                                                                        }
-                                                                        %
-                                                                    </Text>
-                                                                    <Text
-                                                                        style={{
-                                                                            flex: 1,
-                                                                            fontSize: 3.5,
-                                                                            textAlign:
-                                                                                "right",
-                                                                        }}
-                                                                    >
-                                                                        {formatPrice(
-                                                                            discountedPrice
-                                                                        )}
-                                                                    </Text>
-                                                                </View>
-                                                            )}
-                                                        </View>
-                                                    );
-                                                }
-                                            )}
-                                        </>
-                                    )}
-
-                                    {/* Services */}
-                                    {services.length > 0 && (
-                                        <>
-                                            <Text
-                                                style={{
-                                                    fontSize: 4.5,
-                                                    fontWeight: "bold",
-                                                    marginTop: 2,
-                                                }}
-                                            >
-                                                Services
-                                            </Text>
-                                            {services.map((service, index) => {
-                                                const discountPercent =
-                                                    discountPercentages[
-                                                        index
-                                                    ] || 0;
-                                                const discountedPrice =
-                                                    calculateDiscountedPrice(
-                                                        service.price,
-                                                        discountPercent
-                                                    );
-
-                                                return (
-                                                    <View
-                                                        key={index}
-                                                        style={{ marginTop: 1 }}
-                                                    >
-                                                        <View
-                                                            style={{
-                                                                flexDirection:
-                                                                    "row",
-                                                            }}
-                                                        >
-                                                            <Text
-                                                                style={{
-                                                                    flex: 3,
-                                                                    fontSize: 4,
-                                                                }}
-                                                            >
-                                                                {service.name}
-                                                            </Text>
-                                                            <Text
-                                                                style={{
-                                                                    flex: 1,
-                                                                    fontSize: 4,
-                                                                    textAlign:
-                                                                        "right",
-                                                                }}
-                                                            >
-                                                                {formatPrice(
-                                                                    service.price
-                                                                )}
-                                                            </Text>
-                                                        </View>
-
-                                                        {discountPercent >
-                                                            0 && (
-                                                            <View
-                                                                style={{
-                                                                    flexDirection:
-                                                                        "row",
-                                                                }}
-                                                            >
-                                                                <Text
-                                                                    style={{
-                                                                        flex: 2,
-                                                                        fontSize: 3.5,
-                                                                    }}
-                                                                >
-                                                                    -
-                                                                    {
-                                                                        discountPercent
-                                                                    }
-                                                                    %
-                                                                </Text>
-                                                                <Text
-                                                                    style={{
-                                                                        flex: 1,
-                                                                        fontSize: 3.5,
-                                                                        textAlign:
-                                                                            "right",
-                                                                    }}
-                                                                >
-                                                                    {formatPrice(
-                                                                        discountedPrice
-                                                                    )}
-                                                                </Text>
-                                                            </View>
-                                                        )}
-                                                    </View>
-                                                );
-                                            })}
-                                        </>
-                                    )}
-                                </View>
-
-                                {/* Totals */}
-                                <View
-                                    style={{
-                                        borderTopWidth: 0.3,
-                                        paddingTop: 1.5,
-                                        marginBottom: 2,
-                                    }}
-                                >
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            justifyContent: "space-between",
-                                        }}
-                                    >
-                                        <Text style={{ fontSize: 4.5 }}>
-                                            Gross Total:
-                                        </Text>
-                                        <Text style={{ fontSize: 4.5 }}>
-                                            {formatPrice(total_prise)}
-                                        </Text>
-                                    </View>
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            justifyContent: "space-between",
-                                        }}
-                                    >
-                                        <Text style={{ fontSize: 4.5 }}>
-                                            Less Discount:
-                                        </Text>
-                                        <Text style={{ fontSize: 4.5 }}>
-                                            -{formatPrice(total_discount)}
-                                        </Text>
-                                    </View>
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            justifyContent: "space-between",
-                                        }}
-                                    >
-                                        <Text style={{ fontSize: 4.5 }}>
-                                            Net Total:
-                                        </Text>
-                                        <Text style={{ fontSize: 4.5 }}>
-                                            {formatPrice(
-                                                total_prise - total_discount
-                                            )}
-                                        </Text>
-                                    </View>
-
-                                    {isGST && (
-                                        <>
-                                            <View
-                                                style={{
-                                                    flexDirection: "row",
-                                                    justifyContent:
-                                                        "space-between",
-                                                }}
-                                            >
-                                                <Text style={{ fontSize: 4.5 }}>
-                                                    CGST @ {cgsts}%:
-                                                </Text>
-                                                <Text style={{ fontSize: 4.5 }}>
-                                                    {formatPrice(total_cgst)}
-                                                </Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flexDirection: "row",
-                                                    justifyContent:
-                                                        "space-between",
-                                                }}
-                                            >
-                                                <Text style={{ fontSize: 4.5 }}>
-                                                    SGST @ {sgsts}%:
-                                                </Text>
-                                                <Text style={{ fontSize: 4.5 }}>
-                                                    {formatPrice(total_sgst)}
-                                                </Text>
-                                            </View>
-                                        </>
-                                    )}
-
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            justifyContent: "space-between",
-                                            marginTop: 1,
-                                            borderTopWidth: 0.3,
-                                            paddingTop: 1,
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                fontSize: 5.5,
-                                                fontWeight: "bold",
-                                            }}
-                                        >
-                                            Total Payable:
-                                        </Text>
-                                        <Text
-                                            style={{
-                                                fontSize: 5.5,
-                                                fontWeight: "bold",
-                                            }}
-                                        >
-                                            {formatPrice(grand_total)}
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                {/* Receipt Note */}
-                                <View
-                                    style={{
-                                        borderTopWidth: 0.3,
-                                        paddingTop: 1,
-                                        marginBottom: 1,
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            fontSize: 4,
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        Payment Receipt: Total Received
-                                    </Text>
-                                </View>
-
-                                {/* GST Info */}
-                                {isGST && (
-                                    <Text
-                                        style={{
-                                            fontSize: 3.5,
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        GSTN: {gst_number}
-                                    </Text>
-                                )}
-
-                                {/* Footer */}
+                        {/* Item Table */}
+                        <View style={{ width: "100%", marginBottom: 2 }}>
+                            {/* Table Header */}
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    borderBottomWidth: 0.3,
+                                    paddingBottom: 0.5,
+                                    marginBottom: 1,
+                                }}
+                            >
                                 <Text
                                     style={{
-                                        fontSize: 3.5,
-                                        textAlign: "center",
-                                        marginTop: 1,
+                                        flex: 3,
+                                        fontSize: 4.5,
+                                        fontWeight: "bold",
                                     }}
                                 >
-                                    Powered by Swalook Pvt. Ltd.
+                                    Particulars
                                 </Text>
-                            </>
-                        </View>
-                    ) : (
-                        // Original A4 Design (unchanged)
-                        <>
-                            <Text style={styles.invoiceHeader}>{sname}</Text>
-
-                            {/* Header and Customer Section */}
-                            <View style={styles.section}>
-                                <View style={styles.sectionColumn}>
-                                    <Text style={styles.fieldName}>
-                                        Invoice To: {customer_name}
-                                    </Text>
-                                    <Text>{address}</Text>
-                                    <Text>{email}</Text>
-                                    <Text>{mobile_no}</Text>
-                                </View>
-                                <View style={styles.sectionColumn}>
-                                    <Text>Date of Invoice: {invoiceDate}</Text>
-                                    <Text>Invoice Id: {getInvoiceId}</Text>
-                                    {isGST && (
-                                        <Text>GST Number: {gst_number}</Text>
-                                    )}
-                                </View>
+                                <Text
+                                    style={{
+                                        flex: 1,
+                                        fontSize: 4.5,
+                                        fontWeight: "bold",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    Price
+                                </Text>
                             </View>
 
-                            {/* Table */}
-                            <View style={styles.table}>
-                                {/* Table Header */}
-                                <View
-                                    style={[
-                                        styles.tableRow,
-                                        styles.tableHeader,
-                                    ]}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "5%" },
-                                        ]}
-                                    >
-                                        S. No.
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "25%" },
-                                        ]}
-                                    >
-                                        DESC
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    >
-                                        PRICE
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "5%" },
-                                        ]}
-                                    >
-                                        QTY
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    >
-                                        DISC (₹)
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    >
-                                        DISC (%)
-                                    </Text>
-                                    {(isGST || isMemGst || isCouponGst) && (
-                                        <>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                TAX
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                CGST
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                SGST
-                                            </Text>
-                                        </>
-                                    )}
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "15%" },
-                                        ]}
-                                    >
-                                        TOTAL
-                                    </Text>
-                                </View>
-
-                                {/* Service Rows */}
-                                {services.map((service, index) => (
-                                    <View style={styles.tableRow} key={index}>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "5%" },
-                                            ]}
-                                        >
-                                            {index + 1}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "25%" },
-                                            ]}
-                                        >
-                                            {`${service.category}: ${service.name}`}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {formatPrice(service.price)}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "5%" },
-                                            ]}
-                                        >
-                                            {service.inputFieldValue.quantity ||
-                                                "N/A"}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {discounts[index] || 0}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {discountPercentages[index] || 0}
-                                        </Text>
-                                        {(isGST || isMemGst || isCouponGst) && (
-                                            <>
-                                                <Text
-                                                    style={[
-                                                        styles.tableCell,
-                                                        { width: "10%" },
-                                                    ]}
-                                                >
-                                                    {taxes[index] || "N/A"}
-                                                </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.tableCell,
-                                                        { width: "10%" },
-                                                    ]}
-                                                >
-                                                    {cgst[index] || "N/A"}
-                                                </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.tableCell,
-                                                        { width: "10%" },
-                                                    ]}
-                                                >
-                                                    {sgst[index] || "N/A"}
-                                                </Text>
-                                            </>
-                                        )}
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "15%" },
-                                            ]}
-                                        >
-                                            {totalAmts[index] || "N/A"}
-                                        </Text>
-                                    </View>
-                                ))}
-
-                                {/* Membership Row */}
-                                {membership_name &&
-                                    membership_name !== "None" && (
-                                        <View style={styles.tableRow}>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "5%" },
-                                                ]}
-                                            >
-                                                {services.length + 1}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "25%" },
-                                                ]}
-                                            >
-                                                {membership_name}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {formatPrice(membershipPrice)}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "5%" },
-                                                ]}
-                                            >
-                                                1
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                0
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                0
-                                            </Text>
-                                            {(isGST ||
-                                                isMemGst ||
-                                                isCouponGst) && (
-                                                <>
-                                                    <Text
-                                                        style={[
-                                                            styles.tableCell,
-                                                            { width: "10%" },
-                                                        ]}
-                                                    >
-                                                        {formatPrice(
-                                                            membershipTax
-                                                        )}
-                                                    </Text>
-                                                    <Text
-                                                        style={[
-                                                            styles.tableCell,
-                                                            { width: "10%" },
-                                                        ]}
-                                                    >
-                                                        {formatPrice(cgsts)}
-                                                    </Text>
-                                                    <Text
-                                                        style={[
-                                                            styles.tableCell,
-                                                            { width: "10%" },
-                                                        ]}
-                                                    >
-                                                        {formatPrice(sgsts)}
-                                                    </Text>
-                                                </>
-                                            )}
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "15%" },
-                                                ]}
-                                            >
-                                                {formatPrice(membershipTotal)}
-                                            </Text>
-                                        </View>
-                                    )}
-
-                                {/* Coupon Rows */}
-                                {coupon.map((couponItem, index) => {
-                                    const couponPrice =
-                                        couponItem.coupon_price || 0;
-                                    const isCouponExclusive =
-                                        couponItem.gst === "Exclusive";
-
-                                    let couponCGST = 0;
-                                    let couponSGST = 0;
-                                    let couponTax = 0;
-                                    let couponTotal = couponPrice;
-
-                                    if (isCouponExclusive) {
-                                        couponCGST = couponPrice * CGST_RATE;
-                                        couponSGST = couponPrice * SGST_RATE;
-                                        couponTax = couponCGST + couponSGST;
-                                        couponTotal = couponPrice + couponTax;
-                                    }
-
-                                    return (
-                                        <View
-                                            style={styles.tableRow}
-                                            key={index}
-                                        >
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "5%" },
-                                                ]}
-                                            >
-                                                {services.length +
-                                                    (membership_name ? 2 : 1) +
-                                                    index}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "25%" },
-                                                ]}
-                                            >
-                                                {couponItem.coupon_name}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {formatPrice(couponPrice)}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "5%" },
-                                                ]}
-                                            >
-                                                {quantity}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                0.00
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                0.00
-                                            </Text>
-                                            {(isGST ||
-                                                isMemGst ||
-                                                isCouponGst) && (
-                                                <>
-                                                    <Text
-                                                        style={[
-                                                            styles.tableCell,
-                                                            { width: "10%" },
-                                                        ]}
-                                                    >
-                                                        {formatPrice(couponTax)}
-                                                    </Text>
-                                                    <Text
-                                                        style={[
-                                                            styles.tableCell,
-                                                            { width: "10%" },
-                                                        ]}
-                                                    >
-                                                        {formatPrice(
-                                                            couponCGST
-                                                        )}
-                                                    </Text>
-                                                    <Text
-                                                        style={[
-                                                            styles.tableCell,
-                                                            { width: "10%" },
-                                                        ]}
-                                                    >
-                                                        {formatPrice(
-                                                            couponSGST
-                                                        )}
-                                                    </Text>
-                                                </>
-                                            )}
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "15%" },
-                                                ]}
-                                            >
-                                                {formatPrice(couponTotal)}
-                                            </Text>
-                                        </View>
-                                    );
-                                })}
-
-                                {/* Product Rows */}
-                                {productDetails.map((product, index) => (
-                                    <View style={styles.tableRow} key={index}>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "5%" },
-                                            ]}
-                                        >
-                                            {services.length +
-                                                (membership_name ? 1 : 0) +
-                                                coupon.length +
-                                                index +
-                                                1}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "25%" },
-                                            ]}
-                                        >
-                                            {product.name}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {formatPrice(product.price)}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "5%" },
-                                            ]}
-                                        >
-                                            {product.quantity}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {productDiscounts[index] || 0}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "10%" },
-                                            ]}
-                                        >
-                                            {productDiscountPercentages[
-                                                index
-                                            ] || 0}
-                                        </Text>
-                                        {(isGST || isMemGst || isCouponGst) && (
-                                            <>
-                                                <Text
-                                                    style={[
-                                                        styles.tableCell,
-                                                        { width: "10%" },
-                                                    ]}
-                                                >
-                                                    {formatPrice(product.tax)}
-                                                </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.tableCell,
-                                                        { width: "10%" },
-                                                    ]}
-                                                >
-                                                    {formatPrice(product.cgst)}
-                                                </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.tableCell,
-                                                        { width: "10%" },
-                                                    ]}
-                                                >
-                                                    {formatPrice(product.sgst)}
-                                                </Text>
-                                            </>
-                                        )}
-                                        <Text
-                                            style={[
-                                                styles.tableCell,
-                                                { width: "15%" },
-                                            ]}
-                                        >
-                                            {formatPrice(
-                                                product.total -
-                                                    product.cgst -
-                                                    product.sgst
-                                            )}
-                                        </Text>
-                                    </View>
-                                ))}
-
-                                {/* Total Row */}
-                                <View
-                                    style={[styles.tableRow, styles.totalRow]}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "5%" },
-                                        ]}
-                                    ></Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "25%" },
-                                        ]}
-                                    >
-                                        TOTAL
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    ></Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "5%" },
-                                        ]}
-                                    >
-                                        {total_quantity +
-                                            (membership_name ? 1 : 0) +
-                                            coupon.length}
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    >
-                                        {formatPrice(total_discount)}
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "10%" },
-                                        ]}
-                                    ></Text>
-                                    {(isGST || isMemGst || isCouponGst) && (
-                                        <>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {formatPrice(total_tax)}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {formatPrice(total_cgst)}
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    styles.tableCell,
-                                                    { width: "10%" },
-                                                ]}
-                                            >
-                                                {formatPrice(total_sgst)}
-                                            </Text>
-                                        </>
-                                    )}
-                                    <Text
-                                        style={[
-                                            styles.tableCell,
-                                            { width: "15%" },
-                                        ]}
-                                    >
-                                        {formatPrice(grand_total)}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            {comments && <Text>Comments: {comments}</Text>}
-
-                            {/* Footer */}
-                            <View style={styles.footer}>
-                                <View style={styles.footerRow}>
-                                    {membership_points > 0 && (
-                                        <Text style={styles.footerText}>
-                                            Membership Discount:
-                                            <Text style={styles.footerValue}>
-                                                {" "}
-                                                {membership_points} ₹
-                                            </Text>
-                                        </Text>
-                                    )}
-                                    {coupon_points > 0 && (
-                                        <Text style={styles.footerText}>
-                                            Coupon Discount:
-                                            <Text style={styles.footerValue}>
-                                                {" "}
-                                                {coupon_points} ₹
-                                            </Text>
-                                        </Text>
-                                    )}
-                                    <Text style={styles.footerText}>
-                                        Amount in Words:
-                                        <Text style={styles.footerValue}>
-                                            {" "}
-                                            {grandTotalInWords} ₹
-                                        </Text>
-                                    </Text>
+                            {/* Products */}
+                            {productDetails.length > 0 && (
+                                <>
                                     <Text
                                         style={{
-                                            ...styles.footerText,
-                                            fontSize: 13,
+                                            fontSize: 4.5,
+                                            fontWeight: "bold",
                                         }}
                                     >
-                                        FINAL VALUE:
-                                        <Text
-                                            style={{
-                                                ...styles.footerValue,
-                                                fontSize: 13,
-                                            }}
-                                        >
-                                            {" "}
-                                            Rs {formatPrice(final_price)}
-                                        </Text>
+                                        Products
                                     </Text>
-                                </View>
+                                    {productDetails.map((product, index) => {
+                                        const discountPercent =
+                                            productDiscountPercentages[index] ||
+                                            0;
+                                        const discountedPrice =
+                                            calculateDiscountedPrice(
+                                                product.price,
+                                                discountPercent
+                                            );
+
+                                        return (
+                                            <View
+                                                key={index}
+                                                style={{ marginTop: 1 }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        flexDirection: "row",
+                                                    }}
+                                                >
+                                                    <Text
+                                                        style={{
+                                                            flex: 3,
+                                                            fontSize: 4,
+                                                        }}
+                                                    >
+                                                        {product.name}
+                                                    </Text>
+                                                    <Text
+                                                        style={{
+                                                            flex: 1,
+                                                            fontSize: 4,
+                                                            textAlign: "right",
+                                                        }}
+                                                    >
+                                                        {formatPrice(
+                                                            product.price
+                                                        )}
+                                                    </Text>
+                                                </View>
+
+                                                {discountPercent > 0 && (
+                                                    <View
+                                                        style={{
+                                                            flexDirection:
+                                                                "row",
+                                                            justifyContent:
+                                                                "space-between",
+                                                        }}
+                                                    >
+                                                        <Text
+                                                            style={{
+                                                                fontSize: 3.5,
+                                                            }}
+                                                        >
+                                                            -{discountPercent}%
+                                                        </Text>
+                                                        <Text
+                                                            style={{
+                                                                fontSize: 3.5,
+                                                            }}
+                                                        >
+                                                            -
+                                                            {formatPrice(
+                                                                product.price -
+                                                                    discountedPrice
+                                                            )}
+                                                        </Text>
+                                                        <Text
+                                                            style={{
+                                                                fontSize: 3.5,
+                                                                textAlign:
+                                                                    "right",
+                                                            }}
+                                                        >
+                                                            {formatPrice(
+                                                                discountedPrice
+                                                            )}
+                                                        </Text>
+                                                    </View>
+                                                )}
+                                            </View>
+                                        );
+                                    })}
+                                </>
+                            )}
+
+                            {/* Services */}
+                            {services.length > 0 && (
+                                <>
+                                    <Text
+                                        style={{
+                                            fontSize: 4.5,
+                                            fontWeight: "bold",
+                                            marginTop: 2,
+                                        }}
+                                    >
+                                        Services
+                                    </Text>
+                                    {services.map((service, index) => {
+                                        const discountPercent =
+                                            discountPercentages[index] || 0;
+                                        const discountedPrice =
+                                            calculateDiscountedPrice(
+                                                service.price,
+                                                discountPercent
+                                            );
+
+                                        return (
+                                            <View
+                                                key={index}
+                                                style={{ marginTop: 1 }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        flexDirection: "row",
+                                                    }}
+                                                >
+                                                    <Text
+                                                        style={{
+                                                            flex: 3,
+                                                            fontSize: 4,
+                                                        }}
+                                                    >
+                                                        {service.name}
+                                                    </Text>
+                                                    <Text
+                                                        style={{
+                                                            flex: 1,
+                                                            fontSize: 4,
+                                                            textAlign: "right",
+                                                        }}
+                                                    >
+                                                        {formatPrice(
+                                                            service.price
+                                                        )}
+                                                    </Text>
+                                                </View>
+
+                                                {discountPercent > 0 && (
+                                                    <View
+                                                        style={{
+                                                            flexDirection:
+                                                                "row",
+                                                            justifyContent:
+                                                                "space-between",
+                                                        }}
+                                                    >
+                                                        <Text
+                                                            style={{
+                                                                fontSize: 3.5,
+                                                                textAlign:
+                                                                    "left",
+                                                            }}
+                                                        >
+                                                            -{discountPercent}%
+                                                        </Text>
+                                                        <Text
+                                                            style={{
+                                                                fontSize: 3.5,
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            -
+                                                            {formatPrice(
+                                                                service.price -
+                                                                    discountedPrice
+                                                            )}
+                                                        </Text>
+                                                        <Text
+                                                            style={{
+                                                                fontSize: 3.5,
+                                                                textAlign:
+                                                                    "right",
+                                                            }}
+                                                        >
+                                                            {formatPrice(
+                                                                discountedPrice
+                                                            )}
+                                                        </Text>
+                                                    </View>
+                                                )}
+                                            </View>
+                                        );
+                                    })}
+                                </>
+                            )}
+                        </View>
+
+                        {/* Totals */}
+                        <View
+                            style={{
+                                borderTopWidth: 0.3,
+                                paddingTop: 1.5,
+                                marginBottom: 2,
+                            }}
+                        >
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Text style={{ fontSize: 4.5 }}>
+                                    Gross Total:
+                                </Text>
+                                <Text style={{ fontSize: 4.5 }}>
+                                    {formatPrice(total_prise)}
+                                </Text>
                             </View>
-                        </>
-                    )}
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Text style={{ fontSize: 4.5 }}>
+                                    Less Discount:
+                                </Text>
+                                <Text style={{ fontSize: 4.5 }}>
+                                    -{formatPrice(total_discount)}
+                                </Text>
+                            </View>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Text style={{ fontSize: 4.5 }}>
+                                    Net Total:
+                                </Text>
+                                <Text style={{ fontSize: 4.5 }}>
+                                    {formatPrice(total_prise - total_discount)}
+                                </Text>
+                            </View>
+
+                            {isGST && (
+                                <>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            CGST @ {cgsts}%:
+                                        </Text>
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            {formatPrice(total_cgst)}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            SGST @ {sgsts}%:
+                                        </Text>
+                                        <Text style={{ fontSize: 4.5 }}>
+                                            {formatPrice(total_sgst)}
+                                        </Text>
+                                    </View>
+                                </>
+                            )}
+
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    marginTop: 1,
+                                    borderTopWidth: 0.3,
+                                    paddingTop: 1,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        fontSize: 5.5,
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    Total Payable:
+                                </Text>
+                                <Text
+                                    style={{
+                                        fontSize: 5.5,
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    {formatPrice(grand_total)}
+                                </Text>
+                            </View>
+                        </View>
+
+                        {/* Receipt Note */}
+                        <View
+                            style={{
+                                borderTopWidth: 0.3,
+                                paddingTop: 1,
+                                marginBottom: 1,
+                            }}
+                        >
+                            <Text style={{ fontSize: 4, textAlign: "center" }}>
+                                Payment Receipt: Total Received
+                            </Text>
+                        </View>
+
+                        {/* GST Info */}
+                        {isGST && (
+                            <Text
+                                style={{ fontSize: 3.5, textAlign: "center" }}
+                            >
+                                GSTN: {gst_number}
+                            </Text>
+                        )}
+
+                        {/* Footer */}
+                        <Text
+                            style={{
+                                fontSize: 3.5,
+                                textAlign: "center",
+                                marginTop: 1,
+                            }}
+                        >
+                            Powered by Swalook Pvt. Ltd.
+                        </Text>
+                    </View>
                 </Page>
             </Document>
         );
 
         try {
             const blob = await pdf(<InvoiceDocument />).toBlob();
-            const fileName = `Invoice-${invoiceData.getInvoiceId}-${paperSize}.pdf`;
+            const fileName = `Invoice-${invoiceData.getInvoiceId}-thermal.pdf`;
 
             if (blob) {
                 // Save PDF locally
@@ -2306,36 +2858,31 @@ function Invoice() {
                 // Get download URL
                 const downloadURL = await getDownloadURL(pdfRef);
 
-                // Create WhatsApp link only for A4 size (main invoice)
-                if (paperSize === "A4") {
-                    const phoneNumber = `+91${mobile_no}`;
-                    const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${sname}.\nYour total bill amount is: *Rs.${final_price}*\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${sname}\n\nClick on the link to download:: ${downloadURL}`;
-                    const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-                        message
-                    )}`;
+                // Create WhatsApp link
+                const phoneNumber = `+91${mobile_no}`;
+                const message = `Hi ${customer_name}!\nWe hope you had a pleasant experience at ${sname}.\nYour total bill amount is: *Rs.${final_price}*\nWe are looking forward to servicing you again, attached is the invoice.\nThanks and Regards,\nTeam ${sname}\n\nClick on the link to download:: ${downloadURL}`;
+                const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+                    message
+                )}`;
 
-                    // Open WhatsApp link
-                    window.open(whatsappLink, "_blank");
+                // Open WhatsApp link
+                window.open(whatsappLink, "_blank");
 
-                    // Prepare formData with only essential details
-                    const formData = new FormData();
-                    formData.append("file", blob, fileName);
-                    formData.append("invoice", invoiceData.getInvoiceId);
-                    formData.append("customer_name", customer_name);
-                    formData.append("mobile_no", mobile_no);
-                    formData.append("email", email);
-                    formData.append("branch_name", sname);
-                    formData.append("pdf_url", downloadURL);
-                    formData.append("whatsapp_link", whatsappLink);
-                    formData.append("grand_total", grand_total);
-                    formData.append(
-                        "invoice_date",
-                        invoiceData.getCurrentDate()
-                    );
+                // Prepare formData with only essential details
+                const formData = new FormData();
+                formData.append("file", blob, fileName);
+                formData.append("invoice", invoiceData.getInvoiceId);
+                formData.append("customer_name", customer_name);
+                formData.append("mobile_no", mobile_no);
+                formData.append("email", email);
+                formData.append("branch_name", sname);
+                formData.append("pdf_url", downloadURL);
+                formData.append("whatsapp_link", whatsappLink);
+                formData.append("grand_total", grand_total);
+                formData.append("invoice_date", invoiceData.getCurrentDate());
 
-                    // Call handleSendInvoice with essential data only
-                    await handleSendInvoice(formData);
-                }
+                // Call handleSendInvoice with essential data only
+                await handleSendInvoice(formData);
             } else {
                 console.error("Failed to create PDF blob");
             }
@@ -2533,7 +3080,12 @@ function Invoice() {
                                                                     value={
                                                                         discounts[
                                                                             index
-                                                                        ] ?? ""
+                                                                        ] === 0
+                                                                            ? ""
+                                                                            : discounts[
+                                                                                  index
+                                                                              ] ??
+                                                                              ""
                                                                     }
                                                                     onChange={(
                                                                         e
@@ -2543,7 +3095,6 @@ function Invoice() {
                                                                                 .target
                                                                                 .value;
 
-                                                                        // 🧹 Limit to 2 decimal places
                                                                         if (
                                                                             value.includes(
                                                                                 "."
@@ -2582,7 +3133,6 @@ function Invoice() {
                                                                             newDiscounts
                                                                         );
 
-                                                                        // 🧠 Calculate percentage based on price
                                                                         const price =
                                                                             services[
                                                                                 index
@@ -2614,7 +3164,7 @@ function Invoice() {
                                                                             newPercentages
                                                                         );
                                                                     }}
-                                                                    placeholder="Flat"
+                                                                    placeholder="Rupees"
                                                                 />
                                                             </div>
 
@@ -2630,9 +3180,16 @@ function Invoice() {
                                                                     max="100"
                                                                     className="w-full pl-7 p-1 border rounded-full text-center"
                                                                     value={
-                                                                        discountPercentages[
-                                                                            index
-                                                                        ] ?? ""
+                                                                        Number(
+                                                                            discountPercentages[
+                                                                                index
+                                                                            ]
+                                                                        ) === 0
+                                                                            ? ""
+                                                                            : discountPercentages[
+                                                                                  index
+                                                                              ] ??
+                                                                              ""
                                                                     }
                                                                     onChange={(
                                                                         e
@@ -2642,7 +3199,6 @@ function Invoice() {
                                                                                 .target
                                                                                 .value;
 
-                                                                        // 🧹 Limit to 2 decimal places
                                                                         if (
                                                                             value.includes(
                                                                                 "."
@@ -2662,6 +3218,16 @@ function Invoice() {
                                                                                     0,
                                                                                     2
                                                                                 );
+                                                                        }
+
+                                                                        if (
+                                                                            parseFloat(
+                                                                                value
+                                                                            ) >
+                                                                            100
+                                                                        ) {
+                                                                            value =
+                                                                                "100";
                                                                         }
 
                                                                         handleDiscountPercentageChange(
@@ -2878,10 +3444,17 @@ function Invoice() {
                                                                         min="0"
                                                                         className="w-full pl-7 p-1 border rounded-full text-center"
                                                                         value={
-                                                                            productDiscounts[
-                                                                                index
-                                                                            ] ??
-                                                                            ""
+                                                                            Number(
+                                                                                productDiscounts[
+                                                                                    index
+                                                                                ]
+                                                                            ) ===
+                                                                            0
+                                                                                ? ""
+                                                                                : productDiscounts[
+                                                                                      index
+                                                                                  ] ??
+                                                                                  ""
                                                                         }
                                                                         onChange={(
                                                                             e
@@ -2951,7 +3524,7 @@ function Invoice() {
                                                                                       ).toFixed(
                                                                                           2
                                                                                       )
-                                                                                    : "0";
+                                                                                    : "";
 
                                                                             const newPercentages =
                                                                                 [
@@ -2965,7 +3538,7 @@ function Invoice() {
                                                                                 newPercentages
                                                                             );
                                                                         }}
-                                                                        placeholder="Flat"
+                                                                        placeholder="Rupees"
                                                                     />
                                                                 </div>
 
@@ -2981,10 +3554,17 @@ function Invoice() {
                                                                         max="100"
                                                                         className="w-full pl-7 p-1 border rounded-full text-center"
                                                                         value={
-                                                                            productDiscountPercentages[
-                                                                                index
-                                                                            ] ??
-                                                                            ""
+                                                                            Number(
+                                                                                productDiscountPercentages[
+                                                                                    index
+                                                                                ]
+                                                                            ) ===
+                                                                            0
+                                                                                ? ""
+                                                                                : productDiscountPercentages[
+                                                                                      index
+                                                                                  ] ??
+                                                                                  ""
                                                                         }
                                                                         onChange={(
                                                                             e
@@ -3015,12 +3595,23 @@ function Invoice() {
                                                                                     );
                                                                             }
 
+                                                                            // 🧱 Enforce 100% max
+                                                                            if (
+                                                                                parseFloat(
+                                                                                    value
+                                                                                ) >
+                                                                                100
+                                                                            ) {
+                                                                                value =
+                                                                                    "100";
+                                                                            }
+
                                                                             handleProductDiscountPercentageChange(
                                                                                 index,
                                                                                 value
                                                                             );
                                                                         }}
-                                                                        placeholder="%" // optional, visual symbol already shown
+                                                                        placeholder="Percent"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -3204,8 +3795,13 @@ function Invoice() {
                                                 className="hover:bg-gray-50"
                                             >
                                                 <td className="p-3 border text-center">
-                                                    {mode}
+                                                    {mode &&
+                                                        mode
+                                                            .charAt(0)
+                                                            .toUpperCase() +
+                                                            mode.slice(1)}
                                                 </td>
+
                                                 <td className="p-3 border ">
                                                     <input
                                                         type="number"
@@ -3247,39 +3843,32 @@ function Invoice() {
                             )}
                         </div>
                     )}
-                </form>
-            </div>
-            <div className="flex items-center justify-center mt-8 gap-4">
-                {/* <button
-                    type="button"
-                    onClick={() => handlePrint("thermal")}
-                    className="py-2 px-6 bg-gray-500 text-white font-semibold rounded-[2.5rem]"
-                >
-                    Print Invoice
-                </button> */}
 
-                <button
-                    type="submit"
-                    onClick={() => handlePrint("thermal")}
-                    disabled={
-                        totalPayment !== final_price ||
-                        loading ||
-                        invoiceGenerated
-                    }
-                    className={`py-2 px-12 bg-blue-500 text-xl text-white font-semibold rounded-[2.5rem] ${
-                        totalPayment !== final_price
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                    }`}
-                >
-                    {loading ? (
-                        <CircularProgress size={24} color="inherit" />
-                    ) : isEditMode ? (
-                        "Update Final Invoice"
-                    ) : (
-                        "Generate Final Invoice"
-                    )}
-                </button>
+                    <div className="flex items-center justify-center mt-8 gap-4">
+                        <button
+                            type="submit"
+                            onClick={() => handlePrint("thermal")}
+                            disabled={
+                                totalPayment !== final_price ||
+                                loading ||
+                                invoiceGenerated
+                            }
+                            className={`py-2 px-12 bg-blue-500 text-xl text-white font-semibold rounded-[2.5rem] ${
+                                totalPayment !== final_price
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                            }`}
+                        >
+                            {loading ? (
+                                <CircularProgress size={24} color="inherit" />
+                            ) : isEditMode ? (
+                                "Update Final Invoice"
+                            ) : (
+                                "Generate Final Invoice"
+                            )}
+                        </button>
+                    </div>
+                </form>
             </div>
             {showPopup && (
                 <Popup

@@ -11,6 +11,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useLocation } from "react-router-dom";
 import CustomerSummary from "./CustomerSummary";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function getCurrentDate() {
     const currentDate = new Date();
@@ -1367,7 +1368,6 @@ function GenerateInvoice() {
                                 View all invoices
                             </button>
                         </div>
-
                         {/* Customer Details */}
                         <form onSubmit={handleGenerateInvoice}>
                             <div>
@@ -1394,14 +1394,21 @@ function GenerateInvoice() {
 
                                         <input
                                             type="text"
-                                            className="border border-[#CFD3D4] rounded-full m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
+                                            className="border border-[#CFD3D4] rounded-full m-2 p-3 col-span-1 font-semibold placeholder-gray-400"
                                             placeholder="Full Name"
                                             value={customer_name}
                                             required
-                                            onChange={(e) =>
-                                                setCustomer_Name(e.target.value)
-                                            } // Editable only for new user
+                                            onChange={(e) => {
+                                                const formatted =
+                                                    e.target.value.replace(
+                                                        /\b\w/g,
+                                                        (char) =>
+                                                            char.toUpperCase()
+                                                    );
+                                                setCustomer_Name(formatted);
+                                            }}
                                         />
+
                                         <input
                                             type="email"
                                             className="border border-[#CFD3D4] rounded-full m-2  p-3  col-span-1 font-semibold placeholder-gray-400"
@@ -2798,7 +2805,29 @@ function GenerateInvoice() {
                             </div>
                         </form>
                         {/* Toastify Container goes here */}
-                        <ToastContainer />
+                        <ToastContainer
+                            position="top-center"
+                            autoClose={6000}
+                            hideProgressBar={true}
+                            newestOnTop={true}
+                            closeOnClick={false}
+                            rtl={false}
+                            pauseOnFocusLoss={false}
+                            draggable={true}
+                            pauseOnHover={true}
+                            theme="light"
+                            closeButton={({ closeToast }) => (
+                                <button
+                                    onClick={closeToast}
+                                    className="mt-4 self-end px-4 py-2 bg-blue-500 text-white font-medium rounded-full hover:bg-blue-600 transition-all shadow-sm"
+                                >
+                                    OK
+                                </button>
+                            )}
+                            toastClassName={() =>
+                                "relative flex flex-row items-center gap-6 py-2 px-4 m-4 rounded-[2.5rem] bg-white shadow-lg border-l-4 border-blue-500 text-black max-w-md w-full font-medium"
+                            }
+                        />
                     </div>
                 </div>
             </div>

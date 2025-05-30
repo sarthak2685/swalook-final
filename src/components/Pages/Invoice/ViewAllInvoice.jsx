@@ -385,7 +385,7 @@ const ViewAllInvoices = () => {
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 <div className="flex justify-center space-x-2">
                                                     <a
-                                                        href={`${config.apiUrl}/${invoice.pdf_path}`}
+                                                        href={`${invoice.pdf_url}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full"
