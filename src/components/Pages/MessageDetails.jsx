@@ -21,6 +21,8 @@ const MessageDetails = () => {
   const [selectedCustomers, setSelectedCustomers] = useState([]);
   const [filter, setFilter] = useState("All");
   const [isFBLoaded, setIsFBLoaded] = useState(false);
+  const token = localStorage.getItem("token");
+  console.log("templete", selectedTemplate);
 
   const customers = [
     { id: 1, name: "Promoth", phone: "+91-8148148396" },
@@ -34,7 +36,8 @@ const MessageDetails = () => {
       prev.includes(id) ? prev.filter((cid) => cid !== id) : [...prev, id]
     );
   };
-
+  const imageRes = selectedTemplate.image;
+  const fullPath = `/home/ubuntu/aws_swalook${imageRes}`;
   // Select/Deselect All Customers
   const toggleSelectAll = () => {
     if (selectedCustomers.length === customers.length) {
@@ -88,9 +91,11 @@ const MessageDetails = () => {
   //   address: salonDetails.address,
   //   mobile_no: salonDetails.phonenumber,
   // };
-  
+
+  const logoRes = salonDetails.logo;
+  console.log("logoRes", logoRes);
+  const logoFullPath = `/home/ubuntu/aws_swalook${logoRes}`;
   useEffect(() => {
-    // Load the Facebook SDK (only works on HTTPS or localhost)
     const loadFacebookSDK = () => {
       if (typeof window.FB === "undefined") {
         const script = document.createElement("script");
@@ -98,12 +103,16 @@ const MessageDetails = () => {
         script.async = true;
         script.onload = () => {
           window.FB.init({
-            appId: "1084177693728089", // Replace with your Facebook app ID
+            appId: "1084177693728089", // Replace with your actual app ID
             cookie: true,
             xfbml: true,
-            version: "v19.0",
+            version: "v22.0",
           });
           setIsFBLoaded(true);
+        };
+        script.onerror = () => {
+          console.error("Error loading Facebook SDK.");
+          alert("Facebook SDK failed to load.");
         };
         document.body.appendChild(script);
       } else {
@@ -114,12 +123,9 @@ const MessageDetails = () => {
     loadFacebookSDK();
   }, []);
   
-  // Function to handle Facebook login and sharing
   const handleFacebookShare = () => {
     if (isFBLoaded && typeof window.FB !== "undefined") {
-      console.log("Facebook SDK is loaded.");
       window.FB.getLoginStatus((response) => {
-        console.log("Facebook login status:", response);
         if (response.status === 'connected') {
           shareToFacebook(response.authResponse.accessToken);
         } else {
@@ -127,7 +133,7 @@ const MessageDetails = () => {
             if (loginResponse.authResponse) {
               shareToFacebook(loginResponse.authResponse.accessToken);
             } else {
-              alert("Facebook login failed.");
+              alert("Facebook login failed. Please try again.");
             }
           }, {
             scope: 'public_profile,email,pages_show_list,pages_read_engagement'
@@ -136,21 +142,26 @@ const MessageDetails = () => {
       });
     } else {
       console.error("Facebook SDK is not loaded.");
+      alert("Facebook SDK is not available. Please try again later.");
     }
   };
   
-  // Function to share content on Facebook
   const shareToFacebook = (accessToken) => {
-    window.FB.ui({
-      method: "share",
-      href: `https://yourwebsite.com/${selectedTemplate.image}`,
-    }, function (response) {
-      if (response && !response.error_message) {
-        alert("Sharing was successful!");
-      } else {
-        alert("Error while sharing.");
-      }
-    });
+    if (accessToken) {
+      window.FB.ui({
+        method: "share",
+        href: `https://yourwebsite.com/${selectedTemplate.image}`, 
+      }, function (response) {
+        if (response && !response.error_message) {
+          alert("Sharing was successful!");
+        } else {
+          alert("Error while sharing.");
+        }
+      });
+    } else {
+      console.error("No valid access token provided.");
+      alert("Unable to share. Please try again later.");
+    }
   };
   
   // Function to handle Instagram sharing
@@ -175,66 +186,91 @@ const MessageDetails = () => {
       console.error("Facebook SDK is not loaded.");
     }
   };
-  
+
   // Async handler for Instagram post
   const handleInstagramPost = async (accessToken) => {
     try {
-      const longLivedToken = await exchangeToken(); // Optional: use if your backend handles long-lived token
+      const userID = window.FB.getAuthResponse().userID;
+      const longLivedToken = await exchangeToken(accessToken, userID); // Optional: use if your backend handles long-lived token
       await postToInstagram(longLivedToken || accessToken);
     } catch (err) {
       console.error("Instagram share error:", err);
       alert("Something went wrong while posting to Instagram.");
     }
   };
-  
+
   // Function to post to Instagram
   const postToInstagram = async (accessToken) => {
     try {
       const pages = await fetchPages(accessToken);
       const selectedPage = pages[0];
       const instagramId = await fetchInstagramId(selectedPage.id, accessToken);
-      await uploadToInstagram(instagramId, 'https://example.com/image.jpg', 'Check this out!', accessToken);
+      await uploadToInstagram(instagramId, 'Check this out!', accessToken);
       alert("Posted to Instagram!");
     } catch (err) {
       console.error("Instagram post error:", err);
       alert("Something went wrong while posting to Instagram.");
     }
   };
-  
-  // Function to exchange token (called after login)
-  const exchangeToken = async () => {
+
+  const exchangeToken = async (accessToken,userID) => {
     try {
-      const res = await fetch(`${config.apiUrl}/api/swalook/fb/exchange-token/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${localStorage.getItem('token')}`
-        },
-      });
-      const data = await res.json();
-      console.log('Exchanged Access Token:', data.access_token);
-      return data.access_token;
+      console.log("Exchanging token:", accessToken,userID);
+      console.log("Token:", token);
+      const res = await axios.post(
+        `${config.apiUrl}/api/swalook/fb/exchange-token/`,
+        { access_token: accessToken,
+          client_id: userID  // Pass the user ID here
+         }, 
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+  
+      console.log("Exchanged Access Token:", res.data.access_token);
+      return res.data.access_token;
     } catch (error) {
-      console.error('Token exchange failed:', error);
+      console.error("Token exchange failed:", error);
+      return null;
     }
   };
   
+
   // Fetch pages
   const fetchPages = async (accessToken) => {
     try {
       const res = await fetch(`${config.apiUrl}/api/swalook/fb/pages/`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          Authorization: `Token ${token}`,
         },
+        body: JSON.stringify({
+          access_token: accessToken,
+        }),
       });
+  
       const data = await res.json();
-      console.log('Pages:', data.pages);
-      return data.pages;
+  
+      if (!data.data || data.data.length === 0) {
+        console.warn('No pages found in the response.');
+        return [];
+      }
+  
+      const pageIds = data.data.map((page) => page.id);
+      console.log('Page IDs:', pageIds);
+  
+      return data.data; // or return pageIds;
     } catch (error) {
       console.error('Error fetching pages:', error);
+      return [];
     }
   };
   
+  
+
   // Fetch Instagram ID
   const fetchInstagramId = async (pageId, accessToken) => {
     try {
@@ -242,33 +278,53 @@ const MessageDetails = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Token ${token}`, // <-- app's auth token
         },
-        body: JSON.stringify({ page_id: pageId }),
+        body: JSON.stringify({
+          page_id: pageId,
+          access_token: accessToken, // <-- Facebook token here
+        }),
       });
       const data = await res.json();
-      console.log('Instagram ID:', data.instagram_id);
-      return data.instagram_id;
+      console.log('Instagram ID Response:', data);
+  
+      // Check if Instagram ID is available
+      if (data.instagram_business_account && data.instagram_business_account.id) {
+        console.log('Instagram ID:', data.instagram_business_account.id);
+        return data.instagram_business_account.id;
+      } else {
+        console.log('No Instagram account linked to this page.');
+        return null;
+      }
     } catch (error) {
       console.error('Error fetching Instagram ID:', error);
+      return null;
     }
   };
-  
+
   // Upload to Instagram
-  const uploadToInstagram = async (instagramId, imageUrl, caption, accessToken) => {
+  const uploadToInstagram = async (instagramId,caption,accessToken) => {
+    console.log('Uploading to Instagram:',caption,accessToken)
     try {
       const res = await fetch(`${config.apiUrl}/api/swalook/fb/upload-instagram/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Token ${token}`, // ✅ Use your app's token
         },
         body: JSON.stringify({
           instagram_id: instagramId,
-          image_url: imageUrl,
+          image: fullPath,
+          logo: logoFullPath, 
+          salon_name: salonDetails.name,
+          address: salonDetails.address,
+          mobile_number: salonDetails.phonenumber,
           caption: caption,
+          text: "",
+          accessToken: accessToken, // ✅ Pass Facebook token here in body
         }),
       });
+  
       const data = await res.json();
       console.log('Upload success:', data);
     } catch (error) {
@@ -276,26 +332,18 @@ const MessageDetails = () => {
     }
   };
   
-  
+
+
   const handleDownload = async () => {
     setIsDownloading(true);
 
 
     try {
-      const imageRes = await fetch(`${config.apiUrl}${selectedTemplate.image}`);
-      const imageBlob = await imageRes.blob();
-      const imageFile = new File([imageBlob], "template.jpg", { type: imageBlob.type });
-
-      // Convert logo URL to File
-      const logoRes = await fetch(`${config.apiUrl}${salonDetails.logo}`);
-      const logoBlob = await logoRes.blob();
-      const logoFile = new File([logoBlob], "logo.jpg", { type: logoBlob.type });
-
-
+      
       // 3. Create FormData
       const formData = new FormData();
-      formData.append("image", imageFile);
-      formData.append("logo", logoFile);
+      formData.append("image", fullPath);
+      formData.append("logo", logoFullPath);
       formData.append("salon_name", salonDetails.name);
       formData.append("address", salonDetails.address);
       formData.append("mobile_no", salonDetails.phonenumber);
@@ -368,34 +416,29 @@ const MessageDetails = () => {
               <span className="font-semibold">Please Note: </span>Your logo will be added when you download or share.
             </p>
             <div className="mt-4">
-            <div className="mt-4">
-  <label className="text-lg font-semibold mb-2 block">Instagram Caption</label>
-  <textarea
-    ref={textareaRef}
-    value={userText}
-    onChange={(e) => {
-      const input = e.target.value;
-      if (input.length <= 150) {
-        setUserText(input);
-      }
-    }}
-    maxLength={150}
-    rows={1}
-    className="w-full rounded-lg border border-gray-300 bg-white px-5 py-3 text-base text-gray-800 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-300 focus:outline-none resize-none overflow-y-auto min-h-[3.2rem] max-h-[7.5rem] transition-all duration-200 leading-[1.6] break-words"
-  />
-  
-  <button
-    onClick={() => setUserText("✨ Transform your look today! Visit us and feel the difference. 💇‍♀️💅 #SalonVibes")}
-    className="mt-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-300"
-  >
-    Generate Caption using AI
-  </button>
-</div>
+              <div className="mt-4">
+                <label className="text-lg font-semibold mb-2 block">Instagram Caption</label>
+                <textarea
+                  ref={textareaRef}
+                  value={userText}
+                  onChange={(e) => {
+                    const input = e.target.value;
+                    if (input.length <= 150) {
+                      setUserText(input);
+                    }
+                  }}
+                  maxLength={150}
+                  rows={1}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-5 py-3 text-base text-gray-800 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-300 focus:outline-none resize-none overflow-y-auto min-h-[3.2rem] max-h-[7.5rem] transition-all duration-200 leading-[1.6] break-words"
+                />
 
-
-
-
-
+                <button
+                  onClick={() => setUserText("✨ Transform your look today! Visit us and feel the difference. 💇‍♀️💅 #SalonVibes")}
+                  className="mt-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-300"
+                >
+                  Generate Caption using AI
+                </button>
+              </div>
             </div>
             <div className="flex gap-4 mt-4">
               <button
@@ -450,7 +493,7 @@ const MessageDetails = () => {
               </button>
 
               <button
-onClick={handleInstagramShare}
+                onClick={handleInstagramShare}
                 className="flex flex-col items-center gap-1 hover:scale-110 transition"
               >
                 <img

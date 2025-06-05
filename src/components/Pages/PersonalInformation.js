@@ -32,6 +32,7 @@ function PersonalInformation() {
         });
         const userData = response.data.current_user_data;
         setPI(userData);
+        console.log("User Data:", userData);
         localStorage.setItem("profile_pic", userData.profile_pic);
         localStorage.setItem("mobile_no", userData.mobile_no);
       } catch (error) {
